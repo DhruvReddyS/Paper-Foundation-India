@@ -1,0 +1,449 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--ink:#1a1209;--ink2:#3d2f1a;--ink3:#6b5540;
+--paper:#f5f0e8;--paper2:#ede6d4;--paper3:#e2d8c2;
+--press:#8b2000;--forest:#2d4a1e;--archive:#4a3728;
+--gold:#c8960a;--warm:#d4956a;
+}
+body{background:var(--paper);color:var(--ink);font-family:'EB Garamond',serif;padding:0}
+.doc{max-width:680px;margin:0 auto}
+
+/* Header */
+.masthead{background:var(--ink);color:var(--paper);padding:2.5rem 2rem 2rem;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(245,240,232,.04) 23px,rgba(245,240,232,.04) 24px)}
+.masthead-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;opacity:.5;margin-bottom:1.2rem}
+.masthead-title{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;line-height:1.05;letter-spacing:-1px;margin-bottom:.5rem}
+.masthead-sub{font-family:'Playfair Display',serif;font-style:italic;font-size:16px;opacity:.6;margin-bottom:1.5rem}
+.masthead-meta{display:flex;gap:2rem;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:.4}
+
+/* Section markers */
+.section-marker{display:flex;align-items:center;gap:1rem;padding:1.5rem 2rem .5rem;border-top:0.5px solid var(--ink3);margin-top:1.5rem}
+.marker-num{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--press);opacity:.8}
+.marker-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink)}
+
+/* Body content */
+.content{padding:.75rem 2rem 1rem}
+.lead{font-family:'Playfair Display',serif;font-size:17px;font-style:italic;line-height:1.65;color:var(--ink2);margin-bottom:1rem;border-left:2px solid var(--press);padding-left:1rem}
+.body-text{font-size:15px;line-height:1.75;color:var(--ink2);margin-bottom:.85rem}
+.subsection{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--forest);margin:1.25rem 0 .4rem;opacity:.9}
+
+/* Spec blocks */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:.75rem 0 1rem}
+.spec-card{background:var(--paper2);border:0.5px solid var(--ink3);border-left:2px solid var(--archive);padding:.75rem 1rem;border-radius:2px}
+.spec-card .spec-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--archive);margin-bottom:.3rem;opacity:.8}
+.spec-card .spec-value{font-size:13px;line-height:1.6;color:var(--ink2)}
+
+.spec-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin:.75rem 0 1rem}
+.spec-card.highlight{border-left:2px solid var(--press);background:var(--paper3)}
+
+/* Wow moments */
+.wow-block{background:var(--ink);color:var(--paper);padding:1.25rem 1.5rem;margin:.75rem 0;border-radius:2px;position:relative;overflow:hidden}
+.wow-block::after{content:'"WOW"';position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-family:'Playfair Display',serif;font-size:60px;font-weight:700;opacity:.06;line-height:1}
+.wow-num{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--warm);margin-bottom:.3rem;opacity:.8}
+.wow-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:.4rem}
+.wow-desc{font-size:13px;line-height:1.65;opacity:.75;font-style:italic}
+
+/* Palette */
+.palette-row{display:flex;gap:0;margin:.75rem 0;border-radius:2px;overflow:hidden;height:48px}
+.swatch{flex:1;position:relative;display:flex;align-items:flex-end;padding:.3rem .4rem}
+.swatch-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.7);white-space:nowrap}
+
+/* Component boxes */
+.component-block{border:0.5px solid var(--ink3);padding:1rem 1.25rem;margin:.6rem 0;border-radius:2px;position:relative}
+.component-block::before{content:attr(data-num);position:absolute;top:.6rem;right:.75rem;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--archive);opacity:.5}
+.comp-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--press);margin-bottom:.3rem}
+.comp-desc{font-size:13px;line-height:1.6;color:var(--ink2)}
+
+/* Dividers */
+.torn{height:16px;background:var(--paper2);margin:1.5rem 0;clip-path:polygon(0 100%,2% 20%,5% 80%,8% 10%,11% 70%,14% 0,17% 65%,20% 15%,23% 75%,26% 5%,29% 70%,32% 20%,35% 80%,38% 10%,41% 65%,44% 0,47% 70%,50% 20%,53% 80%,56% 15%,59% 70%,62% 5%,65% 75%,68% 20%,71% 60%,74% 0,77% 65%,80% 25%,83% 80%,86% 10%,89% 70%,92% 5%,95% 75%,98% 20%,100% 80%,100% 100%)}
+.rule-thin{border:none;border-top:0.5px solid var(--ink3);margin:1rem 2rem;opacity:.4}
+
+/* Typography specimen */
+.type-specimen{background:var(--paper2);padding:1.5rem 1.25rem;margin:.75rem 0;border-radius:2px;border:0.5px solid var(--ink3)}
+.type-display{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;line-height:1.1;color:var(--ink);letter-spacing:-1px;margin-bottom:.25rem}
+.type-italic{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--ink2);margin-bottom:.25rem}
+.type-mono{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--archive);margin-bottom.25rem}
+.type-body{font-family:'EB Garamond',serif;font-size:15px;line-height:1.75;color:var(--ink2)}
+
+/* Motion timeline */
+.timeline{position:relative;padding-left:1.25rem;border-left:1px solid var(--ink3);margin:1rem 0}
+.tl-item{margin-bottom:1rem;position:relative}
+.tl-item::before{content:'';position:absolute;left:-1.35rem;top:.4rem;width:7px;height:7px;border-radius:50%;background:var(--press)}
+.tl-time{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--press);margin-bottom:.1rem}
+.tl-text{font-size:13px;line-height:1.6;color:var(--ink2)}
+
+.footer-mark{padding:2rem;text-align:center;border-top:0.5px solid var(--ink3);margin-top:1rem}
+.footer-mark p{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);opacity:.6}
+</style>
+
+<div class="doc">
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-label">Creative Direction Document — Version 1.0</div>
+  <div class="masthead-title">Paper Matters</div>
+  <div class="masthead-sub">A Cinematic Digital Experience</div>
+  <div class="masthead-meta">
+    <span>Awwwards-level concept</span>
+    <span>15 sections</span>
+    <span>5 wow moments</span>
+    <span>Full GSAP architecture</span>
+  </div>
+</div>
+
+<!-- CREATIVE VISION -->
+<div class="section-marker">
+  <div class="marker-num">00 — VISION</div>
+  <div class="marker-title">The Creative Thesis</div>
+</div>
+<div class="content">
+  <div class="lead">Paper is not a substrate. Paper is a civilization. Every sheet is a compressed record of forests, rivers, labor, intention, and time. This site will make people feel that.</div>
+  <div class="body-text">The experience operates on three registers simultaneously: <em>scientific</em> (the material reality of cellulose, lignin, water), <em>historical</em> (printing press to pixelated screen), and <em>sensory</em> (the sound, weight, smell, texture that digital has always failed to capture). We are not designing a website. We are designing a memory — the feeling of paper in a world that forgot it.</div>
+  <div class="body-text">The structural conceit: the entire experience is itself constructed from paper. The browser window is a sheet. The scroll is a slow unfolding. Sections tear apart. Typography bleeds. Everything physical is metaphor, and every metaphor is physically accurate.</div>
+</div>
+<div class="torn"></div>
+
+<!-- HERO SECTION -->
+<div class="section-marker">
+  <div class="marker-num">HERO — The Convergence</div>
+  <div class="marker-title">The Press Room at Rest</div>
+</div>
+<div class="content">
+  <div class="lead">"The moment before a sheet is born — suspended between potential and form."</div>
+  
+  <div class="subsection">Initial Load State (0–0s)</div>
+  <div class="body-text">The screen is entirely black. A single sound: pressurized water — the wet slap of pulp hitting a wire mesh. Then nothing. The browser title bar reads: <em>paper matters.</em> Lowercase. Deliberate.</div>
+  
+  <div class="subsection">First 3 Seconds — Fibre Assembly</div>
+  <div class="body-text">From the center of the screen, approximately 40,000 individual cellulose fibres — each rendered as a 1–4px white line segment with organic randomness in width and opacity — begin materializing outward. This is a WebGL particle system (Three.js, custom shader) running at 60fps. Each fibre has a unique rotation, length (4–22px), and opacity (0.3–0.9). They cluster, loosely aligning in the horizontal direction paper fibres actually align during manufacturing.</div>
+  
+  <div class="subsection">Seconds 3–5 — Sheet Formation</div>
+  <div class="body-text">The fibres gradually compress into a flat plane — the paper sheet itself. As they settle, a warm cream color fills in between them using a displacement shader that bleeds outward from the center. The texture that forms is indistinguishable from 90gsm uncoated stock. The fibres don't disappear — they become the texture. The paper is made of its own fibres. This is scientifically accurate and visually impossible to look away from.</div>
+  
+  <div class="subsection">The Headline — Ink Bleed</div>
+  <div class="body-text">Once the sheet is formed, the headline "PAPER MATTERS" prints itself using an ink-diffusion simulation. Individual letters don't appear letter-by-letter — ink bleeds into the paper from a central origin point, character by character filling in from the inside out. The leading <em>P</em> bleeds first, ink spreading through imaginary fibre channels in the paper, then the rest follow with 80ms staggering between characters. The font is Playfair Display at 140px. The bleed creates slight feathering at character edges — physically accurate to offset printing on uncoated stock.</div>
+
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-label">Technology</div><div class="spec-value">Three.js WebGL, custom GLSL fragment shader for fibre simulation and ink diffusion</div></div>
+    <div class="spec-card"><div class="spec-label">Duration</div><div class="spec-value">0–5s: particle assembly. 5–7s: ink formation. 7–9s: sub-elements fade in</div></div>
+    <div class="spec-card"><div class="spec-label">Desktop Layout</div><div class="spec-value">Full viewport canvas. Paper sheet fills 80vw centered. Fibres extend to all edges, darker at periphery</div></div>
+    <div class="spec-card"><div class="spec-label">Mobile Adaptation</div><div class="spec-value">Fibre count reduced to 8,000. Sheet fills full viewport. Headline at 52px. Vertical layout</div></div>
+  </div>
+
+  <div class="subsection">Scroll Transition from Hero</div>
+  <div class="body-text">As the user scrolls, the paper sheet itself begins to crumple — not fold, crumple — in the upper corners using a real-time cloth simulation (Three.js + MeshLine). The headline stays fixed briefly as the sheet warps beneath it, then the text physically de-forms with the paper before dissolving. The next section's content rises from below, itself printed on the reverse side of the sheet. The scroll is not navigating <em>away</em> from the hero — it's turning the sheet over.</div>
+</div>
+
+<!-- SECTION 1 -->
+<div class="section-marker">
+  <div class="marker-num">01 — THE MANIFESTO</div>
+  <div class="marker-title">What Paper Remembers</div>
+</div>
+<div class="content">
+  <div class="lead">A full-viewport cinematic text sequence. No images. Just words, space, and time.</div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-label">Story Purpose</div><div class="spec-value">Establish the emotional register. Make the user feel something before they understand anything.</div></div>
+    <div class="spec-card"><div class="spec-label">Visual Design</div><div class="spec-value">Warm cream background (the sheet). Lines of Playfair Display italic, 28–48px, left-aligned at an 8° tilt.</div></div>
+    <div class="spec-card"><div class="spec-label">Animation</div><div class="spec-value">Each line prints in using GSAP SplitText on individual characters. Stagger 0.025s. Duration 1.2s per line. Ease: "power2.out"</div></div>
+    <div class="spec-card"><div class="spec-label">ScrollTrigger</div><div class="spec-value">Pin the section for 4× viewport scroll distance. Each line triggers at 25% intervals. Lines fade on exit at -40deg X rotation.</div></div>
+  </div>
+  <div class="body-text">The copy reads like a prose poem. Example lines: <em>"A newspaper holds the temperature of 1963."</em> / <em>"The deed to your grandfather's house. The letter he wrote but never sent."</em> / <em>"Paper has always known things screens will never hold."</em> Each line has a different tonal weight. Some are whispered at 18px. Some are declared at 56px.</div>
+  <div class="subsection">Microinteraction</div>
+  <div class="body-text">Hovering over any line causes it to briefly crumple — a CSS transform perspective skew that suggests the page curling — then springs back. Sound: a faint paper rustle (Web Audio API, < 100ms, volume 0.15). Optional, toggleable.</div>
+</div>
+<hr class="rule-thin">
+
+<!-- SECTION 2 -->
+<div class="section-marker">
+  <div class="marker-num">02 — THE MICROSCOPE</div>
+  <div class="marker-title">The Fibre World</div>
+</div>
+<div class="content">
+  <div class="lead">A fully interactive microscope UI. The user zooms into a sheet of paper and discovers an entire universe.</div>
+  <div class="body-text">The section opens with a bird's-eye view of a piece of paper. A circular lens element — like a loupe — appears with the cursor. As the user moves it over the paper, the area beneath magnifies to reveal the actual cellulose fibres (stylized as the WebGL simulation from the hero). At 3× zoom, individual fibres are visible. At 10× zoom, information cards appear: "This fibre is 2mm long. It began as a spruce tree in Sweden."</div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-label">Technology</div><div class="spec-value">Canvas 2D + Three.js render target. Loupe uses CSS clip-path circle() + custom cursor</div></div>
+    <div class="spec-card"><div class="spec-label">Interaction</div><div class="spec-value">Mouse position drives loupe. Scroll wheel controls magnification 1×–20×. Double click locks to position.</div></div>
+    <div class="spec-card"><div class="spec-label">Mobile Adaptation</div><div class="spec-value">Pinch gesture replaces scroll zoom. Single tap locks. Static info cards replace hover states.</div></div>
+    <div class="spec-card highlight"><div class="spec-label">Memorable Quality</div><div class="spec-value">The paper that was abstract in the hero becomes <em>real</em>. Users discover it has depth, history, and specificity.</div></div>
+  </div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section-marker">
+  <div class="marker-num">03 — THE ARCHIVE</div>
+  <div class="marker-title">A Century of Paper</div>
+</div>
+<div class="content">
+  <div class="lead">A horizontal timeline that moves like a drawer being pulled from a cabinet.</div>
+  <div class="body-text">The entire section is a horizontal scroll container triggered by vertical scroll (Lenis + GSAP horizontal ScrollTrigger). Twelve archival "documents" slide through — each is a full-height panel designed to look like a specific paper object from that era. 1440: illuminated manuscript texture. 1455: Gutenberg typeface. 1900: newspaper broadsheet. 1969: NASA mission report. Each panel has a different paper grain, print technique simulation, and typographic language.</div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-label">ScrollTrigger</div><div class="spec-value">Vertical scroll drives horizontal X translation. 100vh vertical = 100vw horizontal movement. Pinned container.</div></div>
+    <div class="spec-card"><div class="spec-label">Panel Transitions</div><div class="spec-value">Between panels, a brief flash of white — the gap between sheets — using GSAP fromTo opacity 0→1→0 in 120ms</div></div>
+    <div class="spec-card"><div class="spec-label">Depth System</div><div class="spec-value">Each panel has 3 depth layers (background texture, content, foreground grain) moving at different scroll speeds: 0.85×, 1×, 1.15×</div></div>
+    <div class="spec-card"><div class="spec-label">Typography</div><div class="spec-value">Each era uses historically accurate type — woodcut for 1455, hot metal for 1900, photocomp for 1970, digital for 1990</div></div>
+  </div>
+</div>
+
+<!-- SECTION 4 -->
+<div class="section-marker">
+  <div class="marker-num">04 — THE PROOF</div>
+  <div class="marker-title">The Myth Dissolution Engine</div>
+</div>
+<div class="content">
+  <div class="lead">Common myths about paper, printing, and pulp — destroyed in real time, on screen, in print.</div>
+  <div class="body-text">A typographic statement appears — "Paper production destroys forests." — printed large in bold. The user interacts (hover or scroll) and the statement physically redacts itself: a red editorial correction line strikes through the text, and corrected text prints in underneath, sourced and footnoted. The visual language is a manuscript under editorial review.</div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-label">GSAP Animation</div><div class="spec-value">Strike-through: GSAP DrawSVG on a horizontal line, duration 0.4s, ease "power3.inOut". Correction text: SplitText stagger-in.</div></div>
+    <div class="spec-card"><div class="spec-label">Visual Design</div><div class="spec-value">Red correction marks reference copy-editing marks. Small superscript footnote numbers. Marginalia in ink-smear handwriting font (Caveat).</div></div>
+    <div class="spec-card"><div class="spec-label">Microinteraction</div><div class="spec-value">Footnote hover opens a small paper slip (CSS translateY + scale + box-shadow) with citation. Clicks fold and unfold like origami.</div></div>
+    <div class="spec-card highlight"><div class="spec-label">Emotional Goal</div><div class="spec-value">Shift the user's relationship to paper from passive to intellectually engaged. Trust through transparency.</div></div>
+  </div>
+</div>
+
+<!-- SECTION 5 -->
+<div class="section-marker">
+  <div class="marker-num">05 — THE ANATOMY</div>
+  <div class="marker-title">What a Sheet Is Made Of</div>
+</div>
+<div class="content">
+  <div class="lead">An exploded diagram of a sheet of paper — not a chart, not an infographic. A physical disassembly in motion.</div>
+  <div class="body-text">A sheet of paper fills the screen in cross-section, rendered in extreme detail. Then it begins separating — the layers slowly drifting apart like a time-lapse of a book being pressed. Each layer is labeled: surface sizing, base coat, cellulose fibre matrix, mineral filler, bottom sizing. Labels fly in from the margins using GSAP MotionPath along curved leader lines. The distance between layers increases as the user scrolls, making the anatomy increasingly readable.</div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-label">GSAP Architecture</div><div class="spec-value">ScrollTrigger driving layer Y translation. Layer 1: 0→-120px. Layer 2: 0→-60px. Layer 3: stationary. Layer 4: 0→60px. Layer 5: 0→120px.</div></div>
+    <div class="spec-card"><div class="spec-label">Label Animation</div><div class="spec-value">GSAP MotionPath. Each label follows a curved SVG path from offscreen-right to its anchor. Duration 0.6s, staggered by 0.15s.</div></div>
+    <div class="spec-card"><div class="spec-label">Hover State</div><div class="spec-value">Hovering a layer highlights it with a warm amber overlay and plays a unique texture animation — fibres moving, mineral particles shifting.</div></div>
+    <div class="spec-card"><div class="spec-label">Mobile Adaptation</div><div class="spec-value">Layers stack vertically. Tap to expand each layer's detail card. Horizontal swipe moves between layers.</div></div>
+  </div>
+</div>
+
+<div class="torn"></div>
+
+<!-- WOW MOMENTS -->
+<div class="section-marker">
+  <div class="marker-num">SIGNATURE MOMENTS</div>
+  <div class="marker-title">Five Unforgettable Instants</div>
+</div>
+<div class="content">
+  <div class="wow-block">
+    <div class="wow-num">WOW MOMENT 01</div>
+    <div class="wow-title">The Folding Transition Between Sections 1 → 2</div>
+    <div class="wow-desc">As section 1 exits, the entire viewport page physically folds from the bottom-right corner — a real-time Three.js cloth simulation. The reverse side reveals a completely different paper texture and color. The next section's content was always on the back. The user has just turned a page. The fold takes 1.4s and is triggered by scroll velocity. Fast scrolling = aggressive fold. Slow scrolling = deliberate, graceful. The sound: a clean, dry page turn at 0.2 volume.</div>
+  </div>
+  <div class="wow-block">
+    <div class="wow-num">WOW MOMENT 02</div>
+    <div class="wow-title">The Fibre Scanner — Live Haptic Analysis</div>
+    <div class="wow-desc">In Section 02, when the user double-clicks to lock the microscope view, a scanning animation runs — a luminous horizontal line sweeps across the field of view, and as it passes, individual fibres glow one by one, and a sidebar panel begins printing fiber statistics in real time: length, species of tree origin, geographic region, mill name. The data is fictional but formatted as if from a real electron microscope report. The effect of having information generated about something as humble as paper fibres is profound.</div>
+  </div>
+  <div class="wow-block">
+    <div class="wow-num">WOW MOMENT 03</div>
+    <div class="wow-title">The Archive Panel Transition — The Paper Gap</div>
+    <div class="wow-desc">Between each archive panel in Section 03, the horizontal scroll passes through approximately 40px of pure white — not a fade, a physical gap between sheets. During this gap, no content exists. The screen is just white. It lasts 80ms. But it functions as a breath — a reset — between entirely different historical worlds. The user becomes Pavlovian: they begin to anticipate these gaps. They learn the rhythm of paper.</div>
+  </div>
+  <div class="wow-block">
+    <div class="wow-num">WOW MOMENT 04</div>
+    <div class="wow-title">The Origami Component — Watch Ideas Fold Into Form</div>
+    <div class="wow-desc">Section 08 (The Product Story) opens with a flat die-cut paper blank — the precise unfolded template for a paper box. As the user scrolls, this flat form slowly assembles itself using GSAP Flip — each face of the box rising along its crease line in sequence, creating the finished 3D paper box in real time. The box contains the product. The unboxing is the story. Three.js with OrbitControls lets the user rotate it afterward. This is 11 seconds of animation time for 8 scroll-vh input.</div>
+  </div>
+  <div class="wow-block">
+    <div class="wow-num">WOW MOMENT 05</div>
+    <div class="wow-title">The Final Section — The Blank Sheet</div>
+    <div class="wow-desc">The very last section is a full-viewport, perfectly white sheet of paper. Nothing else. Then the cursor becomes a pen. As the user moves, they draw on the paper — a thin, slightly imperfect inky line using Canvas 2D with pressure simulation from mouse velocity. The first thing every user does is write their name. Below the sheet, faint text appears: "Every piece of paper begins like this." The browser tab title changes to their cursor's last character. This is memorable forever.</div>
+  </div>
+</div>
+
+<!-- SECTIONS 6–15 CONTINUED -->
+<div class="section-marker">
+  <div class="marker-num">06 → 15 — FULL SECTION BREAKDOWN</div>
+  <div class="marker-title">The Complete Journey</div>
+</div>
+<div class="content">
+
+  <div class="subsection">06 — The Forest Origin</div>
+  <div class="body-text">A living forest rendered in Three.js — stylized, not photorealistic. Trees as geometric forms with paper-texture bark. Falling leaves behave as paper scraps (rigid body physics, Cannon.js). Scroll reveals the story of sustainable forestry. Ambient sound: wind, birdsong, distant chainsaw that cuts out intentionally. Emotional goal: restore the natural dignity paper deserves.</div>
+
+  <div class="subsection">07 — The Mill Process</div>
+  <div class="body-text">A side-scrolling industrial diagram — the paper mill as an isometric mechanical illustration. Not a flow chart. An actual machine you can see operating. Each stage pulses with activity using synchronized GSAP timelines (conveyors moving, rollers spinning, steam rising). Clicking any machine component opens a paper slip with process detail. The typography is engineering-spec notation. Emotional goal: awe at the complexity behind something "simple."</div>
+
+  <div class="subsection">08 — The Origami Product Story</div>
+  <div class="body-text">The Wow Moment 04 sequence. A flat die-cut template assembles into a product container. The scroll-driven origami sequence. OrbitControls exploration afterward. CTA appears printed on the bottom panel of the box as if it was always there.</div>
+
+  <div class="subsection">09 — The Grain Direction</div>
+  <div class="body-text">An interactive physics demonstration: paper folded with and against the grain. WebGL cloth simulation. The user drags a corner. Against-grain: irregular buckling, distressed. With-grain: clean, controlled. This single interactive teaches more about paper than any text could. Visceral, physical, immediate.</div>
+
+  <div class="subsection">10 — The Weight System</div>
+  <div class="body-text">A visual scale — like an apothecary's balance — showing different paper weights from 60gsm to 350gsm. Piling paper onto the scale using drag-and-drop. Each weight changes the visual of the sheet (opacity, shadow depth, flex when held). Numbers float as typeset weight designations (60gsm, 80gsm, 120gsm) using a beautiful monospaced weight. Emotional goal: make the user reach for paper.</div>
+
+  <div class="subsection">11 — The Printing Ink</div>
+  <div class="body-text">Four CMYK ink droplets fall onto a wet sheet of paper in slow motion. Canvas 2D fluid simulation. They spread, bleed, intermingle at edges. Where they overlap, secondary colors bloom. The science of ink and paper absorption — halftone dots forming, ink trapping, paper holdout — visualized with total physical accuracy. A slider controls paper coatedness: uncoated → silk → gloss. The fluid behavior changes accordingly.</div>
+
+  <div class="subsection">12 — The Sound of Paper</div>
+  <div class="body-text">A full-viewport paper instrument. The screen is a sheet. The user touches/clicks different zones — each produces a different paper sound: sharp crinkle, deep thud of thick stock, dry whisper of tissue, the crack of a fold. A visual ripple radiates from each touch point like a plucked string. Web Audio API synthesizer constructed from recorded paper samples. No UI chrome. Just paper and sound and sensation.</div>
+
+  <div class="subsection">13 — The Environmental Story</div>
+  <div class="body-text">Data visualization as hand-illustrated infographic, not chart-library defaults. Trees planted per ton of paper produced, rendered as growing SVG trees in real time. Water used in production visualized as droplets counting down. Carbon sequestration shown as ink darkening a sheet over time. All numbers accurate and cited. Emotional goal: counterintuitive pride in responsibly sourced paper.</div>
+
+  <div class="subsection">14 — The Testimonials</div>
+  <div class="body-text">Quotes from unlikely sources: architects, surgeons, musicians, writers — all describing the irreplaceable role of paper in their work. Each quote is designed as a typographic specimen: different paper stocks, different printing techniques, different letter forms. The quotes are themselves artifacts. Not testimonial cards with profile photos. Letters. Printed things. Emotional goal: paper as cultural foundation.</div>
+
+  <div class="subsection">15 — The Blank Sheet (Final)</div>
+  <div class="body-text">The Wow Moment 05 sequence. Drawing on the last sheet. The cursor-pen. The name. The moment. The CTA below the fold. The sound of a pen on paper, synthesized from recorded Foley. The ending is not a sales pitch. It is an invitation.</div>
+</div>
+
+<!-- SIGNATURE COMPONENTS -->
+<div class="section-marker">
+  <div class="marker-num">SIGNATURE COMPONENTS</div>
+  <div class="marker-title">Custom Invented Elements</div>
+</div>
+<div class="content">
+  <div class="component-block" data-num="C-01">
+    <div class="comp-name">The Caliper</div>
+    <div class="comp-desc">A precision tool UI rendered as a physical micrometer caliper — the actual instrument used to measure paper thickness (caliper). Dragging its jaws controls the paper weight slider. At extreme values, the caliper audibly clicks at standard weight stops. The metaphor is perfect: the caliper measures what the user is exploring. Precision, craft, science.</div>
+  </div>
+  <div class="component-block" data-num="C-02">
+    <div class="comp-name">The Watermark Revealer</div>
+    <div class="comp-desc">Hold your cursor over any section background and the paper's hidden watermark reveals itself — visible only with backlighting. Achieved using SVG mask animation triggered by cursor proximity. The watermark shows the Paper Matters logo in negative space, formed by paper thickness variation. As if the logo was always there, always embedded in the material. Deeply satisfying on discovery.</div>
+  </div>
+  <div class="component-block" data-num="C-03">
+    <div class="comp-name">The Deckle Edge Navigator</div>
+    <div class="comp-desc">The section navigation is a vertical strip of hand-torn paper edges — deckle edges, the natural frayed border of handmade paper. Each torn section is a different paper stock (colored, textured). Clicking a section tears you forward with a cloth simulation. The nav is simultaneously the most beautiful and most technically complex nav ever built for a paper site.</div>
+  </div>
+  <div class="component-block" data-num="C-04">
+    <div class="comp-name">The Compositor's Stick</div>
+    <div class="comp-desc">In the typography-focused sections, hovering over text activates the compositor's stick — a thin horizontal guide that slides under lines of text like a typesetter's line gauge. It shows baseline, cap height, x-height, descender markers. An educational overlay that makes the user see typography as craft. The metaphor honors 600 years of typesetting history.</div>
+  </div>
+  <div class="component-block" data-num="C-05">
+    <div class="comp-name">The Pulper</div>
+    <div class="comp-desc">A destructive-creative CTA element. When the user reaches the final CTA, there is a secondary option: "Pulp it." Clicking this sends the current page layout into a pulping simulation — text fragments scatter, paper layers shred, and from the chaos new fibres emerge and re-form as a fresh sheet with just the CTA visible. "Everything paper can become paper again." The most dramatic possible expression of the brand's sustainability message.</div>
+  </div>
+</div>
+
+<!-- TYPOGRAPHY SYSTEM -->
+<div class="section-marker">
+  <div class="marker-num">TYPE SYSTEM</div>
+  <div class="marker-title">The Typographic Architecture</div>
+</div>
+<div class="content">
+  <div class="type-specimen">
+    <div class="type-display">Playfair Display</div>
+    <div class="type-italic">Editorial headline — 700 weight, tight tracking</div>
+    <div class="type-mono">EB GARAMOND — BODY & NARRATIVE COPY</div>
+    <div class="type-body">EB Garamond for running text. Modelled on the typefaces of Claude Garamond, 1530. Long-form reading. The paper equivalent of a serif pressed in lead.</div>
+  </div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-label">Display Headlines</div><div class="spec-value">Playfair Display 700. 80–140px. -2px tracking. Line height 1.0–1.05. Used for section titles and hero.</div></div>
+    <div class="spec-card"><div class="spec-label">Editorial Sub-heads</div><div class="spec-value">Playfair Display 400 Italic. 24–36px. Used for section introductions and pull quotes.</div></div>
+    <div class="spec-card"><div class="spec-label">Body Copy</div><div class="spec-value">EB Garamond 400. 16–18px. 1.75 line height. 65-char max line length. The reading experience is the product.</div></div>
+    <div class="spec-card"><div class="spec-label">Labels & Data</div><div class="spec-value">DM Mono 300. 9–11px. 3–4px letter spacing. All caps. Used for spec data, measurements, timestamps.</div></div>
+  </div>
+  <div class="body-text">The rhythm is editorial — modular scale 1.618 (golden ratio). Sections breathe. Nothing is crowded. White space is paper space: it is not empty, it is the substrate. Every spacing decision is the equivalent of choosing the right weight of paper for the content it carries.</div>
+</div>
+
+<!-- COLOR SYSTEM -->
+<div class="section-marker">
+  <div class="marker-num">COLOR SYSTEM</div>
+  <div class="marker-title">The Palette of Natural Things</div>
+</div>
+<div class="content">
+  <div class="palette-row">
+    <div class="swatch" style="background:#1a1209"><div class="swatch-label">Pressroom</div></div>
+    <div class="swatch" style="background:#3d2f1a"><div class="swatch-label">Archive</div></div>
+    <div class="swatch" style="background:#6b5540"><div class="swatch-label">Tobacco</div></div>
+    <div class="swatch" style="background:#f5f0e8"><div class="swatch-label" style="color:#3d2f1a">Vellum</div></div>
+    <div class="swatch" style="background:#ede6d4"><div class="swatch-label" style="color:#3d2f1a">Antique</div></div>
+    <div class="swatch" style="background:#e2d8c2"><div class="swatch-label" style="color:#3d2f1a">Cream</div></div>
+    <div class="swatch" style="background:#8b2000"><div class="swatch-label">Press Red</div></div>
+    <div class="swatch" style="background:#2d4a1e"><div class="swatch-label">Forest</div></div>
+    <div class="swatch" style="background:#c8960a"><div class="swatch-label" style="color:#1a1209">Gold</div></div>
+  </div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-label">Background Range</div><div class="spec-value">Vellum (#f5f0e8) to Cream (#e2d8c2). Each section has a slightly different tint — the experience is one long gradient through paper.</div></div>
+    <div class="spec-card"><div class="spec-label">Accent Architecture</div><div class="spec-value">Press Red for editorial corrections and CTAs. Forest Green for sustainability/environmental sections. Gold for archival/prestige moments.</div></div>
+    <div class="spec-card"><div class="spec-label">Dark Sections</div><div class="spec-value">Pressroom Black (#1a1209) for hero, section 12, final CTA. Not digital black — warm, inky, slightly brown.</div></div>
+    <div class="spec-card highlight"><div class="spec-label">Rule</div><div class="spec-value">Never pure white. Never pure black. Paper is never pure. The entire palette is 3–8% warm.</div></div>
+  </div>
+</div>
+
+<!-- GSAP ARCHITECTURE -->
+<div class="section-marker">
+  <div class="marker-num">GSAP ARCHITECTURE</div>
+  <div class="marker-title">The Motion Design System</div>
+</div>
+<div class="content">
+  <div class="subsection">Core Easing Philosophy</div>
+  <div class="body-text">Paper moves with physical memory. It resists, then releases. It doesn't bounce — it settles. The primary easing function across the site is a custom bezier curve approximating paper inertia: <code>ease: "power3.inOut"</code> for large movements, <code>"power2.out"</code> for entrances, <code>"power4.in"</code> for exits. No bounce easings except in the Pulper component where chaos is intentional.</div>
+  
+  <div class="subsection">ScrollTrigger Architecture</div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-time">Global Lenis → GSAP Ticker</div>
+      <div class="tl-text">Lenis handles smooth scroll, feeding RAF to GSAP. Every ScrollTrigger is refreshed on resize. Scroll velocity is captured for physics-reactive elements (the hero page crumple speed, the fold animation aggression).</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">Pin System</div>
+      <div class="tl-text">Sections 01, 03, 05, 08 use pinning. All other sections use scrub:true for scroll-driven animations. Pin releases always use a crisp snap — no floating.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">Stagger Library</div>
+      <div class="tl-text">A global stagger constant: 0.025s for character-level, 0.08s for word-level, 0.15s for element-level. Consistent across all SplitText animations. The timing is matched to average reading speed.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">Three.js Integration</div>
+      <div class="tl-text">Three.js renders into a background canvas element. GSAP timeline controls Three.js uniform values (shader time, opacity, displacement amounts) via proxy objects. The two systems are architecturally separate but temporally synchronized.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">GSAP FLIP for Layout Transitions</div>
+      <div class="tl-text">Section 08 origami sequence uses GSAP FLIP exclusively. The die-cut template's faces are tracked before and after CSS 3D transform application — FLIP handles the interpolation, ensuring physically correct fold paths without manual keyframe management.</div>
+    </div>
+  </div>
+
+  <div class="subsection">Sound Design</div>
+  <div class="spec-grid-3">
+    <div class="spec-card"><div class="spec-label">Paper Rustle</div><div class="spec-value">Triggered on hover/SplitText entrance. 40–80ms. 0.10–0.18 volume. Pitch randomized ±15%.</div></div>
+    <div class="spec-card"><div class="spec-label">Page Fold</div><div class="spec-value">Triggered on page-fold transition. 800ms clean, dry sound. Volume 0.25. No reverb.</div></div>
+    <div class="spec-card"><div class="spec-label">Ink Press</div><div class="spec-value">On major SplitText reveals. Deep, satisfying thud + creak. 200ms. Volume 0.20.</div></div>
+    <div class="spec-card"><div class="spec-label">Scanner Hum</div><div class="spec-value">Section 02 fibre scanner. Looping sine wave tone. Cuts out precisely on scan completion.</div></div>
+    <div class="spec-card"><div class="spec-label">Pen on Paper</div><div class="spec-value">Section 15 drawing. Velocity-responsive — faster = scratchier, slower = smoother. Real Foley recording.</div></div>
+    <div class="spec-card highlight"><div class="spec-label">Global Toggle</div><div class="spec-value">Sound is opt-in. A small speaker icon (muted by default) unlocks audio globally. Never autoplay without consent.</div></div>
+  </div>
+</div>
+
+<!-- MOBILE EXPERIENCE -->
+<div class="section-marker">
+  <div class="marker-num">MOBILE EXPERIENCE</div>
+  <div class="marker-title">Paper in Your Hand</div>
+</div>
+<div class="content">
+  <div class="lead">Mobile is not a downgrade. It is a different material: smaller, more intimate, held in the hand like a book.</div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-label">Hero Adaptation</div><div class="spec-value">Reduced fibre count (8,000). Full-screen portrait canvas. Gyroscope parallax on supporting devices — tilt the phone to see the paper's sheen shift.</div></div>
+    <div class="spec-card"><div class="spec-label">Gesture System</div><div class="spec-value">Swipe left/right = page turn (section 03 archive). Pinch = zoom (section 02 microscope). Long press = material info tooltip. Tap = primary interaction.</div></div>
+    <div class="spec-card"><div class="spec-label">Section 15 on Mobile</div><div class="spec-value">The blank sheet uses touch events. A finger on glass drawing on paper — the most intimate version of the moment. Haptic feedback (if supported) on first mark.</div></div>
+    <div class="spec-card"><div class="spec-label">Performance</div><div class="spec-value">WebGL features degrade gracefully. Three.js scenes have mobile-specific particle counts, shadow maps disabled, reduced draw calls. 60fps target maintained via RAF throttling on older devices.</div></div>
+  </div>
+</div>
+
+<!-- FINAL USER JOURNEY -->
+<div class="section-marker">
+  <div class="marker-num">USER JOURNEY</div>
+  <div class="marker-title">From First Pixel to Final Mark</div>
+</div>
+<div class="content">
+  <div class="timeline">
+    <div class="tl-item"><div class="tl-time">0–5s: Wonder</div><div class="tl-text">Fibres assemble. The user realizes this site is different. They lean forward. They slow down. They haven't scrolled yet.</div></div>
+    <div class="tl-item"><div class="tl-time">5–30s: Discovery</div><div class="tl-text">The manifesto lines print. The user reads slowly. They hover and hear the rustle. They understand: this is not a website. It is a place.</div></div>
+    <div class="tl-item"><div class="tl-time">30s–2min: Immersion</div><div class="tl-text">The archive, the microscope, the anatomy. The user is inside the world. They pause the scroll. They explore the Fibre Scanner. They zoom the microscope to 20×. They have forgotten they were shopping.</div></div>
+    <div class="tl-item"><div class="tl-time">2–4min: Conversion</div><div class="tl-text">The origami box. The grain demonstration. The ink simulation. The user now understands what paper actually is. The brand's expertise is not claimed — it has been demonstrated.</div></div>
+    <div class="tl-item"><div class="tl-time">4–6min: Transcendence</div><div class="tl-text">The blank sheet. They draw their name. The text appears: "Every piece of paper begins like this." They screenshot it. They share it. They remember this for years.</div></div>
+    <div class="tl-item"><div class="tl-time">Exit Intent: The Pulper</div><div class="tl-text">For users who hesitate at the CTA: the Pulper. Destroy the page and rebuild it. The brand's message as destructive-creative act. Conversion is the second action after pulping. It always is.</div></div>
+  </div>
+</div>
+
+<div class="footer-mark">
+  <p>Paper Matters — Creative Direction V1.0 — All concepts original — Prepared for Awwwards consideration</p>
+</div>
+
+</div>

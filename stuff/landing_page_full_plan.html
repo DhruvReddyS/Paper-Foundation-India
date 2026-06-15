@@ -1,0 +1,450 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.w{padding:1rem 0;font-family:var(--font-sans);max-width:900px}
+.sec{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:10px;overflow:hidden}
+.sec-header{display:flex;align-items:stretch;gap:0}
+.sec-num{min-width:44px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0}
+.sec-title-block{padding:10px 14px;flex:1;border-bottom:.5px solid var(--color-border-tertiary)}
+.sec-title{font-size:13px;font-weight:600;color:var(--color-text-primary);margin-bottom:2px}
+.sec-sub{font-size:11px;color:var(--color-text-tertiary)}
+.sec-body{padding:10px 14px 12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+.box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;border:.5px solid var(--color-border-tertiary)}
+.box-title{font-size:11px;font-weight:600;color:var(--color-text-primary);margin-bottom:3px}
+.box-desc{font-size:10.5px;color:var(--color-text-secondary);line-height:1.5}
+.tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.tag{font-size:9.5px;padding:2px 7px;border-radius:20px}
+.anim-tag{background:#fdeee6;color:#a33a0e}
+.copy-tag{background:#e8f0eb;color:#1a3d27}
+.link-tag{background:#e6f1fb;color:#0c447c}
+.ux-tag{background:#eeedfe;color:#3c3489}
+.mob-tag{background:#faeeda;color:#7a4e28}
+.label{font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:4px}
+.copy-block{font-size:11px;font-style:italic;color:var(--color-text-secondary);background:var(--color-background-secondary);border-left:2px solid #2D5F3E;padding:6px 10px;border-radius:0 6px 6px 0;margin-top:6px;line-height:1.5}
+.divider{height:.5px;background:var(--color-border-tertiary);margin:8px 0}
+.cta-pill{display:inline-block;font-size:9.5px;font-weight:600;padding:3px 10px;border-radius:20px;margin:2px}
+.purpose-bar{font-size:10px;color:var(--color-text-secondary);padding:5px 14px;background:var(--color-background-secondary);border-top:.5px solid var(--color-border-tertiary)}
+</style>
+<div class="w">
+
+<!-- S1 -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#1a1a1a;font-size:10px;writing-mode:vertical-rl;padding:8px 0">ALWAYS ON</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Campaign Banner</div>
+      <div class="sec-sub">36px · dismissible · admin-controlled · paper texture bg</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="copy-block">"75% of India's paper starts as recycled fibre. Most people don't know that. → Explore the evidence"</div>
+    <div class="tags">
+      <span class="tag anim-tag">Smooth slide-down on load</span>
+      <span class="tag ux-tag">X dismisses, state in localStorage</span>
+      <span class="tag link-tag">CTA → /myths</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Set the tone immediately. First sentence = first myth-bust.</div>
+</div>
+
+<!-- S2 -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#1F2937">NAV</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Navbar</div>
+      <div class="sec-sub">Transparent on load → paper-white + blur on scroll · paper crane logo</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="row2">
+      <div class="box">
+        <div class="box-title">Desktop</div>
+        <div class="box-desc">Logo left · Knowledge Hub / Myths / Discover / India Map / About centre · Search icon + "Get Involved" CTA right. Hides on scroll down, reappears on scroll up.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Mobile</div>
+        <div class="box-desc">Hamburger → paper flap fold-down drawer. Full nav links + newsletter CTA inside drawer. Backdrop blur behind it.</div>
+      </div>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Always accessible. Every major section reachable in 1 click from anywhere.</div>
+</div>
+
+<!-- S3 HERO -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#e85d26">01</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Hero — Full Viewport Cinematic</div>
+      <div class="sec-sub">100svh · most important section · sets the entire tone</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="row2">
+      <div class="box">
+        <div class="box-title">Left column (55%)</div>
+        <div class="box-desc">Eyebrow: "Paper Foundation India" small caps, sage.<br/>Display headline — ink bleed load animation (blur→sharp 600ms).<br/>Subtext 18px.<br/>2 CTAs side by side.<br/>Tagline badge: "Use Paper Without Hesitation"</div>
+        <div class="copy-block">"India's paper story is remarkable. Most people just haven't heard it yet."</div>
+        <div class="tags">
+          <span class="tag anim-tag">Ink bleed headline</span>
+          <span class="tag copy-tag">Primary CTA: "Explore the Evidence" → /knowledge</span>
+          <span class="tag copy-tag">Secondary CTA: "Test Yourself" → /discover/quiz</span>
+        </div>
+      </div>
+      <div class="box">
+        <div class="box-title">Right column (45%) — THE WOW VISUAL</div>
+        <div class="box-desc">Canvas fibre particle field. 100+ micro paper fibres drift slowly and self-organise into the silhouette of a paper sheet over 3 seconds. Behind fibres: abstract SVG — overlapping translucent circles, earthy tones.<br/><br/>On mobile: collapses below headline, shorter height.</div>
+        <div class="tags">
+          <span class="tag anim-tag">Canvas fibre particles</span>
+          <span class="tag anim-tag">3s self-organisation animation</span>
+          <span class="tag mob-tag">Mobile: stacks below headline</span>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="label">Scroll indicator</div>
+    <div class="box-desc">Animated chevron pulses at bottom centre. On scroll: hero content fades up and out (parallax), next section slides in.</div>
+  </div>
+  <div class="purpose-bar">Purpose: Immediate credibility + curiosity. "What is this place?" → they scroll to find out.</div>
+</div>
+
+<!-- S4 TORN EDGE -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#8B9D77">—</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Torn Paper Edge Transition</div>
+      <div class="sec-sub">SVG divider · peels up 4px on scroll · paper-white → paper-warm</div>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: First moment the visitor realises this site has a paper-world identity. Sets visual language for the rest of the scroll.</div>
+</div>
+
+<!-- S5 -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#244D32">02</div>
+    <div class="sec-title-block">
+      <div class="sec-title">The Number That Shocks — Full Width Stat</div>
+      <div class="sec-sub">Dark forest green · white text · max impact · zero clutter</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="box">
+      <div class="box-title">One giant number fills the section</div>
+      <div class="box-desc">Count-up animation: 0 → 75% over 1.5s when scrolled into view.<br/>Then text resolves below it.</div>
+      <div class="copy-block">"75%<br/>of India's paper is made from recycled fibre — one of the highest rates in the world."</div>
+    </div>
+    <div class="row3" style="margin-top:8px">
+      <div class="box"><div class="box-title">26M+</div><div class="box-desc">Tonnes of paper produced annually</div></div>
+      <div class="box"><div class="box-title">4th</div><div class="box-desc">Largest paper producer globally</div></div>
+      <div class="box"><div class="box-title">700+</div><div class="box-desc">Active paper mills across India</div></div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag anim-tag">CountUp triggers on scroll entry</span>
+      <span class="tag anim-tag">3 sub-stats fade in with 150ms stagger</span>
+      <span class="tag ux-tag">Source footnote below each stat</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: The "wait what?" moment. Stops the scroll. Changes the visitor's mental model of paper in 3 seconds.</div>
+</div>
+
+<!-- S6 TRUST -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#8B9D77">03</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Trust Strip</div>
+      <div class="sec-sub">5 proof badges · continuous horizontal scroll · paper-warm bg</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="tags">
+      <span class="tag copy-tag">Evidence-Based Content</span>
+      <span class="tag copy-tag">Primary Sources Always Cited</span>
+      <span class="tag copy-tag">Corrections Published Openly</span>
+      <span class="tag copy-tag">Industry Independent</span>
+      <span class="tag copy-tag">Peer-Referenced</span>
+    </div>
+    <div class="tags">
+      <span class="tag anim-tag">Continuous marquee scroll (paused on hover)</span>
+      <span class="tag mob-tag">Same on mobile — horizontal scroll</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Signals credibility to journalists, researchers, industry professionals instantly.</div>
+</div>
+
+<!-- S7 MYTHS -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#e85d26">04</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Myth Teaser — "Think You Know Paper?"</div>
+      <div class="sec-sub">3 flip cards · kraft texture surface · tremble animation · links to /myths</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="copy-block">"Think you know paper? Most people don't."</div>
+    <div class="row3" style="margin-top:8px">
+      <div class="box">
+        <div class="box-title">Card 1 — Face down</div>
+        <div class="box-desc">MYTH label in red. Bold myth statement. Subtle CSS tremble. "Click to reveal" on hover.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Card 2 — Face down</div>
+        <div class="box-desc">Same. Different myth. Staggered tremble timing so they don't all wiggle at once.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Card 3 — Pre-revealed</div>
+        <div class="box-desc">Shows FACT side already flipped — social proof that reveals are satisfying. Entices clicks on the other two.</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag anim-tag">Y-axis flip 180° on click (paper spring easing)</span>
+      <span class="tag anim-tag">Paper confetti burst on reveal</span>
+      <span class="tag anim-tag">CSS tremble — staggered per card</span>
+      <span class="tag link-tag">Below: "See all 47 myths →" → /myths</span>
+      <span class="tag mob-tag">Mobile: stacked, full-width cards</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: First interactive moment. Hooks curiosity. The confetti on reveal makes /myths the next destination.</div>
+</div>
+
+<!-- S8 JOURNEY TEASER -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#0F6E56">05</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Paper Journey Teaser — 3-Stage Preview</div>
+      <div class="sec-sub">Scroll-triggered horizontal slide · teases the full /journey experience</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="copy-block">"Paper's journey is more remarkable than you think."</div>
+    <div class="row3" style="margin-top:8px">
+      <div class="box">
+        <div class="box-title">Stage 1 — Collection</div>
+        <div class="box-desc">Icon + "Used paper collected from homes & offices across India daily." Slides in from right on scroll.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Stage 2 — Recycled Pulp</div>
+        <div class="box-desc">Icon + "75% starts here — recycled fibre, not fresh trees." Slides in with 150ms delay.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Stage 3 — New Sheet</div>
+        <div class="box-desc">Icon + "A new sheet forms. The loop continues." + "See the full 8-stage journey →"</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag anim-tag">Horizontal slide-in, staggered 150ms</span>
+      <span class="tag link-tag">CTA: "See the full journey" → /journey</span>
+      <span class="tag mob-tag">Mobile: vertical stack with fade-in</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Teases the /journey page without giving it away. "There's more to this" pull.</div>
+</div>
+
+<!-- S9 ARTICLES -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#2D5F3E">06</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Featured Articles — 3 Cards</div>
+      <div class="sec-sub">Editorial blog cards · paper stack hover · admin-picks which 3 appear</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="copy-block">"From our Knowledge Hub — evidence-backed, source-cited, always."</div>
+    <div class="row3" style="margin-top:8px">
+      <div class="box"><div class="box-title">Card layout</div><div class="box-desc">Cover image or paper-texture placeholder · category badge · reading time · serif title (2 lines) · 2-line excerpt · author + date · "Read →"</div></div>
+      <div class="box"><div class="box-title">Hover state</div><div class="box-desc">Card lifts 2px. Second paper sheet appears underneath (paper stack effect). Title colour shifts to forest green.</div></div>
+      <div class="box"><div class="box-title">Fade-in reveal</div><div class="box-desc">Cards stagger in from below (opacity 0→1, y 20→0) as section enters viewport. 100ms between each card.</div></div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag link-tag">Below cards: "Browse all articles →" → /knowledge</span>
+      <span class="tag mob-tag">Mobile: single column stack</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Establishes editorial credibility. Readers + researchers route here.</div>
+</div>
+
+<!-- S10 INDIA NUMBERS -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#244D32">07</div>
+    <div class="sec-title-block">
+      <div class="sec-title">India in Numbers — Impact Counter Strip</div>
+      <div class="sec-sub">Dark forest green · 4 animated counters · white text · torn edges top & bottom</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="row2">
+      <div class="box">
+        <div class="box-title">4 counters in a row</div>
+        <div class="box-desc">26M+ Tonnes/year · 75% Recycled fibre · 4th Largest producer · 700+ Mills. Each with unit, label, tiny source footnote below.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Animation</div>
+        <div class="box-desc">All 4 count up simultaneously when section scrolls into view. Duration: 1.5s, easeOut. Runs once only (IntersectionObserver disconnect after trigger).</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag anim-tag">CountUp × 4, simultaneous</span>
+      <span class="tag anim-tag">TornEdge top + bottom</span>
+      <span class="tag mob-tag">Mobile: 2×2 grid</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Data-led credibility. Industry professionals stop here. Screenshot-worthy.</div>
+</div>
+
+<!-- S11 GAME TEASER -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#185FA5">08</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Live Game Teaser — Quiz Question</div>
+      <div class="sec-sub">One real quiz question · answer inline · reveals % who got it wrong · → /discover</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="copy-block">"How much do you actually know about paper?"</div>
+    <div class="row2" style="margin-top:8px">
+      <div class="box">
+        <div class="box-title">Question card</div>
+        <div class="box-desc">One live quiz question pulled from seed. 4 answer options as large clickable buttons. Timer bar optional (15s). User answers right on the homepage — no navigation needed.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Answer reveal</div>
+        <div class="box-desc">Correct: green flash + "✓ Correct!" Wrong: red flash + correct answer highlighted. Then: "82% of people got this wrong." + "Play the full quiz →" CTA.</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag anim-tag">Answer flash animation 300ms</span>
+      <span class="tag anim-tag">% reveal fade-in after answer</span>
+      <span class="tag link-tag">CTA: "Play all 4 games →" → /discover</span>
+      <span class="tag mob-tag">Mobile: full-width buttons, stacked</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Most engaging section for general public. The "I got it wrong?!" moment routes them straight to /discover.</div>
+</div>
+
+<!-- S12 MAP TEASER -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#0F6E56">09</div>
+    <div class="sec-title-block">
+      <div class="sec-title">India Map Teaser</div>
+      <div class="sec-sub">Mini SVG map · states light up on scroll · teases /india-map</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="row2">
+      <div class="box">
+        <div class="box-title">Left — small India SVG map</div>
+        <div class="box-desc">Non-interactive mini version. States with paper mills light up one by one on scroll entry (forest green fill, staggered). Looks alive and dynamic.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Right — 3 key state stats</div>
+        <div class="box-desc">"Maharashtra — largest paper producing state" · "Gujarat — highest recycling rate" · "AP — most mills per sq km". Each fades in as its state lights up on the map.</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag anim-tag">States light up sequentially</span>
+      <span class="tag link-tag">CTA: "Explore the full India map →" → /india-map</span>
+      <span class="tag mob-tag">Mobile: map above, stats below</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Teases the India Map page. Data-first visitors — journalists, researchers — click straight through.</div>
+</div>
+
+<!-- S13 CIRCULARITY -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#2D5F3E">10</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Circularity Loop Animation</div>
+      <div class="sec-sub">Auto-playing SVG ring · 6 pulsing nodes · not interactive here · → /circularity</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="copy-block">"Paper is circular by nature. It returns. It begins again."</div>
+    <div class="row2" style="margin-top:8px">
+      <div class="box">
+        <div class="box-title">SVG Ring</div>
+        <div class="box-desc">6 nodes around a ring: Forest → Mill → Product → Consumer → Collection → Recycling Mill. Clockwise flow arrows animate continuously. Each node pulses softly in sequence (2s loop). Forest green on warm background.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Companion text</div>
+        <div class="box-desc">Short paragraph right of the ring explaining circularity in 3 sentences. Simple. Not academic. Ends with "Explore the full cycle →" link.</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag anim-tag">Auto-playing, no click needed</span>
+      <span class="tag anim-tag">Pauses when off-screen (performance)</span>
+      <span class="tag link-tag">CTA → /circularity</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Beautiful. Makes paper feel like a living system, not a commodity.</div>
+</div>
+
+<!-- S14 NEWSLETTER -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#C4956A">11</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Newsletter Signup — Fact of the Week</div>
+      <div class="sec-sub">Last week's fact shown as preview · one input · paper crane success animation</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="copy-block">"Get the Fact of the Week. One surprising paper fact, every week. Evidence-backed, source-cited."</div>
+    <div class="row2" style="margin-top:8px">
+      <div class="box">
+        <div class="box-title">Form</div>
+        <div class="box-desc">Single email input + "Subscribe" button (forest green). Paper texture card background. Error: inline friendly message. Success: paper crane SVG animates across the input field and flies off.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Social proof — last week's fact</div>
+        <div class="box-desc">Small preview card beside the form showing last week's fact: "Last week: Paper has been recycled in India since the 16th century." Admin sets this in site settings.</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag anim-tag">Paper crane success animation</span>
+      <span class="tag ux-tag">Email stored in DB, confirmation via Resend</span>
+      <span class="tag mob-tag">Mobile: form above, preview card below</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Converts casual visitors into recurring audience. The preview card makes the value concrete.</div>
+</div>
+
+<!-- S15 FOOTER -->
+<div class="sec">
+  <div class="sec-header">
+    <div class="sec-num" style="background:#1F2937">FTR</div>
+    <div class="sec-title-block">
+      <div class="sec-title">Footer</div>
+      <div class="sec-sub">Dark charcoal · torn paper edge into footer · 4-column links · social icons</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="row2">
+      <div class="box">
+        <div class="box-title">4 columns</div>
+        <div class="box-desc">Col 1: Logo + tagline + mission sentence.<br/>Col 2: Explore — Knowledge Hub, Myths, Journey, India Map, Discover.<br/>Col 3: Organisation — About, Newsroom, Get Involved, Contact, Corrections.<br/>Col 4: Newsletter (compact) + LinkedIn / Twitter / Instagram.</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Bottom bar</div>
+        <div class="box-desc">© Paper Foundation India · "Built on evidence" · Privacy · Terms.<br/><br/>Torn paper edge at very top of footer (inverted, tears downward into dark bg). Warm charcoal background so it feels premium, not harsh black.</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:8px">
+      <span class="tag mob-tag">Mobile: stacked, link columns accordion</span>
+    </div>
+  </div>
+  <div class="purpose-bar">Purpose: Navigation safety net. Every page reachable. Leaves a polished final impression.</div>
+</div>
+
+</div>

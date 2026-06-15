@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Paper Foundation India — Design</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="tokens.css">
+
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #f0eee9; }
+  body { font-family: 'DM Sans', -apple-system, system-ui, sans-serif; }
+
+  @keyframes pf-rotate-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes pf-rotate-rev  { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+  @keyframes pf-drift-a { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
+  @keyframes pf-drift-b { 0%,100% { transform: translateY(0) rotate(1deg); }  50% { transform: translateY(6px) rotate(-1deg); } }
+
+  /* artboard container — designs render inside a fixed-size frame */
+  .pf-frame { width: 100%; height: 100%; background: var(--pf-paper); overflow: hidden; }
+  .pf-frame--scroll { overflow: auto; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="homepage.jsx"></script>
+<script type="text/babel" src="article.jsx"></script>
+<script type="text/babel" src="myths.jsx"></script>
+<script type="text/babel" src="research.jsx"></script>
+<script type="text/babel" src="admin.jsx"></script>
+<script type="text/babel" src="editor.jsx"></script>
+<script type="text/babel" src="components-spec.jsx"></script>
+<script type="text/babel" src="creative.jsx"></script>
+<script type="text/babel" src="modern.jsx"></script>
+<script type="text/babel" src="journey.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+
+function Frame({ children, scroll = true }) {
+  return (
+    <div className={"pf-frame " + (scroll ? "pf-frame--scroll" : "")}>
+      {children}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection
+        id="journey"
+        title="The Cinematic Journey"
+        subtitle="A24-style sustainability documentary — four chapter pages, fiber-thread continuity, morphing dock nav. Tactile, intellectually rigorous, no eco-marketing."
+      >
+        <DCArtboard id="home-cinematic" label="01 · Cinematic Home — Crumple → Reform" width={1440} height={6200}>
+          <Frame><CinematicHome/></Frame>
+        </DCArtboard>
+        <DCArtboard id="forestry" label="02 · Forestry Intelligence — Root System" width={1440} height={3000}>
+          <Frame><RootSystemPage/></Frame>
+        </DCArtboard>
+        <DCArtboard id="lab" label="03 · Circularity Lab — Modular Fibers" width={1440} height={2400}>
+          <Frame><ModularFibersPage/></Frame>
+        </DCArtboard>
+        <DCArtboard id="stories" label="04 · Impact Stories — Horizontal Narrative" width={1440} height={1280}>
+          <Frame><HorizontalNarrative/></Frame>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="public"
+        title="Public site"
+        subtitle="Editorial knowledge platform — kinetic type, parallax paper, animated flow diagrams. Libre Baskerville × DM Sans."
+      >
+        <DCArtboard id="home-v3" label="Homepage v3 · modern" width={1440} height={6400}>
+          <Frame><HomepageV3/></Frame>
+        </DCArtboard>
+        <DCArtboard id="home-v2" label="Homepage v2 · creative" width={1440} height={5200}>
+          <Frame><HomepageV2/></Frame>
+        </DCArtboard>
+        <DCArtboard id="home" label="Homepage v1 · editorial" width={1440} height={3400}>
+          <Frame><Homepage/></Frame>
+        </DCArtboard>
+        <DCArtboard id="article" label="Knowledge Hub article" width={1440} height={2800}>
+          <Frame><ArticlePage/></Frame>
+        </DCArtboard>
+        <DCArtboard id="myths" label="Myths vs Facts" width={1440} height={2200}>
+          <Frame><MythsPage/></Frame>
+        </DCArtboard>
+        <DCArtboard id="research" label="Research & Reports" width={1440} height={2400}>
+          <Frame><ResearchPage/></Frame>
+        </DCArtboard>
+        <DCArtboard id="mobile" label="Homepage · mobile 390" width={390} height={1800}>
+          <Frame><MobileHome/></Frame>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="admin"
+        title="Editorial admin"
+        subtitle="Neutral, fast, uncluttered — Linear/Notion adjacency. Forest green is the only accent."
+      >
+        <DCArtboard id="dash" label="Dashboard" width={1280} height={880}>
+          <Frame scroll={false}><AdminDashboard/></Frame>
+        </DCArtboard>
+        <DCArtboard id="editor" label="Article editor" width={1280} height={880}>
+          <Frame scroll={false}><ArticleEditor/></Frame>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="system"
+        title="Design system"
+        subtitle="Type, color, surfaces, components — the visual contract."
+      >
+        <DCArtboard id="spec" label="System primitives" width={1280} height={1700}>
+          <Frame><ComponentSpec/></Frame>
+        </DCArtboard>
+      </DCSection>
+
+      <DCPostIt x={40} y={40} w={240}>
+        Paper Foundation India · public knowledge platform. Editorial publication × policy institute. Libre Baskerville for serif voice, DM Sans for UI, JetBrains Mono for metadata. Forest greens dominate; copper used sparingly as accent only.
+      </DCPostIt>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
