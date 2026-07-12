@@ -13,6 +13,7 @@ import {
   Trees,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, type PointerEvent } from "react";
 
 const claims = [
@@ -104,6 +105,12 @@ export default function HomeExperience() {
         </div>
       </section>
 
+      <section className="home-identity-ribbon" aria-label="Paper Foundation India identity">
+        <div className="home-identity-mark"><Image src="/images/brand/paper-foundation-logo.png" alt="Paper Foundation logo" width={112} height={112} /></div>
+        <p><span>Registered society · Hyderabad · 2025</span><strong>Love paper. Use paper without hesitation.</strong></p>
+        <Link href="/about">Meet the foundation <ArrowRight /></Link>
+      </section>
+
       <SystemRail />
 
       <section className="home-lab">
@@ -170,10 +177,10 @@ export default function HomeExperience() {
           {games.map((game, index) => {
             const Icon = game.icon;
             return <Link href={game.href} className={`home-game-ticket ticket-${index + 1}`} key={game.title}>
-              <span className="home-ticket-no">Game {game.number}</span>
-              <Icon />
-              <div><h3>{game.title}</h3><p>{game.note}</p></div>
-              <ArrowRight className="home-ticket-arrow" />
+              <header><span className="home-ticket-no">Game {game.number}</span><small>{index === 0 ? "Paper IQ" : index === 1 ? "Claim lab" : index === 2 ? "Process" : "Clue hunt"}</small></header>
+              <div className="home-ticket-visual"><Icon /><i /><i /></div>
+              <div className="home-ticket-body"><h3>{game.title}</h3><p>{game.note}</p></div>
+              <footer><span>{index === 2 ? "Drag + order" : index === 3 ? "Clues + reveal" : "Tap + learn"}</span><b>Play <ArrowRight /></b></footer>
             </Link>;
           })}
         </div>
@@ -229,9 +236,11 @@ function PaperLandscape({ reducedMotion }: { reducedMotion: boolean }) {
     <div className="home-mountain mountain-right" />
     <div className="home-hill hill-back" />
     <div className="home-hill hill-front" />
+    <div className="home-forest-roots"><i /><i /><i /><i /><i /></div>
     <div className="home-trees">
-      {Array.from({ length: 9 }).map((_, i) => <span key={i} style={{ "--tree-i": i } as React.CSSProperties}><b /><i /><i /><i /></span>)}
+      {Array.from({ length: 11 }).map((_, i) => <span key={i} style={{ "--tree-i": i } as React.CSSProperties}><b /><i /><i /><i /><em /></span>)}
     </div>
+    <div className="home-forest-notes"><span>Managed source</span><span>Fibre becomes form</span><span>Recovery begins again</span></div>
     {Array.from({ length: 8 }).map((_, i) => <motion.i
       className={`home-flying-sheet sheet-${i + 1}`}
       key={i}

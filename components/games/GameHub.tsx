@@ -106,7 +106,7 @@ export default function GameHub() {
   }
 
   return (
-    <main className="game-hub-page">
+    <div className="game-hub-page">
       <section className="game-hub-hero">
         <div className="game-shell relative z-10 grid items-center gap-12 py-20 lg:grid-cols-[1.05fr_.95fr] lg:py-28">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}>
@@ -191,11 +191,9 @@ export default function GameHub() {
                   <GamePosterArt game={index} icon={<Icon />} active={selected} reducedMotion={Boolean(reducedMotion)} />
                   <div className="hub-poster-copy">
                     <p className="hub-game-subtitle">{game.subtitle}</p>
-                    <h3>{game.title}</h3>
-                    <strong className="hub-game-hook">{game.hook}</strong>
+                    <div className="hub-game-title-block"><h3>{game.title}</h3><strong className="hub-game-hook">{game.hook}</strong></div>
                     <p className="hub-game-description">{game.description}</p>
-                    <div className="hub-game-tags"><span>{game.action}</span><span>{game.duration}</span><span>{game.difficulty}</span></div>
-                    {selected && <Link href={game.href}>Read rules &amp; play <ArrowRight size={17} /></Link>}
+                    <div className="hub-game-footer"><div className="hub-game-tags"><span>{game.action}</span><span>{game.duration}</span><span>{game.difficulty}</span></div>{selected && <Link href={game.href}>Play now <ArrowRight size={17} /></Link>}</div>
                   </div>
                   <div className="hub-poster-edge" />
                 </motion.article>
@@ -230,7 +228,7 @@ export default function GameHub() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 

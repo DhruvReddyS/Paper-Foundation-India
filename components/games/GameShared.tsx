@@ -17,10 +17,10 @@ export function GameFrame({
   children: React.ReactNode;
 }) {
   return (
-    <main className="game-page min-h-screen pb-24 pt-8">
+    <div className="game-page min-h-screen pb-24 pt-8">
       <div className="game-shell">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <Link href="/discover" className="game-back-link">
+          <Link href="/games" className="game-back-link">
             <ArrowLeft size={16} /> Game hub
           </Link>
           <div className="text-right">
@@ -35,7 +35,7 @@ export function GameFrame({
         )}
         {children}
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -162,7 +162,7 @@ export function ResultPanel({
       </div>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button onClick={onReplay} className="game-primary-button">Play again</button>
-        <Link href="/discover" className="game-secondary-button">Explore more games</Link>
+        <Link href="/games" className="game-secondary-button">Explore more games</Link>
       </div>
     </motion.section>
   );

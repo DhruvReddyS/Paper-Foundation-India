@@ -1,9 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowRight, Check, ChevronLeft, ChevronRight, ExternalLink, ScanSearch, Sparkles, Stamp, X } from "lucide-react";
+import { ArrowDown, ArrowRight, Check, ChevronLeft, ChevronRight, ExternalLink, Search, ScanSearch, Sparkles, Stamp, X } from "lucide-react";
 import Link from "next/link";
-import { useState, type PointerEvent } from "react";
+import { useMemo, useState, type PointerEvent } from "react";
 
 type Verdict = "myth" | "fact" | "context";
 const claims: { claim: string; verdict: Verdict; short: string; explanation: string; source: string }[] = [
@@ -14,11 +14,11 @@ const claims: { claim: string; verdict: Verdict; short: string; explanation: str
 ];
 
 const library = [
-  ["Forests", "Fresh fibre always means natural forest loss.", "Context"],
-  ["Recovery", "A greasy pizza box recycles exactly like a clean carton.", "Myth"],
-  ["Digital", "Digital communication has no material footprint.", "Myth"],
-  ["Design", "A paper label makes a package automatically recyclable.", "Myth"],
-  ["Use", "Using paper responsibly includes using it fully.", "Fact"],
+  { category: "Forests", text: "Fresh fibre always means natural forest loss.", verdict: "Context", note: "Source and forest management determine the outcome." },
+  { category: "Recovery", text: "A greasy pizza box recycles exactly like a clean carton.", verdict: "Myth", note: "Food residue and local acceptance change the route." },
+  { category: "Digital", text: "Digital communication has no material footprint.", verdict: "Myth", note: "Devices, networks, data centres and energy remain material systems." },
+  { category: "Design", text: "A paper label makes a package automatically recyclable.", verdict: "Myth", note: "Coatings, adhesives and construction still matter." },
+  { category: "Use", text: "Using paper responsibly includes using it fully.", verdict: "Fact", note: "Fit-for-purpose use protects the value already invested in fibre." },
 ] as const;
 
 export default function MythsExperience() {
@@ -26,7 +26,9 @@ export default function MythsExperience() {
   const [claimIndex, setClaimIndex] = useState(0);
   const [answer, setAnswer] = useState<Verdict | null>(null);
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  const [query, setQuery] = useState("");
   const claim = claims[claimIndex];
+  const filteredLibrary = useMemo(() => library.filter((item) => `${item.category} ${item.text} ${item.verdict} ${item.note}`.toLowerCase().includes(query.toLowerCase())), [query]);
 
   function move(event: PointerEvent<HTMLElement>) {
     if (reduced) return;
@@ -67,8 +69,10 @@ export default function MythsExperience() {
     </section>
 
     <section className="myth-library-premium">
-      <header><div><p className="premium-kicker">Swipeable case library</p><h2>Five claims people<br />repeat too easily.</h2></div><p>Scroll sideways. Each card begins with the statement and ends with the verdict it actually deserves.</p></header>
-      <div className="myth-case-rail">{library.map(([category, text, verdict], index) => <motion.article whileHover={{ y: -10 }} key={text} className={`case-tone-${index + 1}`}><span>{String(index + 1).padStart(2, "0")} / {category}</span><strong>{text}</strong><div><small>Verdict</small><b>{verdict}</b></div></motion.article>)}</div>
+      <header><div><p className="premium-kicker">Searchable case library</p><h2>Find the claim<br />before sharing it.</h2></div><p>Search by subject, wording or verdict. Each case keeps the correction close to the claim.</p></header>
+      <label className="myth-search-desk"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search forests, recycling, digital, design..." /><span>{String(filteredLibrary.length).padStart(2, "0")} cases</span></label>
+      <div className="myth-case-rail">{filteredLibrary.map((item, index) => <motion.article layout whileHover={{ y: -10, rotate: index % 2 ? .7 : -.7 }} key={item.text} className={`case-tone-${index % 5 + 1}`}><span>{String(index + 1).padStart(2, "0")} / {item.category}</span><strong>{item.text}</strong><p>{item.note}</p><div><small>Verdict</small><b>{item.verdict}</b></div></motion.article>)}</div>
+      {filteredLibrary.length === 0 && <div className="myth-search-empty"><ScanSearch /><strong>No matching case yet.</strong><p>Try a broader word or submit the claim to the foundation.</p></div>}
     </section>
 
     <section className="myth-method-premium">

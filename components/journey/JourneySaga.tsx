@@ -109,7 +109,7 @@ export default function JourneySaga() {
   const currentSpread = current > 0 ? journeySpreads[current - 1] : null;
 
   return (
-    <main className="journey-page">
+    <div className="journey-page">
       <section
         ref={stageRef}
         className="journey-stage"
@@ -174,7 +174,7 @@ export default function JourneySaga() {
           <a href="https://www.fao.org/sustainable-forest-management/toolbox/modules/management-of-planted-forests/further-learning/en/" target="_blank" rel="noreferrer">FAO forest guidance <ExternalLink /></a>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 
@@ -200,9 +200,9 @@ function BookView({ current, turn, onOpen, onTurnComplete, reducedMotion }: { cu
 
   return (
     <motion.div
-      initial={opening ? { opacity: 0, scale: .48, x: -120, y: 70, rotateX: 18, rotateZ: -4 } : { opacity: 0, scale: .92, y: 18 }}
-      animate={closing ? { opacity: .94, scale: .58, x: -80, y: 58, rotateX: 12, rotateZ: -4 } : { opacity: 1, scale: turn ? 1.035 : 1, x: 0, y: 0, rotateX: 0, rotateZ: 0 }}
-      transition={reducedMotion ? { duration: .01 } : { duration: opening || closing ? 1.25 : .72, ease: [.2, .75, .16, 1] }}
+      initial={opening ? { opacity: .2, scale: .76, x: -72, y: 35, rotateX: 11, rotateZ: -2.5 } : { opacity: 0, scale: .94, y: 14 }}
+      animate={closing ? { opacity: .96, scale: .76, x: -54, y: 30, rotateX: 8, rotateZ: -2.5 } : { opacity: 1, scale: turn ? 1.018 : 1, x: 0, y: 0, rotateX: 0, rotateZ: 0 }}
+      transition={reducedMotion ? { duration: .01 } : { duration: opening || closing ? 1.08 : .68, ease: [.22, .72, .18, 1] }}
       className={`journey-book-open ${opening ? "is-opening" : ""} ${closing ? "is-closing" : ""}`}
     >
       <div className="journey-book-shadow" />
@@ -235,10 +235,11 @@ function BookView({ current, turn, onOpen, onTurnComplete, reducedMotion }: { cu
 
 function ClosedCover({ onOpen }: { onOpen: () => void }) {
   return (
-    <motion.button onClick={onOpen} initial={{ opacity: 0, x: -150, y: 55, scale: .72, rotateX: 20, rotateZ: -7 }} animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotateX: 0, rotateZ: 0 }} transition={{ type: "spring", stiffness: 72, damping: 16, mass: 1.15 }} whileHover={{ y: -10, rotateZ: -1.2, scale: 1.025 }} whileTap={{ scale: .96, rotateX: 4 }} className="journey-cover-closed" aria-label="Open the Paper Journey book">
+    <motion.button onClick={onOpen} initial={{ opacity: 0, x: -110, y: 40, scale: .78, rotateX: 14, rotateZ: -4 }} animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotateX: 0, rotateZ: 0 }} transition={{ type: "spring", stiffness: 68, damping: 18, mass: 1.05 }} whileHover={{ y: -7, rotateY: -2, rotateZ: -.5, scale: 1.012 }} whileTap={{ scale: .975, rotateX: 2 }} className="journey-cover-closed" aria-label="Open the Paper Journey book">
       <CoverFace />
+      <span className="journey-cover-spine" />
       <span className="journey-cover-pages" />
-      <motion.span className="journey-cover-glint" animate={{ x: ["-180%", "220%"] }} transition={{ duration: 3.8, repeat: Infinity, repeatDelay: 2.4, ease: "easeInOut" }} />
+      <motion.span className="journey-cover-glint" animate={{ x: ["-180%", "220%"] }} transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 7.5, ease: "easeInOut" }} />
     </motion.button>
   );
 }
@@ -247,7 +248,8 @@ function CoverFace() {
   return (
     <div className="journey-cover-face">
       <Image src="/images/journey/spreads/cover.jpg" alt="Leather-bound storybook in a forest" fill sizes="(max-width: 768px) 78vw, 480px" priority className="object-cover" />
-      <div className="journey-cover-overlay"><small>Paper Foundation India</small><strong>One Sheet.<br />Many Lives.</strong><span>An interactive paper journey</span></div>
+      <div className="journey-cover-corners" aria-hidden="true"><i /><i /><i /><i /></div>
+      <div className="journey-cover-overlay"><small>Paper Foundation India</small><b>PFI · FIELD EDITION 01</b><strong>One Sheet.<br />Many Lives.</strong><span>An interactive paper journey</span><em>Open the cover</em></div>
     </div>
   );
 }
@@ -356,11 +358,12 @@ function FinalPledge({ onStop }: StopProps) {
 
 function PageImage({ spread, side }: { spread: JourneySpread; side: "right" | "turn" }) {
   return (
-    <div className={`journey-page-paper journey-page-image journey-page-${side}`}>
+    <div className={`journey-page-paper journey-page-image journey-page-${side} ${spread.id === 11 ? "journey-final-page" : ""}`}>
       <Image src={spread.image} alt={spread.title} fill sizes="(max-width: 768px) 44vw, 520px" priority={spread.id <= 2} className="object-cover" />
       <div className="journey-image-wash" />
       <div className="journey-image-life" aria-hidden="true"><motion.i animate={{ y: [0, -13, 0], rotate: [8, 18, 8] }} transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }} /><motion.i animate={{ y: [0, 11, 0], x: [0, -7, 0], rotate: [-18, -4, -18] }} transition={{ duration: 5.4, repeat: Infinity, ease: "easeInOut" }} /><span /></div>
       <div className="journey-image-caption"><small>{spread.chapter}</small><strong>{spread.title}</strong></div>
+      {spread.id === 11 && <div className="journey-back-mark"><span>PFI</span><p>Love paper.<br />Use paper responsibly.</p><small>Hyderabad · 2025</small></div>}
     </div>
   );
 }

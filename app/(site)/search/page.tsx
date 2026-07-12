@@ -1,6 +1,4 @@
-import SearchBar from "./sections/SearchBar";
-import SearchSuggestions from "./sections/SearchSuggestions";
-import SearchResults from "./sections/SearchResults";
+import SearchExperience from "@/components/editorial/SearchExperience";
 
 export const metadata = {
   title: "Search | Paper Foundation India",
@@ -8,11 +6,5 @@ export const metadata = {
 };
 
 export default function SearchPage() {
-  return (
-    <main>
-      <SearchBar />
-      <SearchSuggestions />
-      <SearchResults />
-    </main>
-  );
+  return <SearchExperience />;
 }
