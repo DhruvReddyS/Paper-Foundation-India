@@ -1,4 +1,4 @@
-# India Map
+# India Fibre Map
 
 **Route:** `/india-map`
 **Owner:** Member 2

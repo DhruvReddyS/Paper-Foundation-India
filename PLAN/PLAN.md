@@ -11,25 +11,25 @@ Every public route uses `app/(site)/layout.tsx` and `components/site/Nav.tsx`. D
 | Area | Route |
 | --- | --- |
 | Home | `/` |
-| Myths vs Facts | `/myths` |
-| Knowledge Hub | `/knowledge` |
+| Myth or Material? | `/myths` |
+| Field Notes | `/knowledge` |
 | Article Reader | `/knowledge/[slug]` |
-| Paper Journey | `/journey` |
-| India Map | `/india-map` |
-| India Snapshot | `/india-snapshot` |
-| Circularity | `/circularity` |
-| Everyday Paper | `/everyday-paper` |
+| Follow the Fibre | `/journey` |
+| India Fibre Map | `/india-map` |
+| India by Numbers | `/india-snapshot` |
+| The Fibre Loop | `/circularity` |
+| Paper Everywhere | `/everyday-paper` |
 | Discover | `/discover` |
-| Games Hub | `/games` |
+| The Paper Playground | `/games` |
 | Grow or Shred | `/discover/grow-or-shred` |
 | Hidden Paper | `/discover/hidden-paper` |
 | Mill Master | `/discover/mill-master` |
 | Truth Press | `/discover/truth-press` |
-| Resources | `/resources` |
-| Glossary | `/glossary` |
-| Search | `/search` |
-| About | `/about` |
-| Get Involved | `/get-involved` |
+| The Reading Room | `/resources` |
+| Paper Dictionary | `/glossary` |
+| Search the Archive | `/search` |
+| Our Foundation | `/about` |
+| Join the Fold | `/get-involved` |
 | Contact | `/contact` |
 
 `/newsroom`, `/newsroom/[slug]`, and `/corrections` are retired and must not be recreated without a team scope decision.

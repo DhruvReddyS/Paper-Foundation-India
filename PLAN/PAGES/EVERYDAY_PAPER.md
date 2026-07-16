@@ -1,4 +1,4 @@
-# Everyday Paper
+# Paper Everywhere
 
 **Route:** `/everyday-paper`
 **Owner:** Member 2

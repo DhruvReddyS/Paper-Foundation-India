@@ -1,4 +1,4 @@
-# Resources
+# The Reading Room
 
 **Route:** `/resources`
 **Owner:** Member 3

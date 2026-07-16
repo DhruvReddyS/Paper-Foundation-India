@@ -1,4 +1,4 @@
-# About
+# Our Foundation
 
 **Route:** `/about`
 **Owner:** Member 3

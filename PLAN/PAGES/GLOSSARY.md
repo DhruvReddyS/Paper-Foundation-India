@@ -1,4 +1,4 @@
-# Glossary
+# Paper Dictionary
 
 **Route:** `/glossary`
 **Owner:** Member 1

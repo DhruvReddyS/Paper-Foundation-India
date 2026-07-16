@@ -37,9 +37,9 @@ function Footer() {
       <div className="site-footer-lead"><p>One material.<br />Many lives.</p><Link href="/journey">Follow the fibre <ArrowRight /></Link></div>
       <div className="site-footer-grid">
         <div><h3>Paper Foundation <small>India</small></h3><p>A public, evidence-led platform for understanding paper through context rather than assumption.</p></div>
-        <div><span>Explore</span><Link href="/knowledge">Knowledge hub</Link><Link href="/myths">Myths and facts</Link><Link href="/journey">Paper journey</Link><Link href="/games">Games lab</Link></div>
-        <div><span>Foundation</span><Link href="/about">About us</Link><Link href="/resources">Resources</Link><Link href="/glossary">Glossary</Link><Link href="/contact">Contact</Link></div>
-        <div><span>Participate</span><Link href="/get-involved">Get involved</Link><Link href="/india-map">India map</Link><Link href="/india-snapshot">India snapshot</Link><Link href="/circularity">Circularity</Link></div>
+        <div><span>Knowledge Desk</span><Link href="/knowledge">Field Notes</Link><Link href="/myths">Myth or Material?</Link><Link href="/glossary">Paper Dictionary</Link><Link href="/resources">The Reading Room</Link></div>
+        <div><span>Explore</span><Link href="/journey">Follow the Fibre</Link><Link href="/games">Paper Playground</Link><Link href="/circularity">The Fibre Loop</Link><Link href="/everyday-paper">Paper Everywhere</Link></div>
+        <div><span>India & Foundation</span><Link href="/india-map">India Fibre Map</Link><Link href="/india-snapshot">India by Numbers</Link><Link href="/about">Our Foundation</Link><Link href="/get-involved">Join the Fold</Link></div>
       </div>
       <div className="site-footer-bottom"><p>© {new Date().getFullYear()} Paper Foundation India</p><p>Evidence first. Sources open. Context visible.</p></div>
     </footer>

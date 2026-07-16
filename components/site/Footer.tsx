@@ -8,28 +8,28 @@ const columns = [
   {
     title: 'Learn',
     links: [
-      { label: 'About Paper', href: '/about' },
-      { label: 'Myths vs Facts', href: '/myths' },
-      { label: 'Knowledge Hub', href: '/knowledge' },
-      { label: 'Glossary', href: '/glossary' },
+      { label: 'Our Foundation', href: '/about' },
+      { label: 'Myth or Material?', href: '/myths' },
+      { label: 'Field Notes', href: '/knowledge' },
+      { label: 'Paper Dictionary', href: '/glossary' },
     ],
   },
   {
     title: 'Explore',
     links: [
-      { label: 'Resources', href: '/resources' },
-      { label: 'Games', href: '/games' },
-      { label: 'Paper Journey', href: '/journey' },
-      { label: 'Circularity', href: '/circularity' },
+      { label: 'The Reading Room', href: '/resources' },
+      { label: 'Paper Playground', href: '/games' },
+      { label: 'Follow the Fibre', href: '/journey' },
+      { label: 'The Fibre Loop', href: '/circularity' },
     ],
   },
   {
     title: 'Engage',
     links: [
-      { label: 'Get Involved', href: '/get-involved' },
+      { label: 'Join the Fold', href: '/get-involved' },
       { label: 'Contact Us', href: '/contact' },
-      { label: 'India Map', href: '/india-map' },
-      { label: 'India Snapshot', href: '/india-snapshot' },
+      { label: 'India Fibre Map', href: '/india-map' },
+      { label: 'India by Numbers', href: '/india-snapshot' },
     ],
   },
 ];

@@ -1,4 +1,4 @@
-# India Snapshot
+# India by Numbers
 
 **Route:** `/india-snapshot`
 **Owner:** Member 2

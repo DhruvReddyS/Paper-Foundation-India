@@ -1,4 +1,4 @@
-# Myths vs Facts
+# Myth or Material?
 
 **Route:** `/myths`
 **Owner:** Member 1

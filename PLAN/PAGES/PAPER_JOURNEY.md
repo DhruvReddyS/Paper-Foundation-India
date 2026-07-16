@@ -1,4 +1,4 @@
-# Paper Journey
+# Follow the Fibre
 
 **Route:** `/journey`
 **Owner:** You
