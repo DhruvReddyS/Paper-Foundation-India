@@ -1,0 +1,239 @@
+.section {
+  min-height: calc(100svh - 76px);
+  padding: clamp(5rem, 10vw, 9rem) max(24px, calc((100% - 1240px) / 2));
+  color: #202923;
+  background: #f3ede3;
+}
+
+.heading {
+  display: grid;
+  grid-template-columns: 1fr .65fr;
+  gap: 4rem;
+  align-items: end;
+}
+
+.kicker {
+  color: #2d5f3e;
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.heading h1 {
+  margin: 1rem 0 1.4rem;
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 6vw, 6.6rem);
+  font-weight: 400;
+  line-height: .93;
+  letter-spacing: -.06em;
+}
+
+.heading h1 em {
+  color: #2d5f3e;
+  font-weight: 400;
+}
+
+.introduction {
+  padding-bottom: 1.2rem;
+}
+
+.introduction p {
+  max-width: 52ch;
+  color: #686964;
+  line-height: 1.7;
+}
+
+.introduction a {
+  width: max-content;
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  margin-top: 1rem;
+  color: #2d5f3e;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.introduction svg {
+  width: 16px;
+  transition: transform .2s;
+}
+
+.introduction a:hover svg {
+  transform: translateX(4px);
+}
+
+.gameGrid {
+  margin-top: 4rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.ticket {
+  min-height: 440px;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 1rem;
+  padding: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(45, 95, 62, .14);
+  border-radius: 22px;
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s;
+}
+
+.ticket::after {
+  content: "";
+  width: 220px;
+  aspect-ratio: 1;
+  position: absolute;
+  top: -20%;
+  right: -45%;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: .12;
+  box-shadow: 0 0 0 25px currentColor, 0 0 0 50px currentColor;
+}
+
+.ticket:hover {
+  transform: translateY(-12px) rotate(-1deg);
+  box-shadow: 0 24px 44px rgba(40, 47, 40, .14);
+}
+
+.ticket header,
+.ticket footer {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+}
+
+.ticket header span,
+.ticket header small,
+.ticket footer span {
+  font-family: var(--font-mono);
+  font-size: .5rem;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.ticket header small,
+.ticket footer span {
+  opacity: .62;
+}
+
+.visual {
+  min-height: 145px;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.visual > svg {
+  width: 76px;
+  height: 76px;
+  position: relative;
+  z-index: 2;
+  stroke-width: 1.15;
+  transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+}
+
+.visual i {
+  width: 128px;
+  aspect-ratio: 1;
+  position: absolute;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: .15;
+  transition: transform .6s, opacity .4s;
+}
+
+.visual i:last-child {
+  width: 82px;
+  border-style: dashed;
+}
+
+.ticket:hover .visual > svg {
+  transform: translateY(-7px) rotate(-4deg) scale(1.08);
+}
+
+.ticket:hover .visual i:first-of-type {
+  opacity: .23;
+  transform: scale(1.16) rotate(18deg);
+}
+
+.ticket:hover .visual i:last-child {
+  opacity: .3;
+  transform: scale(.86) rotate(-25deg);
+}
+
+.body {
+  min-height: 96px;
+  position: relative;
+  z-index: 3;
+  align-self: end;
+}
+
+.body h2 {
+  max-width: 12ch;
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 2vw, 2.15rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.035em;
+}
+
+.body p {
+  max-width: 24ch;
+  margin-top: .45rem;
+  font-size: .75rem;
+  line-height: 1.45;
+  opacity: .65;
+}
+
+.ticket footer {
+  padding-top: .9rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.ticket footer b {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .68rem;
+}
+
+.ticket footer svg {
+  width: 14px;
+}
+
+.ticket1 { color: #eef2e8; background: #315e40; }
+.ticket2 { color: #f7eee4; background: #8a5b3d; }
+.ticket3 { color: #213b2b; background: #d4c49e; }
+.ticket4 { color: #22372a; background: #c8d0bb; }
+
+@media (max-width: 1024px) {
+  .heading { grid-template-columns: 1fr; }
+  .gameGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ticket { min-height: 330px; }
+}
+
+@media (max-width: 680px) {
+  .section { padding-inline: 18px; }
+  .gameGrid { grid-template-columns: 1fr; }
+  .ticket { min-height: 330px; }
+  .visual { min-height: 105px; }
+  .body { min-height: 80px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticket,
+  .visual > svg,
+  .visual i,
+  .introduction svg { transition: none; }
+}
