@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Brain, Factory, Fingerprint, Leaf, Puzzle, ScanSearch, Stamp, Timer, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, Brain, Factory, Fingerprint, Grid3X3, Leaf, ScanSearch, Stamp, Timer, Trophy } from "lucide-react";
 import { useCallback, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode, type WheelEvent } from "react";
 
 const games = [
@@ -60,15 +60,15 @@ const games = [
   },
   {
     number: "05",
-    title: "Fibre Crossword",
-    subtitle: "The Five-Minute Grid",
-    href: "/discover/paper-crossword",
-    description: "Connect ten words from forestry, fibre, papermaking and recovery. Finish the grid fast and beat your personal best.",
-    action: "Solve",
+    title: "Fibre Word Search",
+    subtitle: "The Five-Minute Hunt",
+    href: "/discover/paper-word-search",
+    description: "Find ten words from forestry, fibre, papermaking and recovery. Search across, down and diagonally, then beat your personal best.",
+    action: "Find",
     duration: "Up to 5 min",
     difficulty: "Fast recall",
-    icon: Puzzle,
-    className: "hub-poster-crossword",
+    icon: Grid3X3,
+    className: "hub-poster-wordsearch",
     hook: "Ten paper words. One running clock.",
   },
 ] as const;

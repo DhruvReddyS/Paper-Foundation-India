@@ -1,4 +1,4 @@
-import { Factory, Puzzle, ScanSearch, Stamp, Trees, type LucideIcon } from "lucide-react";
+import { Factory, Grid3X3, ScanSearch, Stamp, Trees, type LucideIcon } from "lucide-react";
 
 export type PlayableGame = {
   number: string;
@@ -49,11 +49,11 @@ export const playableGames: PlayableGame[] = [
   },
   {
     number: "05",
-    title: "Fibre Crossword",
-    note: "Solve ten paper words before the clock wins",
-    format: "Speed grid",
-    interaction: "Type + race",
-    href: "/discover/paper-crossword",
-    icon: Puzzle,
+    title: "Fibre Word Search",
+    note: "Find ten paper words before the clock wins",
+    format: "Word hunt",
+    interaction: "Find + race",
+    href: "/discover/paper-word-search",
+    icon: Grid3X3,
   },
 ];

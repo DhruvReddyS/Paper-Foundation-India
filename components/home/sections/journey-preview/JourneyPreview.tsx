@@ -17,8 +17,8 @@ const chapters=[
 export default function JourneyPreview(){
  const[active,setActive]=useState(0);const chapter=chapters[active];const Icon=chapter.icon;
  return <section className={styles.section} aria-labelledby="journey-home-title">
-  <div className={styles.copy}><p>Paper Journey</p><h2 id="journey-home-title">How is paper really made?<br/><em>Take the tour before you take a side.</em></h2><span>Open a thick field book and follow fibre from source to sheet, use and return. Each chapter explains one decision—and why the whole truth needs the whole journey.</span><Link href="/journey">Open the interactive book <BookOpen/><ArrowRight/></Link></div>
-  <div className={styles.bookStage}>
+  <div className={styles.copy} data-reveal="left"><p>Paper Journey</p><h2 id="journey-home-title">How is paper really made? <em>Take the tour before you take a side.</em></h2><span>Open a thick field book and follow fibre from source to sheet, use and return. Each chapter explains one decision—and why the whole truth needs the whole journey.</span><Link href="/journey">Open the interactive book <BookOpen/><ArrowRight/></Link></div>
+  <div className={styles.bookStage} data-reveal="right">
     <Link href="/journey" className={styles.book} aria-label="Open the Paper Journey">
       <div className={styles.cover}><Image src="/images/journey/spreads/cover.jpg" alt="Paper Journey book cover in a forest" fill sizes="(max-width: 768px) 78vw, 470px"/><div className={styles.coverShade}/><div className={styles.coverCopy}><small>Paper Foundation India</small><strong>The Paper<br/>Journey</strong><span>Source · Make · Use · Return</span></div><i/><b/></div>
       <div className={styles.pages}/><div className={styles.spine}/><div className={styles.bookShadow}/>

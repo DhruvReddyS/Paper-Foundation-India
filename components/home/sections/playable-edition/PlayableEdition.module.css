@@ -255,3 +255,10 @@
   .visual i,
   .introduction svg { transition: none; }
 }
+
+/* Horizontal playable-edition carousel: every game remains an equal cover card. */
+.heading h1{display:none}.heading h2{margin:1rem 0 1.4rem;font-size:clamp(3.2rem,5.8vw,6.4rem);font-weight:500;line-height:.94;letter-spacing:-.05em;text-wrap:pretty}.heading h2 em{color:#2d5f3e;font-weight:500}
+.carouselHead{margin-top:3rem;display:flex;align-items:center;justify-content:space-between;padding:.8rem 0;border-top:1px solid #c9bdaa;border-bottom:1px solid #c9bdaa;color:#315e40;font-family:var(--font-mono);font-size:.5rem;letter-spacing:.12em;text-transform:uppercase}.carouselHead>div{display:flex;gap:.45rem}.carouselHead button{width:40px;height:40px;display:grid;place-items:center;border:1px solid #b8aa96;transition:color .2s,background .2s}.carouselHead button:hover{color:white;background:#315e40}.carouselHead svg{width:15px}
+.gameGrid{margin-top:1.2rem;display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding:0 0 1.2rem}.ticket,.ticket5{min-width:min(330px,82vw);width:min(330px,82vw);min-height:470px;grid-column:auto;grid-template-columns:none;grid-template-rows:auto 1fr auto auto;align-items:stretch;flex:0 0 auto;scroll-snap-align:start;border-radius:22px}.ticket5 header{align-self:auto;flex-direction:row;align-items:center}.ticket5 .visual{min-height:145px}.ticket5 .body{min-height:96px;align-self:end}.ticket5 .body h2{font-size:inherit}.ticket5 footer{align-self:auto}.body h3{max-width:12ch;font-family:var(--font-serif);font-size:clamp(1.65rem,2.2vw,2.25rem);font-weight:500;line-height:1;letter-spacing:-.035em}
+@media(max-width:680px){.heading h2{font-size:clamp(3.25rem,13.5vw,4.55rem)}.gameGrid{display:flex;grid-template-columns:none}.ticket,.ticket5{min-height:410px}.carouselHead>span{max-width:180px;line-height:1.5}}
+@media(min-width:681px){.section{padding-block:4.5rem}.ticket,.ticket5{min-height:430px}.carouselHead{margin-top:2rem}}

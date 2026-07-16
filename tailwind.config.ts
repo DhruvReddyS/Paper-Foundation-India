@@ -22,7 +22,7 @@ const config: Config = {
         "dark-green": "#244D32",
       },
       fontFamily: {
-        serif: ["var(--font-cormorant-garamond)", "Cormorant Garamond", "Georgia", "serif"],
+        serif: ["var(--font-bodoni-moda)", "Bodoni Moda", "Georgia", "serif"],
         sans: ["var(--font-dm-sans)", "DM Sans", "system-ui", "sans-serif"],
         mono: ["var(--font-dm-mono)", "DM Mono", "monospace"],
       },

@@ -17,9 +17,25 @@
   --dark-green: #244D32;
 
   /* Typography */
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-serif: 'Bodoni Moda', Didot, Georgia, serif;
   --font-sans: 'DM Sans', system-ui, sans-serif;
   --font-mono: 'DM Mono', monospace;
+}
+
+/* Landing-page reveal language: paper objects arrive like sheets placed on a desk. */
+.home-shell { overflow:hidden; }
+.home-shell > section:not(:first-child),
+.home-shell [data-reveal] {
+  opacity: 0;
+  transform: translateY(42px);
+  transition: opacity .85s cubic-bezier(.2,.75,.2,1), transform .85s cubic-bezier(.2,.75,.2,1);
+}
+.home-shell > section.is-visible,
+.home-shell [data-reveal].is-visible { opacity: 1; transform: none; }
+.home-shell [data-reveal="left"] { transform: translateX(-46px) rotate(-1deg); }
+.home-shell [data-reveal="right"] { transform: translateX(46px) rotate(1deg); }
+@media (prefers-reduced-motion: reduce) {
+  .home-shell > section:not(:first-child), .home-shell [data-reveal] { opacity:1; transform:none; transition:none; }
 }
 
 @layer base {
@@ -365,7 +381,7 @@
 .hub-poster-mill { color:white; background:radial-gradient(circle at 52% 25%,#f0c69a,#c98453 58%,#855039); }
 .hub-poster-mill::after { background:linear-gradient(180deg,transparent 24%,rgba(66,37,20,.05) 44%,rgba(73,40,23,.86) 81%); }
 .hub-poster-hidden { background:radial-gradient(circle at 50% 24%,#dce7c9,#76916d 56%,#314c39); }
-.hub-poster-crossword { background:radial-gradient(circle at 50% 24%,#5c6f61,#29362d 58%,#151e18); }
+.hub-poster-wordsearch { background:radial-gradient(circle at 50% 24%,#5c6f61,#29362d 58%,#151e18); }
 .poster-grid{position:absolute;z-index:3;left:50%;top:50%;padding:.8rem;border:1px solid rgba(255,255,255,.28);font-family:var(--font-mono);font-size:.58rem;line-height:1.8;letter-spacing:.1em;transform:translate(-50%,-50%) rotate(-4deg)}.poster-clock{position:absolute;z-index:4;right:12%;top:14%;display:grid;place-items:center;width:58px;aspect-ratio:1;border:1px solid rgba(255,255,255,.38);border-radius:50%;font-family:var(--font-mono);font-size:.45rem;color:#e0b57d;background:rgba(12,24,16,.28)}
 .art-0 > i { width:8px; height:180px; position:absolute; bottom:-24px; border-radius:99px; background:#d5c18a; transform-origin:bottom; }
 .poster-shreds { width:74%; height:60px; position:absolute; bottom:2px; display:flex; justify-content:space-around; overflow:hidden; }

@@ -20,18 +20,19 @@ export default function MythsFairly() {
 
   return (
     <section id="understand-fairly" className={styles.section} aria-labelledby="fair-title">
-      <header className={styles.heading}>
-        <div><p><Scale /> Myths vs facts</p><h2 id="fair-title">Paper needs to be<br /><em>understood fairly.</em></h2></div>
+      <div className={styles.newsTicker} aria-hidden="true"><span>CLAIM</span><p>Context changes the verdict · evidence before assumption · material is not outcome</p><i>EDITION 02</i></div>
+      <header className={styles.heading} data-reveal>
+        <div><p><Scale /> Myths vs facts</p><h2 id="fair-title">Paper needs to be <em>understood fairly.</em></h2></div>
         <p>A fair answer does not defend paper blindly or condemn it automatically. It follows the evidence until the missing context becomes visible.</p>
       </header>
 
-      <div className={styles.desk}>
+      <div className={styles.desk} data-reveal="right">
         <nav aria-label="Select a paper claim">
           <span>Case files</span>
           {claims.map((claim,index) => <button className={active === index ? styles.active : ""} onClick={() => choose(index)} key={claim.short}><small>0{index+1}</small><strong>{claim.short}</strong><i /></button>)}
         </nav>
         <article className={revealed ? styles.revealed : ""}>
-          <header><span>{item.file}</span><small>Public claim review</small></header>
+          <header><span>{item.file}</span><small>The Fair Paper · Public claim review</small></header>
           <div className={styles.claimFace}>
             <p>Claim under review</p><blockquote>“{item.claim}”</blockquote>
             <button onClick={() => setRevealed(true)} disabled={revealed}><Eye /> {revealed ? "Context revealed" : "Reveal the full picture"}</button>

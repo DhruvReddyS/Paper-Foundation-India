@@ -16,7 +16,7 @@ import {
   MapPinned,
   Menu,
   PackageOpen,
-  Puzzle,
+  Grid3X3,
   Recycle,
   Search,
   Sprout,
@@ -55,7 +55,7 @@ const navGroups: NavGroup[] = [
       { href: "/discover/hidden-paper", label: "Hidden Paper", description: "Find fibre in unexpected places", icon: Search },
       { href: "/discover/mill-master", label: "Mill Master", description: "Build the papermaking sequence", icon: PackageOpen },
       { href: "/discover/truth-press", label: "Truth Press", description: "Evaluate familiar paper claims", icon: Stamp },
-      { href: "/discover/paper-crossword", label: "Fibre Crossword", description: "Race through ten paper words", icon: Puzzle },
+      { href: "/discover/paper-word-search", label: "Fibre Word Search", description: "Find ten paper words against the clock", icon: Grid3X3 },
     ],
   },
   {
@@ -77,6 +77,7 @@ const navGroups: NavGroup[] = [
     introduction: "Learn about our public mission, participate in the work or contact the foundation.",
     items: [
       { href: "/about", label: "About Us", description: "Mission, principles and people", icon: Building2 },
+      { href: "/join", label: "Join the Foundation", description: "Complete the membership application", icon: Users },
       { href: "/get-involved", label: "Get Involved", description: "Contribute, collaborate or partner", icon: Users },
       { href: "/contact", label: "Contact", description: "Reach the foundation directly", icon: Mail },
     ],

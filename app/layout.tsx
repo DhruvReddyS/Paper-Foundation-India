@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
+import { Bodoni_Moda, DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
 
-const cormorantGaramond = Cormorant_Garamond({
+const bodoniModa = Bodoni_Moda({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-cormorant-garamond",
+  weight: ["400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
+  variable: "--font-bodoni-moda",
 });
 
 const dmSans = DM_Sans({
@@ -52,7 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${cormorantGaramond.variable} ${dmSans.variable} ${dmMono.variable} min-h-screen bg-paper-white text-charcoal font-sans antialiased`}
+        className={`${bodoniModa.variable} ${dmSans.variable} ${dmMono.variable} min-h-screen bg-paper-white text-charcoal font-sans antialiased`}
       >
         {children}
       </body>

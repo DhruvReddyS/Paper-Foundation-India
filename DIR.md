@@ -40,7 +40,7 @@ The landing page is composed as a sequence of isolated sections. `HomePage.tsx` 
 | 04 | Paper Journey | `components/home/sections/journey-preview/JourneyPreview.tsx` | `components/home/sections/journey-preview/JourneyPreview.module.css` | Journey chapter preview inside component | Landing page section 04 |
 | 05 | The Playable Edition | `components/home/sections/playable-edition/PlayableEdition.tsx` | `components/home/sections/playable-edition/PlayableEdition.module.css` | `components/home/sections/playable-edition/games.ts` | `/#playable-edition` |
 | 06 | Compact India Preview | `components/home/sections/india-ledger/IndiaLedger.tsx` | `components/home/sections/india-ledger/IndiaLedger.module.css` | Demo pins and numbers inside component | Landing page section 06 |
-| 07 | Join Our Initiative | `components/home/sections/initiative-form/InitiativeForm.tsx` | `components/home/sections/initiative-form/InitiativeForm.module.css` | Official membership fields from the source PDF | Landing page section 07 |
+| 07 | Join + Correspondence Desk | `components/home/sections/community-desk/CommunityDesk.tsx` | `components/home/sections/community-desk/CommunityDesk.module.css` | Join CTA and misinformation/contact form | Landing page section 07 |
 
 To move, remove or add a landing section, edit the import and render order in `components/home/HomePage.tsx`. Keep each new section in its own directory under `components/home/sections/` and register it in this table.
 
@@ -66,7 +66,8 @@ Most public routes keep their section code directly beside their page entry.
 | `/knowledge/[slug]` | `app/(site)/knowledge/[slug]/page.tsx` | `app/(site)/knowledge/[slug]/sections/` |
 | `/journey` | `app/(site)/journey/page.tsx` | `components/journey/` |
 | `/discover` and `/games` | Their route `page.tsx` files | `components/games/` |
-| `/discover/paper-crossword` | `app/(site)/discover/paper-crossword/page.tsx` | `components/games/PaperCrosswordGame.tsx` and its CSS module |
+| `/discover/paper-word-search` | `app/(site)/discover/paper-word-search/page.tsx` | `components/games/PaperWordSearchGame.tsx` and its CSS module |
+| `/join` | `app/(site)/join/page.tsx` | `components/home/sections/initiative-form/InitiativeForm.tsx` and its CSS module |
 | `/india-map` | `app/(site)/india-map/page.tsx` | `app/(site)/india-map/sections/` |
 | `/india-snapshot` | `app/(site)/india-snapshot/page.tsx` | `app/(site)/india-snapshot/sections/` |
 | `/circularity` | `app/(site)/circularity/page.tsx` | `app/(site)/circularity/sections/` |
