@@ -15,7 +15,7 @@ export default function PlayableEdition() {
         </div>
         <div className={styles.introduction}>
           <p>
-            Four short, replayable games built for curious people of every age. Every result can become a shareable proof of what you learned.
+            Five short, replayable games built for curious people of every age. Every result can become a shareable proof of what you learned.
           </p>
           <Link href="/games">View the games hub <ArrowRight aria-hidden="true" /></Link>
         </div>

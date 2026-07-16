@@ -1,36 +1,30 @@
 "use client";
 
-import { ArrowRight, Factory, PackageOpen, Recycle, Sprout, Store, Trees } from "lucide-react";
+import { ArrowRight, BookOpen, Factory, Leaf, PackageOpen, Recycle, Trees } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import styles from "./JourneyPreview.module.css";
 
-const steps = [
-  { label: "Grown", title: "A working landscape", copy: "Fibre begins in managed landscapes where decisions about species, soil, water and livelihoods matter.", icon: Trees },
-  { label: "Made", title: "Fibre becomes a sheet", copy: "At the mill, preparation, energy, water and process choices shape the paper that leaves the machine.", icon: Factory },
-  { label: "Designed", title: "Purpose takes form", copy: "A sheet becomes packaging, communication, hygiene, education or one of countless useful products.", icon: PackageOpen },
-  { label: "Used", title: "Value lives with people", copy: "How long a product serves, and how thoughtfully it is used, are part of its material story.", icon: Store },
-  { label: "Recovered", title: "The next life begins", copy: "Clean collection and capable systems can return used paper to the fibre loop.", icon: Recycle },
-  { label: "Renewed", title: "The loop needs care", copy: "Recovered and responsibly sourced fresh fibre work together to keep useful paper circulating.", icon: Sprout },
+const chapters=[
+  {label:"Source",title:"Where fibre begins",copy:"Responsible sources and recovered paper enter the story.",icon:Trees},
+  {label:"Pulp",title:"Fibres are prepared",copy:"Water and motion separate, clean and ready the fibre.",icon:Leaf},
+  {label:"Sheet",title:"A moving web forms",copy:"Drainage, pressing and drying turn flow into paper.",icon:Factory},
+  {label:"Purpose",title:"Design gives it a job",copy:"The sheet becomes a product made for a particular need.",icon:PackageOpen},
+  {label:"Return",title:"Useful fibre comes back",copy:"Collection and sorting decide whether another life begins.",icon:Recycle},
 ] as const;
 
-export default function JourneyPreview() {
-  const [active, setActive] = useState(0);
-  const step = steps[active];
-  const Icon = step.icon;
-  return (
-    <section className={styles.section} aria-labelledby="journey-preview-title">
-      <header><p>Follow the fibre</p><h2 id="journey-preview-title">Six moments.<br /><em>One connected journey.</em></h2><Link href="/journey">Open the full Paper Journey <ArrowRight /></Link></header>
-      <div className={styles.book}>
-        <nav aria-label="Paper journey stages">
-          {steps.map((item, index) => <button className={active === index ? styles.active : ""} onClick={() => setActive(index)} aria-current={active === index ? "step" : undefined} key={item.label}><span>0{index + 1}</span><b>{item.label}</b></button>)}
-        </nav>
-        <article key={step.label}>
-          <div className={styles.pageNumber}>0{active + 1}</div>
-          <Icon aria-hidden="true" /><small>{step.label}</small><h3>{step.title}</h3><p>{step.copy}</p>
-          <div className={styles.pageLines} aria-hidden="true"><i /><i /><i /></div>
-        </article>
-      </div>
-    </section>
-  );
+export default function JourneyPreview(){
+ const[active,setActive]=useState(0);const chapter=chapters[active];const Icon=chapter.icon;
+ return <section className={styles.section} aria-labelledby="journey-home-title">
+  <div className={styles.copy}><p>Paper Journey</p><h2 id="journey-home-title">How is paper really made?<br/><em>Take the tour before you take a side.</em></h2><span>Open a thick field book and follow fibre from source to sheet, use and return. Each chapter explains one decision—and why the whole truth needs the whole journey.</span><Link href="/journey">Open the interactive book <BookOpen/><ArrowRight/></Link></div>
+  <div className={styles.bookStage}>
+    <Link href="/journey" className={styles.book} aria-label="Open the Paper Journey">
+      <div className={styles.cover}><Image src="/images/journey/spreads/cover.jpg" alt="Paper Journey book cover in a forest" fill sizes="(max-width: 768px) 78vw, 470px"/><div className={styles.coverShade}/><div className={styles.coverCopy}><small>Paper Foundation India</small><strong>The Paper<br/>Journey</strong><span>Source · Make · Use · Return</span></div><i/><b/></div>
+      <div className={styles.pages}/><div className={styles.spine}/><div className={styles.bookShadow}/>
+    </Link>
+    <div className={styles.bookNote} key={chapter.label}><Icon/><small>{chapter.label}</small><strong>{chapter.title}</strong><p>{chapter.copy}</p></div>
+  </div>
+  <nav aria-label="Preview Paper Journey chapters">{chapters.map((item,index)=><button className={active===index?styles.active:""} onClick={()=>setActive(index)} key={item.label}><span>0{index+1}</span><strong>{item.label}</strong><i/></button>)}</nav>
+ </section>;
 }

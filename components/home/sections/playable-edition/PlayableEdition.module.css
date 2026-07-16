@@ -216,6 +216,20 @@
 .ticket2 { color: #f7eee4; background: #8a5b3d; }
 .ticket3 { color: #213b2b; background: #d4c49e; }
 .ticket4 { color: #22372a; background: #c8d0bb; }
+.ticket5 {
+  min-height: 250px;
+  grid-column: 1 / -1;
+  grid-template-columns: 120px minmax(160px, .45fr) 1fr minmax(180px, .45fr);
+  grid-template-rows: 1fr;
+  align-items: center;
+  color: #f7eee4;
+  background: #27342b;
+}
+.ticket5 header { align-self: start; flex-direction: column; align-items: flex-start; }
+.ticket5 .visual { min-height: 170px; }
+.ticket5 .body { min-height: auto; align-self: center; }
+.ticket5 .body h2 { font-size: clamp(2.2rem, 4vw, 4.4rem); }
+.ticket5 footer { align-self: end; }
 
 @media (max-width: 1024px) {
   .heading { grid-template-columns: 1fr; }
@@ -229,6 +243,10 @@
   .ticket { min-height: 330px; }
   .visual { min-height: 105px; }
   .body { min-height: 80px; }
+  .ticket5 { min-height: 350px; grid-template-columns: 1fr; grid-template-rows: auto 1fr auto auto; }
+  .ticket5 header { flex-direction: row; align-items: center; }
+  .ticket5 .visual { min-height: 105px; }
+  .ticket5 .body h2 { font-size: 2.15rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

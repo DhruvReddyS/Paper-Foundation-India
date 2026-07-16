@@ -16,6 +16,7 @@ import {
   MapPinned,
   Menu,
   PackageOpen,
+  Puzzle,
   Recycle,
   Search,
   Sprout,
@@ -38,7 +39,7 @@ const navGroups: NavGroup[] = [
     introduction: "Read researched perspectives, consult source material and understand the language of paper.",
     items: [
       { href: "/knowledge", label: "Articles", description: "Editorial stories and explainers", icon: BookOpen },
-      { href: "/knowledge/how-fibre-sourcing-shapes-the-paper-story", label: "Featured Article", description: "Our current long-form read", icon: FileText },
+      { href: "/knowledge/truth-about-paper-forestry", label: "Featured Article", description: "Our current long-form read", icon: FileText },
       { href: "/resources", label: "Resources", description: "Reports, guides and source documents", icon: Library },
       { href: "/glossary", label: "Glossary", description: "Clear definitions for paper terminology", icon: BookMarked },
     ],
@@ -54,6 +55,7 @@ const navGroups: NavGroup[] = [
       { href: "/discover/hidden-paper", label: "Hidden Paper", description: "Find fibre in unexpected places", icon: Search },
       { href: "/discover/mill-master", label: "Mill Master", description: "Build the papermaking sequence", icon: PackageOpen },
       { href: "/discover/truth-press", label: "Truth Press", description: "Evaluate familiar paper claims", icon: Stamp },
+      { href: "/discover/paper-crossword", label: "Fibre Crossword", description: "Race through ten paper words", icon: Puzzle },
     ],
   },
   {
@@ -128,27 +130,26 @@ export default function Nav() {
       <nav className="container-wide flex h-[72px] items-center justify-between" aria-label="Primary navigation">
         <Link href="/" className="site-brand" aria-label="Paper Foundation India home">
           <Image src="/images/brand/paper-foundation-nav-logo.png" alt="" width={40} height={49} priority />
-          <span>Paper Foundation <small>India</small></span>
         </Link>
 
-        <ul ref={desktopMenuRef} className="site-desktop-nav hidden items-center lg:flex">
+        <ul ref={desktopMenuRef} className="site-desktop-nav hidden items-center xl:flex">
           <li><Link href="/" className={`site-nav-link ${pathname === "/" ? "is-active" : ""}`}>Home</Link></li>
           <li><Link href="/myths" className={`site-nav-link ${routeMatches(pathname, "/myths") ? "is-active" : ""}`}>Myths vs Facts</Link></li>
-          <DesktopGroup group={navGroups[0]} pathname={pathname} openGroup={openGroup} setOpenGroup={setOpenGroup} />
           <li><Link href="/journey" className={`site-nav-link ${routeMatches(pathname, "/journey") ? "is-active" : ""}`}>Paper Journey</Link></li>
+          <DesktopGroup group={navGroups[0]} pathname={pathname} openGroup={openGroup} setOpenGroup={setOpenGroup} />
           {navGroups.slice(1).map((group) => <DesktopGroup key={group.slug} group={group} pathname={pathname} openGroup={openGroup} setOpenGroup={setOpenGroup} />)}
         </ul>
 
         <div className="site-nav-actions">
           <Link href="/search" className="site-search" aria-label="Search"><Search size={17} /></Link>
-          <button type="button" className="site-menu-toggle lg:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} aria-controls="mobile-navigation">
+          <button type="button" className="site-menu-toggle xl:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} aria-controls="mobile-navigation">
             {mobileOpen ? <X size={21} /> : <Menu size={21} />}
           </button>
         </div>
       </nav>
 
       {mobileOpen && (
-        <div id="mobile-navigation" className="site-mobile-menu max-h-[calc(100svh-72px)] overflow-y-auto lg:hidden">
+        <div id="mobile-navigation" className="site-mobile-menu max-h-[calc(100svh-72px)] overflow-y-auto xl:hidden">
           <div className="container-wide py-3">
             <div className="site-mobile-primary"><Link href="/">Home</Link><Link href="/myths">Myths vs Facts</Link><Link href="/journey">Paper Journey</Link></div>
             {navGroups.map((group) => {

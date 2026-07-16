@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Brain, Factory, Fingerprint, Leaf, ScanSearch, Stamp, Timer, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, Brain, Factory, Fingerprint, Leaf, Puzzle, ScanSearch, Stamp, Timer, Trophy } from "lucide-react";
 import { useCallback, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode, type WheelEvent } from "react";
 
 const games = [
@@ -58,6 +58,19 @@ const games = [
     className: "hub-poster-hidden",
     hook: "Paper is hiding in plain sight.",
   },
+  {
+    number: "05",
+    title: "Fibre Crossword",
+    subtitle: "The Five-Minute Grid",
+    href: "/discover/paper-crossword",
+    description: "Connect ten words from forestry, fibre, papermaking and recovery. Finish the grid fast and beat your personal best.",
+    action: "Solve",
+    duration: "Up to 5 min",
+    difficulty: "Fast recall",
+    icon: Puzzle,
+    className: "hub-poster-crossword",
+    hook: "Ten paper words. One running clock.",
+  },
 ] as const;
 
 export default function GameHub() {
@@ -112,7 +125,7 @@ export default function GameHub() {
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}>
             <div className="game-hero-label"><span /> Paper Foundation India presents</div>
             <h1>Learn paper<br /><em>by playing with it.</em></h1>
-            <p className="game-hero-lead">Four tactile games that turn evidence, manufacturing and hidden material science into something anyone can understand—and want to share.</p>
+            <p className="game-hero-lead">Five tactile games that turn evidence, manufacturing and hidden material science into something anyone can understand—and want to share.</p>
             <div className="flex flex-wrap gap-3">
               <Link href="/discover/grow-or-shred" className="game-primary-button">Play the flagship game <ArrowRight size={18} /></Link>
               <a href="#game-index" className="game-secondary-button">Browse the game deck</a>
@@ -241,6 +254,7 @@ function GamePosterArt({ game, icon, active, reducedMotion }: { game: number; ic
       {game === 1 && <><span className="poster-claim">MYTH?</span><motion.span className="poster-stamp" animate={moving ? { y: [-34, 4, -34], rotate: [-8, -2, -8] } : undefined} transition={{ duration: 1.7, repeat: Infinity, times: [0, .35, 1] }}>PRESS</motion.span></>}
       {game === 2 && <><span className="poster-mill-line"><b>1</b><b>?</b><b>3</b><b>?</b></span><motion.span className="poster-sheet-roll" animate={moving ? { x: [-22, 24, -22], rotate: [0, 180, 360] } : undefined} transition={{ duration: 3.2, repeat: Infinity, ease: "linear" }} /></>}
       {game === 3 && <><span className="poster-clue clue-a">POROUS</span><span className="poster-clue clue-b">LIGHT</span><motion.span className="poster-scan" animate={moving ? { x: [-62, 72, -62] } : undefined} transition={{ duration: 2.7, repeat: Infinity, ease: "easeInOut" }} /></>}
+      {game === 4 && <><span className="poster-grid" aria-hidden="true">F&nbsp;I&nbsp;B&nbsp;R&nbsp;E<br />&nbsp;&nbsp;&nbsp;A<br />P&nbsp;A&nbsp;P&nbsp;E&nbsp;R</span><motion.span className="poster-clock" animate={moving ? { rotate: [0, 360] } : undefined} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}>05:00</motion.span></>}
     </div>
   );
 }

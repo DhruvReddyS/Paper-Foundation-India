@@ -1,25 +1,21 @@
-import EvidenceDesk from "@/components/home/sections/evidence-desk/EvidenceDesk";
-import FieldNotes from "@/components/home/sections/field-notes/FieldNotes";
 import IndiaLedger from "@/components/home/sections/india-ledger/IndiaLedger";
-import JoinTheFold from "@/components/home/sections/join-the-fold/JoinTheFold";
+import InitiativeForm from "@/components/home/sections/initiative-form/InitiativeForm";
 import JourneyPreview from "@/components/home/sections/journey-preview/JourneyPreview";
+import KnowledgeHub from "@/components/home/sections/knowledge-hub/KnowledgeHub";
 import LivingCover from "@/components/home/sections/living-cover/LivingCover";
-import PaperEverywhere from "@/components/home/sections/paper-everywhere/PaperEverywhere";
+import MythsFairly from "@/components/home/sections/myths-fairly/MythsFairly";
 import PlayableEdition from "@/components/home/sections/playable-edition/PlayableEdition";
-import Reconsidered from "@/components/home/sections/reconsidered/Reconsidered";
 
 export default function HomePage() {
   return (
     <div>
       <LivingCover />
-      <Reconsidered />
-      <EvidenceDesk />
+      <MythsFairly />
+      <KnowledgeHub />
+      <JourneyPreview />
       <PlayableEdition />
       <IndiaLedger />
-      <JourneyPreview />
-      <FieldNotes />
-      <PaperEverywhere />
-      <JoinTheFold />
+      <InitiativeForm />
     </div>
   );
 }

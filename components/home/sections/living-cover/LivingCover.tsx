@@ -1,60 +1,62 @@
 "use client";
 
-import { ArrowDown, ArrowRight, BadgeCheck, BookOpen, Leaf } from "lucide-react";
+import { ArrowDown, ArrowRight, BookOpen, Factory, Recycle, Trees, type LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { useRef, type PointerEvent } from "react";
+import { useRef, useState, type PointerEvent } from "react";
 import styles from "./LivingCover.module.css";
 
-const principles = [
-  { icon: BadgeCheck, label: "Evidence before assumption" },
-  { icon: BookOpen, label: "Context before conclusion" },
-  { icon: Leaf, label: "Circularity beyond slogans" },
-] as const;
+type Life = { number: string; label: string; title: string; note: string; icon: LucideIcon };
+
+const lives: Life[] = [
+  { number: "01", label: "Grown", title: "A fibre begins", note: "in a landscape shaped by people and choices", icon: Trees },
+  { number: "02", label: "Made", title: "A purpose forms", note: "as fibre, water and engineering become a sheet", icon: Factory },
+  { number: "03", label: "Used", title: "Value is carried", note: "through learning, protection, hygiene and exchange", icon: BookOpen },
+  { number: "04", label: "Returned", title: "A next life opens", note: "when clean fibre finds its way back into the loop", icon: Recycle },
+];
 
 export default function LivingCover() {
+  const [active, setActive] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+  const life = lives[active];
+  const Icon = life.icon;
 
-  function moveSheet(event: PointerEvent<HTMLElement>) {
+  function moveArt(event: PointerEvent<HTMLElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    sectionRef.current?.style.setProperty("--pointer-x", `${x * 22}px`);
-    sectionRef.current?.style.setProperty("--pointer-y", `${y * 16}px`);
+    sectionRef.current?.style.setProperty("--x", `${((event.clientX - rect.left) / rect.width - .5) * 18}px`);
+    sectionRef.current?.style.setProperty("--y", `${((event.clientY - rect.top) / rect.height - .5) * 14}px`);
   }
 
   return (
-    <section ref={sectionRef} className={styles.cover} onPointerMove={moveSheet} aria-labelledby="living-cover-title">
-      <div className={styles.grain} aria-hidden="true" />
+    <section ref={sectionRef} className={styles.hero} onPointerMove={moveArt} aria-labelledby="hero-title">
+      <div className={styles.ink} aria-hidden="true" />
       <div className={styles.copy}>
-        <p className={styles.issue}><span /> Paper Foundation India · Field edition 01</p>
-        <h1 id="living-cover-title">Paper is more than<br /><em>what you throw away.</em></h1>
-        <p className={styles.lead}>Follow one sheet through evidence, everyday life, industry and renewal—and see a familiar material with fresh context.</p>
+        <h1 id="hero-title">Paper has more<br />{" "}than <em>one life.</em></h1>
+        <p>A sheet is not a finish line. It can begin in a working landscape, carry an idea, protect what matters and return as fibre for something new.</p>
         <div className={styles.actions}>
-          <a href="#reconsidered">Follow the sheet <ArrowDown aria-hidden="true" /></a>
-          <Link href="/knowledge">Explore the evidence <ArrowRight aria-hidden="true" /></Link>
+          <a href="#understand-fairly">See the whole story <ArrowDown /></a>
+          <Link href="/journey">Take the paper tour <ArrowRight /></Link>
         </div>
       </div>
 
-      <div className={styles.paperStage} aria-hidden="true">
-        <div className={styles.orbit}><i /><i /><i /></div>
-        <div className={styles.sheet}>
-          <span className={styles.sheetMark}>PFI</span>
-          <strong>ONE<br />SHEET</strong>
-          <small>many possible lives</small>
-          <i className={styles.fold} />
+      <div className={styles.art}>
+        <div className={styles.halo} aria-hidden="true"><i /><i /><i /></div>
+        <div className={styles.lifeSheet} key={life.label}>
+          <header><span>Life {life.number}</span><small>{life.label}</small></header>
+          <Icon aria-hidden="true" />
+          <div><strong>{life.title}</strong><p>{life.note}</p></div>
+          <i className={styles.corner} />
         </div>
-        <span className={`${styles.annotation} ${styles.annotationOne}`}>01 · fibre</span>
-        <span className={`${styles.annotation} ${styles.annotationTwo}`}>02 · knowledge</span>
-        <span className={`${styles.annotation} ${styles.annotationThree}`}>03 · renewal</span>
+        <div className={styles.ghostSheet} aria-hidden="true" />
+        <div className={styles.fibreLines} aria-hidden="true"><i /><i /><i /><i /><i /></div>
       </div>
 
-      <div className={styles.principles}>
-        {principles.map(({ icon: Icon, label }, index) => (
-          <div key={label}>
-            <span>0{index + 1}</span><Icon aria-hidden="true" /><p>{label}</p>
-          </div>
+      <nav className={styles.lifeRail} aria-label="Explore the lives of one sheet">
+        {lives.map((item, index) => (
+          <button className={active === index ? styles.active : ""} onClick={() => setActive(index)} aria-pressed={active === index} key={item.label}>
+            <span>{item.number}</span><strong>{item.label}</strong><i />
+          </button>
         ))}
-      </div>
+      </nav>
     </section>
   );
 }

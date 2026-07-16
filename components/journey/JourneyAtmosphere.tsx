@@ -8,14 +8,14 @@ export default function JourneyAtmosphere({ reducedMotion }: { reducedMotion: bo
   return (
     <div className="journey-atmosphere" aria-hidden="true">
       <Canvas
-        dpr={[1, 1.35]}
+        dpr={[1, 1.15]}
         frameloop={reducedMotion ? "demand" : "always"}
         camera={{ position: [0, 0, 5], fov: 48 }}
         gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
       >
         <ambientLight intensity={0.55} color="#87a37f" />
         <pointLight position={[2.5, 3, 2]} intensity={8} color="#f4c96c" distance={9} />
-        <FibreField count={reducedMotion ? 70 : 280} reducedMotion={reducedMotion} />
+        <FibreField count={reducedMotion ? 45 : 150} reducedMotion={reducedMotion} />
         <LightRays reducedMotion={reducedMotion} />
       </Canvas>
     </div>

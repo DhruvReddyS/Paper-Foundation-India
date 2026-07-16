@@ -127,7 +127,7 @@ export default function JourneySaga() {
         <div className="journey-vignette" />
 
         <header className="journey-overlay-header">
-          <Link href="/" className="journey-brand-mark" aria-label="Exit journey and return home"><span /><div><small>Paper Foundation India · Exit</small><strong>One Sheet. Many Lives.</strong></div></Link>
+          <Link href="/" className="journey-brand-mark" aria-label="Exit journey and return home"><span /><div><small>Paper Foundation India · Exit</small><strong>How Paper Is Made</strong></div></Link>
           <div className="journey-counter"><small>Chapter</small><strong>{String(visiblePage).padStart(2, "0")}<span> / {String(journeyTotal - 1).padStart(2, "0")}</span></strong></div>
         </header>
 
@@ -155,7 +155,7 @@ export default function JourneySaga() {
         <AnimatePresence>
           {helpOpen && current === 0 && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="journey-help">
-              <BookOpen /><p><strong>Open the story</strong><span>Scroll, swipe, use arrow keys, or tap the controls.</span></p><button onClick={openBook}>Begin <ArrowRight /></button>
+              <BookOpen /><p><strong>Take the complete tour</strong><span>Source, fibre, sheet, purpose and return—chapter by chapter.</span></p><button onClick={openBook}>Open book <ArrowRight /></button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -165,8 +165,8 @@ export default function JourneySaga() {
 
       <section className="journey-evidence-footer">
         <div>
-          <p>Continue beyond the story</p>
-          <h2>The cycle works when evidence guides every choice.</h2>
+          <p>The tour continues</p>
+          <h2>Now you know how a sheet is made. What happens next is a shared choice.</h2>
         </div>
         <div className="journey-evidence-links">
           <Link href="/circularity">Explore circularity <ArrowRight /></Link>
@@ -249,7 +249,7 @@ function CoverFace() {
     <div className="journey-cover-face">
       <Image src="/images/journey/spreads/cover.jpg" alt="Leather-bound storybook in a forest" fill sizes="(max-width: 768px) 78vw, 480px" priority className="object-cover" />
       <div className="journey-cover-corners" aria-hidden="true"><i /><i /><i /><i /></div>
-      <div className="journey-cover-overlay"><small>Paper Foundation India</small><b>PFI · FIELD EDITION 01</b><strong>One Sheet.<br />Many Lives.</strong><span>An interactive paper journey</span><em>Open the cover</em></div>
+      <div className="journey-cover-overlay"><small>Paper Foundation India</small><b>SOURCE · FIBRE · SHEET · RETURN</b><strong>How Paper<br />Is Made.</strong><span>The whole truth needs the whole journey</span><em>Open the book</em></div>
     </div>
   );
 }

@@ -34,15 +34,13 @@ The landing page is composed as a sequence of isolated sections. `HomePage.tsx` 
 
 | Order | Section | Component | Styles | Content/data | Browser anchor |
 | --- | --- | --- | --- | --- | --- |
-| 01 | The Living Cover | `components/home/sections/living-cover/LivingCover.tsx` | `components/home/sections/living-cover/LivingCover.module.css` | Inside component | `/` |
-| 02 | Paper, Reconsidered | `components/home/sections/reconsidered/Reconsidered.tsx` | `components/home/sections/reconsidered/Reconsidered.module.css` | Inside component | `/#reconsidered` |
-| 03 | The Evidence Desk | `components/home/sections/evidence-desk/EvidenceDesk.tsx` | `components/home/sections/evidence-desk/EvidenceDesk.module.css` | Inside component | Landing page section 03 |
-| 04 | The Playable Edition | `components/home/sections/playable-edition/PlayableEdition.tsx` | `components/home/sections/playable-edition/PlayableEdition.module.css` | `components/home/sections/playable-edition/games.ts` | `/#playable-edition` |
-| 05 | One Sheet Across India | `components/home/sections/india-ledger/IndiaLedger.tsx` | `components/home/sections/india-ledger/IndiaLedger.module.css` | Inside component | Landing page section 05 |
-| 06 | Follow the Fibre | `components/home/sections/journey-preview/JourneyPreview.tsx` | `components/home/sections/journey-preview/JourneyPreview.module.css` | Inside component | Landing page section 06 |
-| 07 | Field Notes | `components/home/sections/field-notes/FieldNotes.tsx` | `components/home/sections/field-notes/FieldNotes.module.css` | Inside component | Landing page section 07 |
-| 08 | Paper Everywhere | `components/home/sections/paper-everywhere/PaperEverywhere.tsx` | `components/home/sections/paper-everywhere/PaperEverywhere.module.css` | Inside component | Landing page section 08 |
-| 09 | Join the Fold | `components/home/sections/join-the-fold/JoinTheFold.tsx` | `components/home/sections/join-the-fold/JoinTheFold.module.css` | Inside component | Landing page section 09 |
+| 01 | Paper Has More Than One Life | `components/home/sections/living-cover/LivingCover.tsx` | `components/home/sections/living-cover/LivingCover.module.css` | Four life states inside component | `/` |
+| 02 | Paper Understood Fairly | `components/home/sections/myths-fairly/MythsFairly.tsx` | `components/home/sections/myths-fairly/MythsFairly.module.css` | Claim files inside component | `/#understand-fairly` |
+| 03 | Knowledge Hub | `components/home/sections/knowledge-hub/KnowledgeHub.tsx` | `components/home/sections/knowledge-hub/KnowledgeHub.module.css` | Featured and latest articles inside component | Landing page section 03 |
+| 04 | Paper Journey | `components/home/sections/journey-preview/JourneyPreview.tsx` | `components/home/sections/journey-preview/JourneyPreview.module.css` | Journey chapter preview inside component | Landing page section 04 |
+| 05 | The Playable Edition | `components/home/sections/playable-edition/PlayableEdition.tsx` | `components/home/sections/playable-edition/PlayableEdition.module.css` | `components/home/sections/playable-edition/games.ts` | `/#playable-edition` |
+| 06 | Compact India Preview | `components/home/sections/india-ledger/IndiaLedger.tsx` | `components/home/sections/india-ledger/IndiaLedger.module.css` | Demo pins and numbers inside component | Landing page section 06 |
+| 07 | Join Our Initiative | `components/home/sections/initiative-form/InitiativeForm.tsx` | `components/home/sections/initiative-form/InitiativeForm.module.css` | Official membership fields from the source PDF | Landing page section 07 |
 
 To move, remove or add a landing section, edit the import and render order in `components/home/HomePage.tsx`. Keep each new section in its own directory under `components/home/sections/` and register it in this table.
 
@@ -52,7 +50,7 @@ To move, remove or add a landing section, edit the import and render order in `c
 | --- | --- |
 | Public layout wrapper | `app/(site)/layout.tsx` |
 | Navbar and all dropdowns | `components/site/Nav.tsx` |
-| Footer | `app/(site)/layout.tsx` (`Footer` function) |
+| Footer | `components/site/Footer.tsx` and `components/site/Footer.module.css` |
 | Global tokens and truly shared styles | `app/globals.css` |
 | Foundation brand images | `public/images/brand/` |
 
@@ -68,6 +66,7 @@ Most public routes keep their section code directly beside their page entry.
 | `/knowledge/[slug]` | `app/(site)/knowledge/[slug]/page.tsx` | `app/(site)/knowledge/[slug]/sections/` |
 | `/journey` | `app/(site)/journey/page.tsx` | `components/journey/` |
 | `/discover` and `/games` | Their route `page.tsx` files | `components/games/` |
+| `/discover/paper-crossword` | `app/(site)/discover/paper-crossword/page.tsx` | `components/games/PaperCrosswordGame.tsx` and its CSS module |
 | `/india-map` | `app/(site)/india-map/page.tsx` | `app/(site)/india-map/sections/` |
 | `/india-snapshot` | `app/(site)/india-snapshot/page.tsx` | `app/(site)/india-snapshot/sections/` |
 | `/circularity` | `app/(site)/circularity/page.tsx` | `app/(site)/circularity/sections/` |
