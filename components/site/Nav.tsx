@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, ChevronDown, Menu, Search, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -10,25 +11,43 @@ type NavGroup = { label: string; items: NavItem[] };
 
 const navGroups: NavGroup[] = [
   {
-    label: "Knowledge Desk",
+    label: "Learn",
     items: [
-      { href: "/myths", label: "Myth or Material?", note: "Test common paper claims" },
       { href: "/knowledge", label: "Field Notes", note: "Evidence-led articles" },
+      { href: "/knowledge/how-fibre-sourcing-shapes-the-paper-story", label: "Cover Essay", note: "Read the featured fibre story" },
+      { href: "/myths", label: "Myth or Material?", note: "Test common paper claims" },
       { href: "/glossary", label: "Paper Dictionary", note: "Terms made human" },
+      { href: "/resources", label: "The Reading Room", note: "Reports, guides and downloads" },
+      { href: "/search", label: "Search the Archive", note: "Find anything across the site" },
     ],
   },
   {
-    label: "India in Paper",
-    items: [
-      { href: "/india-map", label: "India Fibre Map", note: "Explore the story state by state" },
-      { href: "/india-snapshot", label: "India by Numbers", note: "Facts, charts and context" },
-    ],
-  },
-  {
-    label: "Explore",
+    label: "India & Fibre",
     items: [
       { href: "/journey", label: "Follow the Fibre", note: "From source to second life" },
+      { href: "/india-map", label: "India Fibre Map", note: "Explore the story state by state" },
+      { href: "/india-snapshot", label: "India by Numbers", note: "Facts, charts and context" },
+      { href: "/circularity", label: "The Fibre Loop", note: "See how paper moves in circles" },
+      { href: "/everyday-paper", label: "Paper Everywhere", note: "Find paper in daily life" },
+    ],
+  },
+  {
+    label: "Play",
+    items: [
+      { href: "/discover", label: "Discover", note: "Start at the interactive hub" },
       { href: "/games", label: "The Paper Playground", note: "Learn by playing" },
+      { href: "/discover/grow-or-shred", label: "Grow or Shred", note: "Make the system-level choice" },
+      { href: "/discover/hidden-paper", label: "Hidden Paper", note: "Spot paper in unexpected places" },
+      { href: "/discover/mill-master", label: "Mill Master", note: "Put papermaking in order" },
+      { href: "/discover/truth-press", label: "Truth Press", note: "Print the evidence, reject the myth" },
+    ],
+  },
+  {
+    label: "Foundation",
+    items: [
+      { href: "/about", label: "Our Foundation", note: "Mission, principles and people" },
+      { href: "/get-involved", label: "Join the Fold", note: "Contribute, partner or participate" },
+      { href: "/contact", label: "Contact Desk", note: "Reach the foundation directly" },
     ],
   },
 ];
@@ -37,6 +56,10 @@ function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === href;
   if (href === "/games") return pathname === "/games" || pathname.startsWith("/discover");
   return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function isItemActive(pathname: string, href: string) {
+  return pathname === href;
 }
 
 export default function Nav() {
@@ -69,10 +92,10 @@ export default function Nav() {
     <header className="site-header sticky top-0 z-50">
       <nav className="container-wide flex h-[72px] items-center justify-between" aria-label="Primary navigation">
         <Link href="/" className="flex items-center gap-2" aria-label="Paper Foundation India home">
-          <div className="site-logo-mark" aria-hidden="true"><span>P</span></div>
-          <span className="font-serif text-lg font-bold text-charcoal">
-            Paper Foundation <small>India</small>
+          <span className="site-brand-avatar" aria-hidden="true">
+            <Image src="/images/brand/paper-foundation-logo.png" alt="" width={48} height={48} priority />
           </span>
+          <span className="site-brand-name">Paper Foundation <small>India</small></span>
         </Link>
 
         <ul ref={menuRef} className="hidden items-center gap-6 lg:flex">
@@ -99,7 +122,7 @@ export default function Nav() {
                 {expanded && (
                   <div className="site-nav-dropdown">
                     {group.items.map((item) => {
-                      const active = isActive(pathname, item.href);
+                      const active = isItemActive(pathname, item.href);
                       return (
                         <Link key={item.href} href={item.href} className={active ? "is-active" : ""} aria-current={active ? "page" : undefined}>
                           <strong>{item.label}</strong>
@@ -113,11 +136,6 @@ export default function Nav() {
             );
           })}
 
-          <li>
-            <Link href="/about" className={`site-nav-link ${isActive(pathname, "/about") ? "is-active" : ""}`} aria-current={isActive(pathname, "/about") ? "page" : undefined}>
-              Our Foundation
-            </Link>
-          </li>
         </ul>
 
         <div className="hidden items-center gap-3 lg:flex">
@@ -144,13 +162,12 @@ export default function Nav() {
             <section key={group.label} className="site-mobile-nav-group">
               <p>{group.label}</p>
               {group.items.map((item) => (
-                <Link key={item.href} href={item.href} className={`site-mobile-nav-link ${isActive(pathname, item.href) ? "is-active" : ""}`}>
+                <Link key={item.href} href={item.href} className={`site-mobile-nav-link ${isItemActive(pathname, item.href) ? "is-active" : ""}`}>
                   <span>{item.label}</span><small>{item.note}</small>
                 </Link>
               ))}
             </section>
           ))}
-          <Link href="/about" className={`site-mobile-nav-link mt-2 ${isActive(pathname, "/about") ? "is-active" : ""}`}>Our Foundation</Link>
           <div className="mt-4 flex gap-3 border-t border-charcoal/10 pt-4">
             <Link href="/search" className="site-search" aria-label="Search the archive"><Search size={17} /></Link>
             <Link href="/get-involved" className="site-nav-cta flex-1 justify-center">Join the fold <ArrowRight size={15} /></Link>

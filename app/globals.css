@@ -114,17 +114,17 @@
   background: rgba(250, 248, 245, .88);
   backdrop-filter: blur(18px) saturate(1.2);
 }
-.site-logo-mark { width: 34px; height: 34px; display:grid; place-items:center; border:1px solid rgba(45,95,62,.3); border-radius:50% 47% 52% 45%; color:white; background:var(--forest); box-shadow:inset 0 0 0 3px rgba(255,255,255,.08); transform:rotate(-4deg); }
-.site-logo-mark span { font-family:var(--font-serif); font-size:.9rem; transform:rotate(4deg); }
-.site-header nav > a > span:last-child { display:flex; align-items:baseline; gap:.4rem; font-weight:400; letter-spacing:-.025em; }
-.site-header nav > a small { font-family:var(--font-mono); font-size:.48rem; letter-spacing:.15em; text-transform:uppercase; color:var(--forest); }
+.site-brand-avatar { width:42px; height:42px; display:grid; place-items:center; overflow:hidden; border:1px solid rgba(45,95,62,.18); border-radius:50%; background:white; box-shadow:0 5px 16px rgba(31,41,55,.08); }
+.site-brand-avatar img { width:100%; height:100%; object-fit:cover; }
+.site-brand-name { display:flex; align-items:baseline; gap:.4rem; color:var(--charcoal); font-family:var(--font-serif); font-size:1.05rem; font-weight:700; letter-spacing:-.025em; }
+.site-brand-name small { font-family:var(--font-mono); font-size:.48rem; letter-spacing:.15em; text-transform:uppercase; color:var(--forest); }
 .site-nav-link { position:relative; color:#5e625e; font-size:.78rem; font-weight:600; }
 .site-nav-link::after { content:""; position:absolute; left:0; right:100%; bottom:-8px; height:1px; background:var(--forest); transition:right .25s ease; }
 .site-nav-link:hover,.site-nav-link.is-active { color:var(--forest); }.site-nav-link:hover::after,.site-nav-link.is-active::after { right:0; }
 .site-nav-group { position:relative; }
 .site-nav-group-trigger { display:inline-flex; align-items:center; gap:.3rem; background:none; border:0; cursor:pointer; }
 .site-nav-group-trigger svg { transition:transform .2s ease; }
-.site-nav-dropdown { position:absolute; top:calc(100% + 20px); left:50%; width:260px; padding:.55rem; transform:translateX(-50%); border:1px solid rgba(45,95,62,.14); border-radius:14px; background:rgba(250,248,245,.98); box-shadow:0 20px 50px rgba(31,41,55,.13); }
+.site-nav-dropdown { position:absolute; top:calc(100% + 20px); left:50%; width:285px; max-height:calc(100vh - 110px); overflow-y:auto; padding:.55rem; transform:translateX(-50%); border:1px solid rgba(45,95,62,.14); border-radius:14px; background:rgba(250,248,245,.98); box-shadow:0 20px 50px rgba(31,41,55,.13); }
 .site-nav-dropdown::before { content:""; position:absolute; left:0; right:0; top:-22px; height:22px; }
 .site-nav-dropdown a { display:flex; flex-direction:column; gap:.18rem; padding:.72rem .8rem; border-radius:9px; transition:background .2s,transform .2s; }
 .site-nav-dropdown a:hover,.site-nav-dropdown a.is-active { background:rgba(45,95,62,.08); transform:translateX(2px); }
@@ -207,7 +207,7 @@
 @keyframes home-scan{from{left:-10%}to{left:110%}}@keyframes home-scan-once{from{left:-10%}to{left:110%}}
 
 @media (max-width:1024px){.home-field-note{display:none}.home-cover h1{font-size:clamp(4rem,11vw,7.5rem)}.home-lab,.home-reading{grid-template-columns:1fr}.home-journey-portal{grid-template-columns:1fr .75fr}.home-game-grid{grid-template-columns:repeat(2,1fr)}.home-game-ticket{min-height:320px}.home-playground-heading{grid-template-columns:1fr}.home-reading-title h2{max-width:12ch}}
-@media (max-width:760px){.site-header nav > a small{display:none}.home-cover{min-height:760px}.home-cover-copy{padding-top:3.6rem}.home-cover h1{font-size:clamp(3.65rem,17vw,6rem)}.home-cover-lead{max-width:33ch}.home-cover-index{grid-template-columns:1fr 1fr}.home-cover-index span{font-size:.49rem}.home-cover-index span:last-child{display:none}.home-sun{width:90vw;top:34%}.home-mountain{bottom:13%}.home-trees{bottom:4%}.home-trees > span:nth-child(even){display:none}.home-flying-sheet{transform:scale(.75)}.home-position{min-height:auto}.home-position h2{font-size:clamp(3.3rem,15vw,5.4rem)}.home-principles{grid-template-columns:1fr;gap:2.5rem}.home-lab{padding-inline:18px}.home-claim-sheet{min-height:330px}.home-scanner{transform:none}.home-journey-portal{grid-template-columns:1fr;min-height:auto;text-align:center}.home-journey-copy > p:not(.home-micro-label){margin-inline:auto}.home-journey-copy > a{margin-inline:auto}.home-book-object{width:min(310px,78vw)}.home-game-grid{grid-template-columns:1fr}.home-game-ticket{min-height:240px}.home-game-ticket > svg:not(.home-ticket-arrow){width:64px;height:64px}.home-reading-list a{min-height:112px;grid-template-columns:32px 1fr 20px}.home-reading-list small{display:none}.home-closing{min-height:500px}.home-closing h2{font-size:clamp(3.2rem,15vw,5.4rem)}}
+@media (max-width:760px){.site-brand-name small{display:none}.site-brand-avatar{width:38px;height:38px}.home-cover{min-height:760px}.home-cover-copy{padding-top:3.6rem}.home-cover h1{font-size:clamp(3.65rem,17vw,6rem)}.home-cover-lead{max-width:33ch}.home-cover-index{grid-template-columns:1fr 1fr}.home-cover-index span{font-size:.49rem}.home-cover-index span:last-child{display:none}.home-sun{width:90vw;top:34%}.home-mountain{bottom:13%}.home-trees{bottom:4%}.home-trees > span:nth-child(even){display:none}.home-flying-sheet{transform:scale(.75)}.home-position{min-height:auto}.home-position h2{font-size:clamp(3.3rem,15vw,5.4rem)}.home-principles{grid-template-columns:1fr;gap:2.5rem}.home-lab{padding-inline:18px}.home-claim-sheet{min-height:330px}.home-scanner{transform:none}.home-journey-portal{grid-template-columns:1fr;min-height:auto;text-align:center}.home-journey-copy > p:not(.home-micro-label){margin-inline:auto}.home-journey-copy > a{margin-inline:auto}.home-book-object{width:min(310px,78vw)}.home-game-grid{grid-template-columns:1fr}.home-game-ticket{min-height:240px}.home-game-ticket > svg:not(.home-ticket-arrow){width:64px;height:64px}.home-reading-list a{min-height:112px;grid-template-columns:32px 1fr 20px}.home-reading-list small{display:none}.home-closing{min-height:500px}.home-closing h2{font-size:clamp(3.2rem,15vw,5.4rem)}}
 @media (prefers-reduced-motion:reduce){.home-landscape,.home-game-ticket,.home-book-object,.home-book-cover{transition:none}.home-scanner:not(.is-scanned):hover .home-scan-line{animation:none}}
 
 /* Modern editorial pages */
