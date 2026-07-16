@@ -14,7 +14,7 @@ const reads = [
 export default function KnowledgeHub() {
   return <section className={styles.section} aria-labelledby="knowledge-home-title">
     <header className={styles.heading} data-reveal>
-      <div><p>Knowledge Hub · editorial desk</p><h2 id="knowledge-home-title">The headline is only the <span>first line.</span></h2></div>
+      <div><p>Knowledge Hub · editorial desk</p><h2 id="knowledge-home-title">Read past the <span>headline.</span></h2></div>
       <div><p>Investigations, explainers and source material for readers who want the method—not just the answer.</p><Link href="/knowledge">Browse every article <ArrowRight /></Link></div>
     </header>
 
@@ -28,8 +28,8 @@ export default function KnowledgeHub() {
 
     <div className={styles.shelf} data-reveal="right">
       <p><span>Start anywhere.</span> Follow a question as far as your curiosity takes it.</p>
-      <Link href="/glossary"><BookMarked /><div><small>Paper dictionary</small><strong>Glossary</strong></div><ArrowRight /></Link>
-      <Link href="/resources"><Library /><div><small>Reports &amp; guides</small><strong>Open resources</strong></div><ArrowRight /></Link>
+      <Link href="/glossary"><BookMarked /><div><small>Build your vocabulary</small><strong>Explore the glossary</strong><span>Plain-language paper terms →</span></div><ArrowRight /></Link>
+      <Link href="/resources"><Library /><div><small>Reports, guides &amp; sources</small><strong>Browse resources</strong><span>Take the evidence with you →</span></div><ArrowRight /></Link>
     </div>
   </section>;
 }

@@ -30,8 +30,8 @@
   transform: translateY(42px);
   transition: opacity .85s cubic-bezier(.2,.75,.2,1), transform .85s cubic-bezier(.2,.75,.2,1);
 }
-.home-shell > section.is-visible,
-.home-shell [data-reveal].is-visible { opacity: 1; transform: none; }
+.home-shell > section[data-revealed="true"],
+.home-shell [data-reveal][data-revealed="true"] { opacity: 1; transform: none; }
 .home-shell [data-reveal="left"] { transform: translateX(-46px) rotate(-1deg); }
 .home-shell [data-reveal="right"] { transform: translateX(46px) rotate(1deg); }
 @media (prefers-reduced-motion: reduce) {

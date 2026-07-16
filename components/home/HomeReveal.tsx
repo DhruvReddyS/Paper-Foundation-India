@@ -8,7 +8,7 @@ export default function HomeReveal() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          (entry.target as HTMLElement).classList.add("is-visible");
+          (entry.target as HTMLElement).dataset.revealed = "true";
           observer.unobserve(entry.target);
         }
       });
