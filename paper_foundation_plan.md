@@ -1,4 +1,6 @@
 # Paper Foundation India — Complete Website Plan
+
+> Historical research document. For the current scope, routes, and team ownership, use `PLAN/PLAN.md`, `PLAN/TEAM_OWNERSHIP.md`, and the briefs in `PLAN/PAGES/`. Newsroom and Corrections have been removed from the current product scope.
 ## "Use Paper Without Hesitation"
 
 > **Version:** 1.0 — Full Site Plan  

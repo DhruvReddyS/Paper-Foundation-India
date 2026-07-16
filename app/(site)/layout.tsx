@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Menu, Search, X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
+import Nav from "@/components/site/Nav";
 
 /* ── Campaign Banner ─────────────────────────────────── */
 function CampaignBanner() {
@@ -29,83 +30,6 @@ function CampaignBanner() {
   );
 }
 
-/* ── Navbar ──────────────────────────────────────────── */
-function Nav() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const links = [
-    { href: "/", label: "Home" },
-    { href: "/myths", label: "Myths" },
-    { href: "/knowledge", label: "Knowledge Hub" },
-    { href: "/journey", label: "Paper Journey" },
-    { href: "/games", label: "Games" },
-    { href: "/about", label: "About" },
-  ];
-
-  return (
-    <header className="site-header sticky top-0 z-50">
-      <nav className="container-wide flex items-center justify-between h-[72px]">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="site-logo-mark">
-            <span>P</span>
-          </div>
-          <span className="font-serif font-bold text-lg text-charcoal">
-            Paper Foundation <small>India</small>
-          </span>
-        </Link>
-
-        {/* Desktop Links */}
-        <ul className="hidden md:flex items-center gap-7">
-          {links.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className="site-nav-link"
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        {/* Mobile Toggle */}
-        <div className="hidden md:flex items-center gap-3">
-          <Link href="/search" className="site-search" aria-label="Search"><Search size={17} /></Link>
-          <Link href="/get-involved" className="site-nav-cta">Get involved <ArrowRight size={15} /></Link>
-        </div>
-
-        <button
-          className="md:hidden p-2 text-charcoal"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X /> : <Menu />}
-        </button>
-      </nav>
-
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="site-mobile-menu md:hidden px-5 pb-5">
-          <ul className="flex flex-col gap-3 pt-3">
-            {links.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="block text-sm font-sans text-mid-grey hover:text-forest transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </header>
-  );
-}
-
 /* ── Footer ──────────────────────────────────────────── */
 function Footer() {
   return (
@@ -114,10 +38,10 @@ function Footer() {
       <div className="site-footer-grid">
         <div><h3>Paper Foundation <small>India</small></h3><p>A public, evidence-led platform for understanding paper through context rather than assumption.</p></div>
         <div><span>Explore</span><Link href="/knowledge">Knowledge hub</Link><Link href="/myths">Myths and facts</Link><Link href="/journey">Paper journey</Link><Link href="/games">Games lab</Link></div>
-        <div><span>Foundation</span><Link href="/about">About us</Link><Link href="/corrections">Corrections</Link><Link href="/resources">Resources</Link><Link href="/contact">Contact</Link></div>
-        <div><span>Participate</span><Link href="/get-involved">Get involved</Link><Link href="/newsroom">Newsroom</Link><Link href="/india-snapshot">India snapshot</Link><Link href="/circularity">Circularity</Link></div>
+        <div><span>Foundation</span><Link href="/about">About us</Link><Link href="/resources">Resources</Link><Link href="/glossary">Glossary</Link><Link href="/contact">Contact</Link></div>
+        <div><span>Participate</span><Link href="/get-involved">Get involved</Link><Link href="/india-map">India map</Link><Link href="/india-snapshot">India snapshot</Link><Link href="/circularity">Circularity</Link></div>
       </div>
-      <div className="site-footer-bottom"><p>© {new Date().getFullYear()} Paper Foundation India</p><p>Evidence first. Sources open. Corrections visible.</p></div>
+      <div className="site-footer-bottom"><p>© {new Date().getFullYear()} Paper Foundation India</p><p>Evidence first. Sources open. Context visible.</p></div>
     </footer>
   );
 }
@@ -134,7 +58,7 @@ export default function SiteLayout({
   return (
     <>
       {!immersive && <CampaignBanner />}
-      {!immersive && <Nav />}
+      <Nav />
       <main className="min-h-screen">{children}</main>
       {!immersive && <Footer />}
     </>

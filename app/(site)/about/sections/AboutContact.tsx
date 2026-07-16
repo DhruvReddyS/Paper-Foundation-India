@@ -30,10 +30,10 @@ export default function AboutContact() {
               </svg>
             </Link>
             <Link
-              href="/newsroom"
+              href="/get-involved"
               className="inline-flex items-center justify-center px-8 py-4 border-2 border-paper-white/30 text-paper-white rounded-xl font-semibold hover:bg-paper-white/10 transition-colors"
             >
-              Media &amp; Press
+              Get Involved
             </Link>
           </div>
         </motion.div>

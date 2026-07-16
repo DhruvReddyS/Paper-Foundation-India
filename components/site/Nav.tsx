@@ -1,142 +1,115 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import Link from "next/link";
+import { ArrowRight, Menu, Search, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const navLinks = [
-  { href: '/about', label: 'About' },
-  { href: '/myths', label: 'Myths vs Facts' },
-  { href: '/articles', label: 'Articles' },
-  { href: '/resources', label: 'Resources' },
-  { href: '/games', label: 'Games' },
-  { href: '/contact', label: 'Contact' },
+  { href: "/", label: "Home" },
+  { href: "/myths", label: "Myths vs Facts" },
+  { href: "/knowledge", label: "Knowledge" },
+  { href: "/india-snapshot", label: "India" },
+  { href: "/journey", label: "Journey" },
+  { href: "/games", label: "Games" },
+  { href: "/about", label: "About" },
 ];
 
+function isActive(pathname: string, href: string) {
+  if (href === "/") return pathname === href;
+  if (href === "/games") {
+    return pathname === "/games" || pathname.startsWith("/discover");
+  }
+  if (href === "/india-snapshot") {
+    return pathname === href || pathname === "/india-map";
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export default function Nav() {
-  const [scrolled, setScrolled] = useState(false);
-  const [visible, setVisible] = useState(true);
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const lastScrollY = useRef(0);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 40);
-      setVisible(y < lastScrollY.current || y < 40);
-      lastScrollY.current = y;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  useEffect(() => setMobileOpen(false), [pathname]);
 
   return (
-    <header
-      className={`
-        fixed top-0 left-0 right-0 z-50 transition-all duration-300
-        ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'}
-        ${visible ? 'translate-y-0' : '-translate-y-full'}
-      `}
-    >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-[#1a3c2a] flex items-center justify-center">
-            <span className="text-white font-bold text-sm">PF</span>
+    <header className="site-header sticky top-0 z-50">
+      <nav className="container-wide flex h-[72px] items-center justify-between" aria-label="Primary navigation">
+        <Link href="/" className="flex items-center gap-2" aria-label="Paper Foundation India home">
+          <div className="site-logo-mark" aria-hidden="true">
+            <span>P</span>
           </div>
-          <span className={`font-bold text-lg ${scrolled ? 'text-stone-900' : 'text-white'}`}>
-            Paper Foundation
+          <span className="font-serif text-lg font-bold text-charcoal">
+            Paper Foundation <small>India</small>
           </span>
         </Link>
 
-        {/* Desktop Links */}
-        <ul className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-[#1a3c2a] ${
-                  scrolled ? 'text-stone-700' : 'text-white/90'
-                }`}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        {/* CTA + Search */}
-        <div className="hidden md:flex items-center gap-4">
-          <button
-            aria-label="Search"
-            className={`p-2 rounded-lg transition-colors ${
-              scrolled ? 'text-stone-600 hover:bg-stone-100' : 'text-white/80 hover:bg-white/10'
-            }`}
-          >
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="8" cy="8" r="6" />
-              <path d="M12.5 12.5 16 16" />
-            </svg>
-          </button>
-          <Link
-            href="/contact"
-            className="rounded-full bg-[#1a3c2a] px-5 py-2 text-sm font-semibold text-white hover:bg-[#245038] transition-colors"
-          >
-            Get Involved
-          </Link>
-        </div>
-
-        {/* Mobile Hamburger */}
-        <button
-          className="md:hidden p-2"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          <div className="space-y-1.5">
-            <span
-              className={`block h-0.5 w-6 transition-all ${
-                scrolled ? 'bg-stone-800' : 'bg-white'
-              } ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`}
-            />
-            <span
-              className={`block h-0.5 w-6 transition-all ${
-                scrolled ? 'bg-stone-800' : 'bg-white'
-              } ${mobileOpen ? 'opacity-0' : ''}`}
-            />
-            <span
-              className={`block h-0.5 w-6 transition-all ${
-                scrolled ? 'bg-stone-800' : 'bg-white'
-              } ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`}
-            />
-          </div>
-        </button>
-      </nav>
-
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="md:hidden bg-white border-t shadow-lg">
-          <ul className="flex flex-col p-6 gap-4">
-            {navLinks.map((link) => (
+        <ul className="hidden items-center gap-5 lg:flex">
+          {navLinks.map((link) => {
+            const active = isActive(pathname, link.href);
+            return (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-stone-700 font-medium text-lg hover:text-[#1a3c2a]"
-                  onClick={() => setMobileOpen(false)}
+                  className={`site-nav-link ${active ? "is-active" : ""}`}
+                  aria-current={active ? "page" : undefined}
                 >
                   {link.label}
                 </Link>
               </li>
-            ))}
-            <li className="pt-2">
-              <Link
-                href="/contact"
-                className="block w-full rounded-full bg-[#1a3c2a] px-5 py-3 text-center text-sm font-semibold text-white"
-                onClick={() => setMobileOpen(false)}
-              >
-                Get Involved
-              </Link>
-            </li>
+            );
+          })}
+        </ul>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          <Link href="/search" className="site-search" aria-label="Search">
+            <Search size={17} />
+          </Link>
+          <Link href="/get-involved" className="site-nav-cta">
+            Get involved <ArrowRight size={15} />
+          </Link>
+        </div>
+
+        <button
+          type="button"
+          className="p-2 text-charcoal lg:hidden"
+          onClick={() => setMobileOpen((open) => !open)}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation"
+        >
+          {mobileOpen ? <X /> : <Menu />}
+        </button>
+      </nav>
+
+      {mobileOpen && (
+        <div id="mobile-navigation" className="site-mobile-menu px-5 pb-5 lg:hidden">
+          <ul className="flex flex-col gap-1 pt-3">
+            {navLinks.map((link) => {
+              const active = isActive(pathname, link.href);
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`block rounded-md px-3 py-2 text-sm font-sans transition-colors ${
+                      active ? "bg-forest/10 font-semibold text-forest" : "text-mid-grey hover:bg-forest/5 hover:text-forest"
+                    }`}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
+          <div className="mt-4 flex gap-3 border-t border-charcoal/10 pt-4">
+            <Link href="/search" className="site-search" aria-label="Search">
+              <Search size={17} />
+            </Link>
+            <Link href="/get-involved" className="site-nav-cta flex-1 justify-center">
+              Get involved <ArrowRight size={15} />
+            </Link>
+          </div>
         </div>
       )}
     </header>
