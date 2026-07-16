@@ -161,7 +161,7 @@ export default function Nav() {
             {navGroups.map((group) => {
               const expanded = mobileGroup === group.slug;
               return (
-                <section key={group.slug} className="site-mobile-section">
+                <section key={group.slug} className={`site-mobile-section group-${group.slug} ${expanded ? "is-expanded" : ""}`}>
                   <button type="button" onClick={() => setMobileGroup(expanded ? null : group.slug)} aria-expanded={expanded}>
                     <span>{group.label}</span><ChevronDown size={17} className={expanded ? "rotate-180" : ""} />
                   </button>
