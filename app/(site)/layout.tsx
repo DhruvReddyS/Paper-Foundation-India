@@ -1,34 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Nav from "@/components/site/Nav";
-
-/* ── Campaign Banner ─────────────────────────────────── */
-function CampaignBanner() {
-  const [visible, setVisible] = useState(true);
-  if (!visible) return null;
-
-  return (
-    <div className="bg-forest text-white text-sm text-center py-2 px-4 relative">
-      <span className="font-sans">
-        <strong>New:</strong> Four evidence-led paper games are now open.{" "}
-        <Link href="/games" className="underline hover:text-copper transition-colors">
-          Enter the games lab <ArrowRight className="inline h-3.5 w-3.5" />
-        </Link>
-      </span>
-      <button
-        onClick={() => setVisible(false)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
-        aria-label="Dismiss banner"
-      >
-        <X size={15} />
-      </button>
-    </div>
-  );
-}
 
 /* ── Footer ──────────────────────────────────────────── */
 function Footer() {
@@ -57,7 +32,6 @@ export default function SiteLayout({
 
   return (
     <>
-      {!immersive && <CampaignBanner />}
       <Nav />
       <main className="min-h-screen">{children}</main>
       {!immersive && <Footer />}
