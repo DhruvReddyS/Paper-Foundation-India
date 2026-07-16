@@ -5,6 +5,7 @@ import JourneyPreview from "@/components/home/sections/journey-preview/JourneyPr
 import KnowledgeHub from "@/components/home/sections/knowledge-hub/KnowledgeHub";
 import LivingCover from "@/components/home/sections/living-cover/LivingCover";
 import MythsFairly from "@/components/home/sections/myths-fairly/MythsFairly";
+import PaperEverywhere from "@/components/home/sections/paper-everywhere/PaperEverywhere";
 import PlayableEdition from "@/components/home/sections/playable-edition/PlayableEdition";
 
 export default function HomePage() {
@@ -14,6 +15,7 @@ export default function HomePage() {
       <LivingCover />
       <MythsFairly />
       <KnowledgeHub />
+      <PaperEverywhere />
       <JourneyPreview />
       <PlayableEdition />
       <IndiaLedger />

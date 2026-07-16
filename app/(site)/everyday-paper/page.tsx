@@ -1,12 +1,12 @@
 "use client";
 
-import EverydayHero from "./sections/EverydayHero";
+import PaperEverywhere from "@/components/home/sections/paper-everywhere/PaperEverywhere";
 import EverydayGrid from "./sections/EverydayGrid";
 
 export default function EverydayPaperPage() {
   return (
     <main className="min-h-screen">
-      <EverydayHero />
+      <PaperEverywhere />
       <EverydayGrid />
     </main>
   );

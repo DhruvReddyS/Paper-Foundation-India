@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, BookOpenCheck, Check, ChevronLeft, ChevronRight, FileSearch, HeartHandshake, Mail, MapPin, RefreshCw, Scale, SearchCheck, Sparkles, Users } from "lucide-react";
+import { ArrowRight, BookOpenCheck, Check, ChevronLeft, ChevronRight, FileSearch, HeartHandshake, Mail, MapPin, Minus, Plus, RefreshCw, Scale, SearchCheck, Sparkles, Users } from "lucide-react";
 import { useState, type PointerEvent } from "react";
 
 const principles = [
@@ -37,10 +37,19 @@ const advisors = [
   ["Venkateshwar Rao", "Raithu Naisthan Magazine"],
 ] as const;
 
+const faqs = [
+  ["Is Paper Foundation India part of the paper industry?", "Paper Foundation India is a registered public foundation. Its public work is built around evidence, transparent sourcing, named methods and visible corrections—not unqualified promotion."],
+  ["Does the foundation say paper has no environmental impact?", "No. Every material system has impacts and trade-offs. Our role is to replace blanket claims with the context needed to understand fibre source, production, use, recovery and local conditions."],
+  ["How do you choose the claims you investigate?", "We begin with questions people repeatedly encounter in public discussion, advertising, classrooms and purchasing decisions, then map the evidence and the limits of what it can prove."],
+  ["Can readers challenge or correct an article?", "Yes. Readers can contact the foundation with a precise claim, source or correction. Material changes should be made visible instead of silently erasing the earlier record."],
+  ["How can I participate in the initiative?", "You can apply to join the foundation, share a public question, report misinformation or contribute relevant source material through the Join and Contact pages."],
+] as const;
+
 export default function AboutExperience() {
   const reducedMotion = useReducedMotion();
   const [principle, setPrinciple] = useState(0);
   const [step, setStep] = useState(0);
+  const [faqOpen, setFaqOpen] = useState(0);
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
   const current = principles[principle];
   const CurrentIcon = current.icon;
@@ -95,6 +104,17 @@ export default function AboutExperience() {
     <section id="method" className="about-method-timeline"><header><p className="premium-kicker">Our working method</p><h2>From public question<br />to useful knowledge.</h2></header><div className="about-timeline-track">{timeline.map((item, index) => <button onClick={() => setStep(index)} className={step === index ? "is-active" : ""} key={item.year}><span>{item.year}</span><i /></button>)}</div><AnimatePresence mode="wait"><motion.div key={step} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><span>Step {timeline[step].year}</span><h3>{timeline[step].title}</h3><p>{timeline[step].text}</p></motion.div></AnimatePresence></section>
 
     <section className="about-transparency"><div><p className="premium-kicker">Trust is a visible process</p><h2>Registered.<br />Reachable.<br />Correctable.</h2><p>Paper Foundation is registered in Hyderabad, Telangana. Readers should be able to inspect claims, understand our method and contact the organization directly.</p><div className="about-contact-lines"><span><MapPin /> Domalguda, Hyderabad, Telangana</span><a href="mailto:paperfoundationindia@gmail.com"><Mail /> paperfoundationindia@gmail.com</a></div></div><div className="transparency-stack"><motion.article whileHover={{ rotate: -2, y: -8 }}><BookOpenCheck /><span>Sources</span><strong>Linked where the claim appears.</strong><Check /></motion.article><motion.article whileHover={{ rotate: 1, y: -8 }}><FileSearch /><span>Methods</span><strong>Boundaries and assumptions named.</strong><Check /></motion.article><motion.article whileHover={{ rotate: -1, y: -8 }}><RefreshCw /><span>Corrections</span><strong>Updated without erasing history.</strong><Check /></motion.article></div></section>
+
+    <section className="about-faq" aria-labelledby="about-faq-title">
+      <header><p className="premium-kicker">Questions worth asking</p><h2 id="about-faq-title">Before you take<br />our word for it.</h2><p>Our answers should be as open to inspection as the questions we ask of everyone else.</p></header>
+      <div className="about-faq-list">{faqs.map(([question, answer], index) => {
+        const open = faqOpen === index;
+        return <motion.article initial={{ opacity: 0, y: 45 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .45 }} transition={{ duration: .55, delay: index * .07 }} className={open ? "is-open" : ""} key={question}>
+          <button aria-expanded={open} onClick={() => setFaqOpen(open ? -1 : index)}><span>{String(index + 1).padStart(2, "0")}</span><strong>{question}</strong><i>{open ? <Minus /> : <Plus />}</i></button>
+          <AnimatePresence initial={false}>{open && <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: .32 }}><p>{answer}</p></motion.div>}</AnimatePresence>
+        </motion.article>;
+      })}</div>
+    </section>
 
     <section className="about-studio-cta"><Sparkles /><p>Paper Foundation India</p><h2>Read. Question. Play.<br />Use paper thoughtfully.</h2><div><Link href="/knowledge">Enter the knowledge studio <ArrowRight /></Link><Link href="/games">Test your paper sense</Link></div></section>
   </div>;
