@@ -108,7 +108,7 @@ for name, content in lib_files.items():
     create_file(f'lib/{name}', content)
 
 # 6. lib/models/
-models = ['Article', 'Myth', 'Resource', 'Glossary', 'Game', 'Inquiry', 'Subscriber', 'NewsItem', 'Correction', 'Analytics']
+models = ['Article', 'Myth', 'Resource', 'Glossary', 'Game', 'Inquiry', 'Subscriber', 'Analytics']
 for model in models:
     create_file(f'lib/models/{model}.ts', f'''
 import mongoose from 'mongoose';

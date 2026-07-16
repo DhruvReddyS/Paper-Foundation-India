@@ -10,7 +10,7 @@ const columns = [
     links: [
       { label: 'About Paper', href: '/about' },
       { label: 'Myths vs Facts', href: '/myths' },
-      { label: 'Articles', href: '/articles' },
+      { label: 'Knowledge Hub', href: '/knowledge' },
       { label: 'Glossary', href: '/glossary' },
     ],
   },
@@ -19,17 +19,17 @@ const columns = [
     links: [
       { label: 'Resources', href: '/resources' },
       { label: 'Games', href: '/games' },
-      { label: 'Paper Trail', href: '/games/paper-trail' },
-      { label: 'Lifecycle', href: '/about/lifecycle' },
+      { label: 'Paper Journey', href: '/journey' },
+      { label: 'Circularity', href: '/circularity' },
     ],
   },
   {
     title: 'Engage',
     links: [
-      { label: 'Newsroom', href: '/newsroom' },
+      { label: 'Get Involved', href: '/get-involved' },
       { label: 'Contact Us', href: '/contact' },
-      { label: 'Partner', href: '/contact' },
-      { label: 'FAQ', href: '/about' },
+      { label: 'India Map', href: '/india-map' },
+      { label: 'India Snapshot', href: '/india-snapshot' },
     ],
   },
 ];
