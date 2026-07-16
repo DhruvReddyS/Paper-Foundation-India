@@ -1,4 +1,4 @@
-# Knowledge Hub
+# Field Notes
 
 **Route:** `/knowledge`
 **Owner:** Member 1

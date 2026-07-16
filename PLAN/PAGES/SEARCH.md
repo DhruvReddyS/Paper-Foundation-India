@@ -1,4 +1,4 @@
-# Search
+# Search the Archive
 
 **Route:** `/search`
 **Owner:** Member 3

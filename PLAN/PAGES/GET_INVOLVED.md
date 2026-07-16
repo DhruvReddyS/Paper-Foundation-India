@@ -1,4 +1,4 @@
-# Get Involved
+# Join the Fold
 
 **Route:** `/get-involved`
 **Owner:** Member 3
