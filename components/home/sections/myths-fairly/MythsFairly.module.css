@@ -7,3 +7,5 @@
 @keyframes circleIn{from{opacity:0;transform:rotate(-5deg) scale(.6)}to{opacity:1;transform:rotate(-5deg) scale(1)}}@keyframes factPulse{50%{text-shadow:0 0 34px rgba(212,162,113,.45)}}@keyframes paperBurst{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--burst-x),-160px) rotate(190deg)}}
 .paperBits i:nth-child(1){--burst-x:-130px}.paperBits i:nth-child(2){--burst-x:-65px}.paperBits i:nth-child(3){--burst-x:24px}.paperBits i:nth-child(4){--burst-x:86px}.paperBits i:nth-child(5){--burst-x:145px}
 @media(max-width:850px){.reader .spread{transform:none}.evidenceSeal{top:55%}}
+.caseCounter{align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.55);text-align:center}.caseCounter span{font-family:var(--font-mono);font-size:.42rem;letter-spacing:.12em;text-transform:uppercase;color:#d4a271}.caseCounter strong{margin-top:.25rem;font-family:var(--font-serif);font-size:.9rem}.controls{grid-template-columns:60px 1fr 60px}
+@media(max-width:620px){.controls{grid-template-columns:48px 1fr 48px}.caseCounter strong{font-size:.78rem}}

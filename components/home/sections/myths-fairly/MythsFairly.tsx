@@ -55,7 +55,7 @@ export default function MythsFairly() {
       </div>
       <div className={styles.controls}>
         <button onClick={previous} aria-label="Previous myth"><ChevronLeft /></button>
-        <nav aria-label="Choose a myth case">{claims.map((item, index) => <button className={active === index ? styles.active : ""} onClick={() => go(index)} aria-label={`Open ${item.short} case`} aria-current={active === index ? "true" : undefined} key={item.short}><span>0{index + 1}</span><strong>{item.short}</strong><i /></button>)}</nav>
+        <p className={styles.caseCounter}><span>Use the arrows</span><strong>Inspect another claim</strong></p>
         <button onClick={next} aria-label="Next myth"><ChevronRight /></button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, BookMarked, Clock, Factory, Library, Recycle, Trees } from "lucide-react";
+import { ArrowRight, BookMarked, Clock, Factory, Library, Recycle, Sparkles, Trees } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./KnowledgeHub.module.css";
@@ -27,7 +27,7 @@ export default function KnowledgeHub() {
     </div>
 
     <div className={styles.shelf} data-reveal="right">
-      <p><span>Start anywhere.</span> Follow a question as far as your curiosity takes it.</p>
+      <div className={styles.promptCard}><Sparkles /><div><small>Choose your own trail</small><strong><em>Start anywhere.</em></strong><span>Follow a question as far as your curiosity takes it.</span></div></div>
       <Link href="/glossary"><BookMarked /><div><small>Build your vocabulary</small><strong>Explore the glossary</strong><span>Plain-language paper terms →</span></div><ArrowRight /></Link>
       <Link href="/resources"><Library /><div><small>Reports, guides &amp; sources</small><strong>Browse resources</strong><span>Take the evidence with you →</span></div><ArrowRight /></Link>
     </div>

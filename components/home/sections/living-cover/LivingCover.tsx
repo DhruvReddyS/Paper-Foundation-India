@@ -65,7 +65,5 @@ export default function LivingCover() {
       <div className={styles.fibreTrail} aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
       <p className={styles.playHint}>Touch the paper objects <span>↗</span></p>
     </div>
-
-    <nav className={styles.rail} aria-label="Explore the lives of one sheet">{lives.map((item, index) => <button className={active === index ? styles.active : ""} onClick={() => setActive(index)} aria-pressed={active === index} key={item.label}><span>{item.number}</span><strong>{item.label}</strong><small>{item.title}</small><i /></button>)}</nav>
   </section>;
 }
