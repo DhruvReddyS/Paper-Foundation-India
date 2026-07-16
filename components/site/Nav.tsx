@@ -87,18 +87,33 @@ function routeMatches(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+function navTheme(pathname: string) {
+  if (pathname === "/games" || pathname.startsWith("/discover")) return "discover";
+  if (["/journey", "/india-map", "/india-snapshot", "/everyday-paper", "/circularity"].some((route) => pathname === route || pathname.startsWith(`${route}/`))) return "paper";
+  if (pathname === "/") return "home";
+  return "editorial";
+}
+
 export default function Nav() {
   const pathname = usePathname();
   const desktopMenuRef = useRef<HTMLUListElement>(null);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileGroup, setMobileGroup] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     setOpenGroup(null);
     setMobileOpen(false);
     setMobileGroup(null);
   }, [pathname]);
+
+  useEffect(() => {
+    function onScroll() { setScrolled(window.scrollY > 24); }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     function closeOutside(event: MouseEvent) {
@@ -116,7 +131,7 @@ export default function Nav() {
   }, []);
 
   return (
-    <header className="site-header sticky top-0 z-50">
+    <header className={`site-header nav-theme-${navTheme(pathname)} ${scrolled ? "is-scrolled" : ""} sticky top-0 z-50`}>
       <nav className="container-wide flex h-[72px] items-center justify-between" aria-label="Primary navigation">
         <Link href="/" className="site-brand" aria-label="Paper Foundation India home">
           <Image src="/images/brand/paper-foundation-logo.png" alt="" width={42} height={42} priority />
