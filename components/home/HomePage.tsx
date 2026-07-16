@@ -7,7 +7,6 @@ import LivingCover from "@/components/home/sections/living-cover/LivingCover";
 import MythsFairly from "@/components/home/sections/myths-fairly/MythsFairly";
 import PaperEverywhere from "@/components/home/sections/paper-everywhere/PaperEverywhere";
 import PlayableEdition from "@/components/home/sections/playable-edition/PlayableEdition";
-import TerminalQuote from "@/components/home/sections/terminal-quote/TerminalQuote";
 
 export default function HomePage() {
   return (
@@ -17,7 +16,6 @@ export default function HomePage() {
       <MythsFairly />
       <KnowledgeHub />
       <PaperEverywhere />
-      <TerminalQuote />
       <JourneyPreview />
       <PlayableEdition />
       <IndiaLedger />

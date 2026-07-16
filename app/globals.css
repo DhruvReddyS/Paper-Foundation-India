@@ -17,13 +17,13 @@
   --dark-green: #244D32;
 
   /* Typography */
-  --font-serif: 'Bodoni Moda', Didot, Georgia, serif;
-  --font-sans: 'DM Sans', system-ui, sans-serif;
-  --font-mono: 'DM Mono', monospace;
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), monospace;
 }
 
 /* Landing-page reveal language: paper objects arrive like sheets placed on a desk. */
-.home-shell { overflow:hidden; }
+.home-shell { overflow-x:clip; }
 .home-shell > section:not(:first-child),
 .home-shell [data-reveal] {
   opacity: 0;

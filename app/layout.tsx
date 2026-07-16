@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda, DM_Sans, DM_Mono } from "next/font/google";
+import { DM_Mono, DM_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 
-const bodoniModa = Bodoni_Moda({
+const fraunces = Fraunces({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   style: ["normal", "italic"],
-  variable: "--font-bodoni-moda",
+  variable: "--font-fraunces",
 });
 
 const dmSans = DM_Sans({
@@ -53,7 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${bodoniModa.variable} ${dmSans.variable} ${dmMono.variable} min-h-screen bg-paper-white text-charcoal font-sans antialiased`}
+        className={`${fraunces.variable} ${dmSans.variable} ${dmMono.variable} min-h-screen bg-paper-white text-charcoal font-sans antialiased`}
       >
         {children}
       </body>
