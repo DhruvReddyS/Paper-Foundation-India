@@ -30,13 +30,21 @@ app/(site)/page.tsx
 
 ## Landing page section registry
 
-The landing page is intentionally reduced to one approved section while it is redesigned from the beginning.
+The landing page is composed as a sequence of isolated sections. `HomePage.tsx` controls their order; each section owns its component and responsive CSS module.
 
 | Order | Section | Component | Styles | Content/data | Browser anchor |
 | --- | --- | --- | --- | --- | --- |
-| 01 | The Playable Edition | `components/home/sections/playable-edition/PlayableEdition.tsx` | `components/home/sections/playable-edition/PlayableEdition.module.css` | `components/home/sections/playable-edition/games.ts` | `/#playable-edition` |
+| 01 | The Living Cover | `components/home/sections/living-cover/LivingCover.tsx` | `components/home/sections/living-cover/LivingCover.module.css` | Inside component | `/` |
+| 02 | Paper, Reconsidered | `components/home/sections/reconsidered/Reconsidered.tsx` | `components/home/sections/reconsidered/Reconsidered.module.css` | Inside component | `/#reconsidered` |
+| 03 | The Evidence Desk | `components/home/sections/evidence-desk/EvidenceDesk.tsx` | `components/home/sections/evidence-desk/EvidenceDesk.module.css` | Inside component | Landing page section 03 |
+| 04 | The Playable Edition | `components/home/sections/playable-edition/PlayableEdition.tsx` | `components/home/sections/playable-edition/PlayableEdition.module.css` | `components/home/sections/playable-edition/games.ts` | `/#playable-edition` |
+| 05 | One Sheet Across India | `components/home/sections/india-ledger/IndiaLedger.tsx` | `components/home/sections/india-ledger/IndiaLedger.module.css` | Inside component | Landing page section 05 |
+| 06 | Follow the Fibre | `components/home/sections/journey-preview/JourneyPreview.tsx` | `components/home/sections/journey-preview/JourneyPreview.module.css` | Inside component | Landing page section 06 |
+| 07 | Field Notes | `components/home/sections/field-notes/FieldNotes.tsx` | `components/home/sections/field-notes/FieldNotes.module.css` | Inside component | Landing page section 07 |
+| 08 | Paper Everywhere | `components/home/sections/paper-everywhere/PaperEverywhere.tsx` | `components/home/sections/paper-everywhere/PaperEverywhere.module.css` | Inside component | Landing page section 08 |
+| 09 | Join the Fold | `components/home/sections/join-the-fold/JoinTheFold.tsx` | `components/home/sections/join-the-fold/JoinTheFold.module.css` | Inside component | Landing page section 09 |
 
-Add each newly approved landing section as its own directory under `components/home/sections/`, then register it in this table and import it into `components/home/HomePage.tsx`.
+To move, remove or add a landing section, edit the import and render order in `components/home/HomePage.tsx`. Keep each new section in its own directory under `components/home/sections/` and register it in this table.
 
 ## Shared public shell
 
