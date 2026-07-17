@@ -1,51 +1,85 @@
 "use client";
 
-import { ArrowRight, BookOpen } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowRight, Droplets, Factory, Layers3, Recycle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import InteractiveBook, { type BookPage } from "@/components/ui/interactive-book";
 import styles from "./JourneyPreview.module.css";
 
-const previewPages: BookPage[] = [
+const chapters = [
   {
-    pageNumber: 1,
-    title: "Source + recover",
-    content: <div className={styles.previewPage}><Image src="/images/journey/spreads-v2/spread5.jpg" alt="Managed fibre landscape" fill sizes="290px" /><span>Fresh and recovered fibre enter through different routes.</span></div>,
-    backContent: <div className={styles.previewNote}><small>01 / SOURCE</small><strong>Start with evidence.</strong><p>Traceability, landscape management and clean recovery shape what a fibre can become.</p></div>,
+    no: "01",
+    verb: "Source",
+    note: "Fresh and recovered fibre begin through different, inspectable routes.",
+    image: "/images/journey/spreads-v2/spread5.jpg",
+    icon: Layers3,
   },
   {
-    pageNumber: 2,
-    title: "Pulp + clean",
-    content: <div className={styles.previewPage}><Image src="/images/journey/spreads-v2/spread4.jpg" alt="Paper mill pulper" fill sizes="290px" /><span>Water and motion release the old sheet into usable fibre.</span></div>,
-    backContent: <div className={styles.previewNote}><small>02 / PREPARE</small><strong>Remove what does not belong.</strong><p>Screens and cleaners protect the furnish before the sheet is formed again.</p></div>,
+    no: "02",
+    verb: "Prepare",
+    note: "Water, motion, screening and cleaning release useful fibre.",
+    image: "/images/journey/spreads-v2/spread4.jpg",
+    icon: Droplets,
   },
   {
-    pageNumber: 3,
-    title: "Form + finish",
-    content: <div className={styles.previewPage}><Image src="/images/journey/spreads-v2/spread6.jpg" alt="Papermaking process inspection" fill sizes="290px" /><span>A dilute flow becomes a continuous, useful web.</span></div>,
-    backContent: <div className={styles.previewNote}><small>03 / MAKE</small><strong>Pressure first. Controlled heat next.</strong><p>The tour explains each decision without pretending every grade uses one recipe.</p></div>,
+    no: "03",
+    verb: "Make",
+    note: "A dilute furnish is formed, pressed, dried and converted.",
+    image: "/images/journey/spreads-v2/spread6.jpg",
+    icon: Factory,
   },
   {
-    pageNumber: 4,
-    title: "Continue the journey",
-    content: <div className={styles.previewFinish}><BookOpen /><strong>Ready for the full field book?</strong><Link href="/journey">Enter all 12 chapters <ArrowRight /></Link></div>,
+    no: "04",
+    verb: "Return",
+    note: "Clean separation keeps suitable fibre moving toward another use.",
+    image: "/images/journey/spreads-v2/spread3.jpg",
+    icon: Recycle,
   },
-];
+] as const;
 
 export default function JourneyPreview() {
-  return <section className={styles.section} aria-labelledby="journey-home-title">
-    <div className={styles.copy} data-reveal="left"><p>Paper Journey</p><h2 id="journey-home-title">How is paper really made? <em>Take the full tour.</em></h2><span>Open a thick field book and follow fibre from source to sheet, use and return. Each chapter explains one decision—and why the whole truth needs the whole journey.</span><Link href="/journey">Open the interactive book <BookOpen /><ArrowRight /></Link></div>
-    <div className={styles.bookStage} data-reveal="right">
-      <InteractiveBook
-        coverImage="/images/journey/spreads-v2/cover.jpg"
-        bookTitle="The Paper Journey"
-        bookAuthor="Paper Foundation India"
-        pages={previewPages}
-        width={290}
-        height={410}
-        className={styles.interactiveBook}
-      />
-      <div className={styles.bookNote}><BookOpen /><small>A field book with weight</small><strong>Open it. Turn it. Follow it.</strong><p>The cover now opens into a real preview before the full journey.</p></div>
-    </div>
-  </section>;
+  const reduced = useReducedMotion();
+
+  return (
+    <section className={styles.section} aria-labelledby="journey-home-title">
+      <div className={styles.copy} data-reveal="left">
+        <p>Paper Journey · process folio</p>
+        <h2 id="journey-home-title">A sheet is not made in one moment.</h2>
+        <span>
+          Pull the process apart—source, prepare, make and return—then open the
+          full field book for all thirteen evidence-led chapters.
+        </span>
+        <Link href="/journey">Enter the complete journey <ArrowRight /></Link>
+      </div>
+
+      <div className={styles.folio} data-reveal="right">
+        <div className={styles.thread} aria-hidden="true"><i /><i /><i /><i /></div>
+        {chapters.map((chapter, index) => {
+          const Icon = chapter.icon;
+          return (
+            <motion.article
+              key={chapter.no}
+              className={styles.chapter}
+              initial={reduced ? false : { opacity: 0, x: 60, rotate: index % 2 ? 1.5 : -1.5 }}
+              whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+              viewport={{ once: true, amount: .45 }}
+              transition={{ delay: index * .08, duration: .62, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={reduced ? undefined : { x: -14 }}
+            >
+              <div className={styles.photo}>
+                <Image src={chapter.image} alt="" fill sizes="(max-width: 760px) 35vw, 230px" />
+              </div>
+              <span>{chapter.no}</span>
+              <Icon aria-hidden="true" />
+              <div><strong>{chapter.verb}</strong><p>{chapter.note}</p></div>
+              <ArrowRight aria-hidden="true" />
+            </motion.article>
+          );
+        })}
+        <Link href="/journey" className={styles.seal}>
+          <span>13</span><small>chapters</small><strong>Open the field book</strong><ArrowRight />
+        </Link>
+      </div>
+    </section>
+  );
 }

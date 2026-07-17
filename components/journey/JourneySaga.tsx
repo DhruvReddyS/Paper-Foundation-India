@@ -51,7 +51,7 @@ export default function JourneySaga() {
 
         <div className={styles.bookWindow}>
           <InteractiveBook
-            coverImage="/images/journey/paper-journey-cover.svg"
+            coverImage="/images/journey/paper-journey-cover-v2.jpg"
             bookTitle="The Paper Journey"
             bookAuthor="Paper Foundation India"
             pages={journeyPages}

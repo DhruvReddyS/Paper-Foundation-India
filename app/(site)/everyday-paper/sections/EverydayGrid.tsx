@@ -1,86 +1,25 @@
 "use client";
 
 import EverydayCard from "./EverydayCard";
+import styles from "./EverydayGrid.module.css";
 
 const items = [
-  {
-    title: "Notebooks",
-    emoji: "📓",
-    front: "The student's essential companion",
-    back: "India produces 2 billion+ notebooks annually, mostly from recycled fibre. Each notebook uses about 0.05 trees worth of pulp.",
-    category: "Education",
-  },
-  {
-    title: "Corrugated Boxes",
-    emoji: "📦",
-    front: "E-commerce's backbone",
-    back: "92% of corrugated boxes in India are recycled. The corrugated industry is the single largest consumer of recycled fibre.",
-    category: "Packaging",
-  },
-  {
-    title: "Tissue Paper",
-    emoji: "🧻",
-    front: "Hygiene you take for granted",
-    back: "India's tissue market is growing at 15% annually. Modern tissue mills use 100% recycled fibre for standard grades.",
-    category: "Hygiene",
-  },
-  {
-    title: "Newspaper",
-    emoji: "📰",
-    front: "Still reaching 400M+ readers daily",
-    back: "India remains the world's largest newspaper market by circulation. Most newsprint is made from de-inked recycled fibre.",
-    category: "Media",
-  },
-  {
-    title: "Tea Bags",
-    emoji: "🍵",
-    front: "Filter paper in every cup",
-    back: "Specialty filter paper for tea bags is made from food-grade virgin pulp with precise porosity for optimal brewing.",
-    category: "Food",
-  },
-  {
-    title: "Currency Notes",
-    emoji: "💵",
-    front: "Not quite paper, but close",
-    back: "Indian banknotes are printed on cotton-rag paper, an extremely durable specialty grade that lasts years of handling.",
-    category: "Specialty",
-  },
-  {
-    title: "Medicine Boxes",
-    emoji: "💊",
-    front: "Protecting your prescriptions",
-    back: "Pharmaceutical packaging uses high-quality bleached board with barrier coatings to protect medicines from moisture.",
-    category: "Healthcare",
-  },
-  {
-    title: "Paper Bags",
-    emoji: "🛍️",
-    front: "The sustainable shopping choice",
-    back: "Paper bags biodegrade in 2-6 months vs. 500+ years for plastic. India's paper bag market has tripled since the plastic ban.",
-    category: "Retail",
-  },
-  {
-    title: "Textbooks",
-    emoji: "📚",
-    front: "Knowledge on every page",
-    back: "India prints 1 billion+ textbooks annually for its 320M students. Maplitho paper is the preferred grade for durability.",
-    category: "Education",
-  },
-];
+  { title: "Notebooks", image: "/images/everyday/learning-in-paper.jpg", front: "A stable place for ideas to stay.", back: "A notebook’s value begins with use: filled pages, both sides where appropriate, then clean separation into a suitable recovery stream.", category: "Education" },
+  { title: "Corrugated boxes", image: "/images/everyday/business-in-paper.jpg", front: "Lightweight structure carrying heavy responsibility.", back: "Flutes and linerboard create strength with relatively little material. Clean, flattened boxes are a valuable recovered grade.", category: "Packaging" },
+  { title: "Tissue", image: "/images/everyday/hygiene-in-paper.jpg", front: "A specialised sheet designed for hygiene.", back: "Tissue grades balance softness, strength and absorbency. Used hygiene papers usually do not belong in ordinary paper recycling.", category: "Hygiene" },
+  { title: "Newsprint", image: "/images/everyday/newsprint-in-paper.jpg", front: "A shared record made portable.", back: "Newsprint prioritises efficient communication. Fibre choice, ink and the local collection system shape its next route.", category: "Media" },
+  { title: "Tea filters", image: "/images/everyday/food-in-paper.jpg", front: "Porosity engineered into a tiny paper product.", back: "Filter paper must let liquid pass while retaining particles. Food contact and mixed components affect disposal options.", category: "Food" },
+  { title: "Banknotes", image: "/images/everyday/currency-paper.jpg", front: "Paper-like, but engineered for years of handling.", back: "Indian banknote substrate uses cotton rather than ordinary wood-pulp paper, showing why appearance alone cannot identify a material.", category: "Specialty" },
+  { title: "Medicine cartons", image: "/images/everyday/health-in-paper.jpg", front: "Protection and information travelling together.", back: "A medicine carton protects the pack and carries essential instructions. Coatings, inserts and contamination change recovery decisions.", category: "Healthcare" },
+  { title: "Paper bags", image: "/images/everyday/craft-in-paper.jpg", front: "A carrying format whose impact depends on reuse.", back: "Strength, fibre source, number of uses and end-of-life all matter. No material label is a complete environmental verdict.", category: "Retail" },
+  { title: "Textbooks", image: "/images/knowledge/articles/zero-paper-waste-campuses.jpg", front: "Information designed to be revisited.", back: "Durability and readability extend a textbook’s service. Sharing, repair and responsible collection can keep its value moving.", category: "Education" },
+] as const;
 
 export default function EverydayGrid() {
   return (
-    <section className="py-12 px-6 bg-white">
-      <div className="max-w-6xl mx-auto">
-        <p className="text-center text-sm text-forest/50 mb-8">
-          👆 Tap any card to flip and learn more
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item, i) => (
-            <EverydayCard key={item.title} item={item} index={i} />
-          ))}
-        </div>
-      </div>
+    <section className={styles.section}>
+      <header><div><p>Everyday atlas / nine object files</p><h2>Open the object.<br />Read the material job.</h2></div><p>Each reveal stays inside its own card, so the archive never jumps or pushes an entire row.</p></header>
+      <div className={styles.grid}>{items.map((item, index) => <EverydayCard key={item.title} item={item} index={index} />)}</div>
     </section>
   );
 }

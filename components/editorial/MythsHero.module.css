@@ -332,3 +332,12 @@
     backdrop-filter: none !important;
   }
 }
+
+/* Landscape evidence desk: a wide reading surface with horizontal case slips. */
+.hero{min-height:max(680px,calc(100svh - 72px))!important}
+.copy{width:min(1060px,calc(100vw - 180px));min-height:390px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.copy h1{max-width:980px;font-size:clamp(3.8rem,6.7vw,7.1rem)!important;line-height:.86!important;text-wrap:balance}.copy>p:not(:first-child){max-width:720px!important}.stack{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}
+.card{width:clamp(310px,29vw,430px)!important;min-height:clamp(190px,17vw,255px)!important}.card>strong{font-size:clamp(1rem,1.45vw,1.45rem)!important;-webkit-line-clamp:4}
+.card:nth-child(1){left:-4%!important;top:8%!important}.card:nth-child(2){left:24%!important;top:-12%!important}.card:nth-child(3){right:16%!important;top:-8%!important}.card:nth-child(4){right:-5%!important;top:11%!important}.card:nth-child(5){left:-8%!important;top:60%!important}.card:nth-child(6){left:18%!important;top:77%!important}.card:nth-child(7){right:22%!important;top:78%!important}.card:nth-child(8){right:-7%!important;top:61%!important}.card:nth-child(n+9){display:none}
+@media(max-width:900px){.copy{width:min(680px,calc(100vw - 56px));min-height:430px}.card{width:250px!important;min-height:205px!important}}
+@media(max-width:620px){.hero{min-height:790px!important}.copy{width:100%;min-height:500px}.copy h1{font-size:clamp(2.8rem,13vw,4rem)!important}.card{width:180px!important;min-height:190px!important}}

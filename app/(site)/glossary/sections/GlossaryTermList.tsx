@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowDown, BookOpenText, Search, X } from "lucide-react";
+import { BookOpenText, Search, X } from "lucide-react";
 import styles from "./Glossary.module.css";
 
 interface Term {
@@ -68,42 +68,16 @@ export default function GlossaryTermList() {
 
   return (
     <main className={styles.page}>
-      <section className={styles.hero}>
-        <div className={styles.heroMark} aria-hidden="true">Aa</div>
-        <motion.div
-          className={styles.heroCopy}
-          initial={{ opacity: 0, y: 28 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: .65 }}
-        >
-          <p className={styles.eyebrow}>The language of paper · clearly put</p>
-          <h1>Words shape<br />what we <em>understand.</em></h1>
-          <p className={styles.deck}>
-            A working dictionary for paper, fibre, forests and circular systems—written
-            in plain language, with room for nuance.
-          </p>
-          <a href="#glossary-index">Open the index <ArrowDown aria-hidden="true" /></a>
-        </motion.div>
-
-        <motion.aside
-          className={styles.definitionSlip}
-          initial={{ opacity: 0, rotate: 5, x: 30 }}
-          animate={{ opacity: 1, rotate: -2, x: 0 }}
-          transition={{ delay: .18, duration: .7 }}
-        >
-          <span>word of the desk · 01</span>
-          <BookOpenText aria-hidden="true" />
-          <small>cir·cu·lar·i·ty</small>
-          <strong>Keeping materials useful for longer—not simply calling something recyclable.</strong>
-          <i>noun</i>
-        </motion.aside>
-      </section>
-
       <section id="glossary-index" className={styles.index}>
+        <motion.div className={styles.compactIntro} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+          <div><p className={styles.eyebrow}>Paper language / field index</p><h1>Glossary</h1></div>
+          <p>Plain-language definitions for paper, fibre, forestry and circular systems. Search first, or browse the live alphabet.</p>
+          <aside><BookOpenText /><span>TERM ON THE DESK</span><strong>cir·cu·lar·i·ty</strong><small>Keeping materials useful for longer.</small></aside>
+        </motion.div>
         <header className={styles.indexHeader}>
           <div>
             <p className={styles.eyebrow}>A—Z field index</p>
-            <h2>Find the word<br />behind the claim.</h2>
+            <h2>Find the word behind the claim.</h2>
           </div>
           <label className={styles.search}>
             <Search aria-hidden="true" />

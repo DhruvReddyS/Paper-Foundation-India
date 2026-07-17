@@ -198,6 +198,7 @@ export default function InteractiveBook({
                 <div className="absolute inset-0 w-full h-full z-0" style={{ transformStyle: 'preserve-3d' }}>
                     {pages.map((page, index) => {
                         const isFlipped = index <= currentPageIndex;
+                        const shouldRenderContent = index >= Math.max(-1, currentPageIndex - 1) && index <= currentPageIndex + 2;
                         // Stagger delays slightly for a realistic "whip" effect if user clicks fast, 
                         // but mostly we want instant feedback with smooth transition.
 
@@ -235,7 +236,7 @@ export default function InteractiveBook({
                                                     {page.title}
                                                 </h3>
                                             )}
-                                            {page.content}
+                                            {shouldRenderContent ? page.content : null}
                                         </div>
                                     </div>
                                     <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black/5 to-transparent pointer-events-none mix-blend-multiply" />
@@ -257,7 +258,7 @@ export default function InteractiveBook({
                                             {page.pageNumber * 2}
                                         </div>
                                         <div className="prose prose-neutral prose-sm max-w-none font-serif text-neutral-700 leading-relaxed select-none h-full flex flex-col">
-                                            {page.backContent ? (
+                                            {shouldRenderContent && page.backContent ? (
                                                 <div className="flex-1">
                                                     {page.backContent}
                                                 </div>

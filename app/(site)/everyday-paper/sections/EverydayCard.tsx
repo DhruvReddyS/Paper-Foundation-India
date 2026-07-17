@@ -1,59 +1,38 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, X } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import styles from "./EverydayGrid.module.css";
 
 interface EverydayCardProps {
-  item: {
-    title: string;
-    emoji: string;
-    front: string;
-    back: string;
-    category: string;
-  };
+  item: { title: string; image: string; front: string; back: string; category: string };
   index: number;
 }
 
 export default function EverydayCard({ item, index }: EverydayCardProps) {
-  const [flipped, setFlipped] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
+    <motion.article
+      className={`${styles.card} ${open ? styles.open : ""}`}
+      initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.05 }}
-      className="perspective-1000 cursor-pointer"
-      onClick={() => setFlipped(!flipped)}
+      viewport={{ once: true, amount: .2 }}
+      transition={{ delay: Math.min(index * .05, .25) }}
+      whileHover={{ y: -8, rotate: index % 2 ? .25 : -.25 }}
     >
-      <motion.div
-        animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.5, type: "spring" }}
-        className="relative w-full h-56 preserve-3d"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        {/* Front */}
-        <div
-          className="absolute inset-0 rounded-2xl bg-white shadow-sm border border-sage/20 p-5 flex flex-col items-center justify-center text-center"
-          style={{ backfaceVisibility: "hidden" }}
-        >
-          <span className="text-4xl mb-3">{item.emoji}</span>
-          <h3 className="font-semibold text-forest text-lg mb-1">{item.title}</h3>
-          <p className="text-sm text-forest/60">{item.front}</p>
-          <span className="mt-3 text-xs bg-sage/20 text-forest/60 px-2 py-0.5 rounded-full">
-            {item.category}
-          </span>
-        </div>
-
-        {/* Back */}
-        <div
-          className="absolute inset-0 rounded-2xl bg-forest text-paper-white p-5 flex flex-col items-center justify-center text-center"
-          style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-        >
-          <span className="text-3xl mb-3">{item.emoji}</span>
-          <p className="text-sm leading-relaxed">{item.back}</p>
-        </div>
-      </motion.div>
-    </motion.div>
+      <button type="button" onClick={() => setOpen(value => !value)} aria-expanded={open}>
+        <div className={styles.image}><Image src={item.image} alt="" fill sizes="(max-width:640px) 100vw, (max-width:980px) 50vw, 33vw" /></div>
+        <span>{String(index + 1).padStart(2, "0")} / {item.category}</span>
+        <h3>{item.title}</h3>
+        <p>{item.front}</p>
+        <i>{open ? <X /> : <ArrowUpRight />}</i>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && <motion.div className={styles.reveal} initial={{ clipPath: "inset(100% 0 0)" }} animate={{ clipPath: "inset(0% 0 0)" }} exit={{ clipPath: "inset(100% 0 0)" }} transition={{ duration: .35, ease: [0.22, 1, 0.36, 1] }}><small>OBJECT NOTE</small><p>{item.back}</p></motion.div>}
+      </AnimatePresence>
+    </motion.article>
   );
 }

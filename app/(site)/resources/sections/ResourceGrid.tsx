@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowDown, ArrowUpRight, BarChart3, BookOpen, FileText,
+  ArrowUpRight, BarChart3, BookOpen, FileText,
   GraduationCap, Library, Play, Search, SlidersHorizontal, X,
 } from "lucide-react";
 import styles from "./Resources.module.css";
@@ -38,38 +38,12 @@ export default function ResourceGrid() {
 
   return (
     <main className={styles.page}>
-      <section className={styles.hero}>
-        <motion.div
-          className={styles.heroCopy}
-          initial={{ opacity: 0, y: 28 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: .65 }}
-        >
-          <p className={styles.eyebrow}>Reports · methods · teaching tools</p>
-          <h1>Evidence you can<br /><em>take with you.</em></h1>
-          <p>Open the reading room: a curated working archive for understanding paper in India beyond the headline.</p>
-          <a href="#resource-archive">Browse the archive <ArrowDown aria-hidden="true" /></a>
-        </motion.div>
-
-        <motion.div
-          className={styles.archiveObject}
-          initial={{ opacity: 0, rotate: -4, scale: .94 }}
-          animate={{ opacity: 1, rotate: 1, scale: 1 }}
-          transition={{ delay: .15, duration: .7 }}
-          aria-hidden="true"
-        >
-          <div className={styles.folderBack}><span>PFI / PUBLIC FILE</span></div>
-          <div className={styles.folderSheet}>
-            <Library />
-            <small>Reading room selection</small>
-            <strong>Sources before slogans.</strong>
-            <i>06 documents · open access</i>
-          </div>
-          <div className={styles.folderFront}><span>ARCHIVE 01</span><b>↗</b></div>
-        </motion.div>
-      </section>
-
       <section id="resource-archive" className={styles.archive}>
+        <motion.div className={styles.compactIntro} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+          <div><p className={styles.eyebrow}>Public evidence desk / open access</p><h1>Resources</h1></div>
+          <p>Reports, methods and teaching tools—each labelled with publisher, format and date before you open it.</p>
+          <aside><Library /><span>READING ROOM</span><strong>06</strong><small>documents on this shelf</small></aside>
+        </motion.div>
         <header className={styles.archiveHeader}>
           <div>
             <p className={styles.eyebrow}>The public evidence desk</p>

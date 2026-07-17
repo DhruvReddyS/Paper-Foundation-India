@@ -76,20 +76,25 @@ export default function MythsExperience() {
       <header><div><p className="premium-kicker">Browse by evidence category</p><h2>Choose a subject.<br />Open one dossier.</h2></div><p>No collapsing shelves and no broken grid. Pick a category, then open any card in a focused evidence reader without disturbing the wall behind it.</p></header>
       <label className="myth-search-desk"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search all sixty claims..." /><span>{String(filteredLibrary.length).padStart(2, "0")} cases</span></label>
 
-      {!query && <nav className="myth-category-index" aria-label="Myth categories">
-        {grouped.map((group, index) => <button key={group.slug} onClick={() => setActiveCategory(group.name)} className={activeCategory === group.name ? "is-active" : ""}><span>{String(index + 1).padStart(2, "0")}</span><strong>{group.name}</strong><small>{group.items.length}</small></button>)}
-      </nav>}
+      <div className="myth-library-layout">
+        {!query && <nav className="myth-category-index" aria-label="Myth categories">
+          <span className="myth-category-caption">EVIDENCE CATEGORIES</span>
+          {grouped.map((group, index) => <button key={group.slug} onClick={() => setActiveCategory(group.name)} className={activeCategory === group.name ? "is-active" : ""}><span>{String(index + 1).padStart(2, "0")}</span><strong>{group.name}</strong><small>{group.items.length}</small></button>)}
+        </nav>}
 
-      <div className="myth-wall-heading">
-        <div><span>{query ? "SEARCH RESULTS" : activeGroup.slug.replaceAll("-", " / ").toUpperCase()}</span><h3>{query ? `${filteredLibrary.length} matching dossiers` : activeGroup.name}</h3></div>
-        <p>Click a seal to open that claim on its own reading desk.</p>
+        <div className="myth-library-cases">
+          <div className="myth-wall-heading">
+            <div><span>{query ? "SEARCH RESULTS" : activeGroup.slug.replaceAll("-", " / ").toUpperCase()}</span><h3>{query ? `${filteredLibrary.length} matching dossiers` : activeGroup.name}</h3></div>
+            <p>Press the seal. The card changes face without moving the row.</p>
+          </div>
+
+          <motion.div layout className="myth-evidence-grid">
+            <AnimatePresence mode="popLayout">
+              {(query ? filteredLibrary : activeGroup.items).map((item, index) => <MythCase key={item.id} item={item} index={index} />)}
+            </AnimatePresence>
+          </motion.div>
+        </div>
       </div>
-
-      <motion.div layout className="myth-evidence-grid">
-        <AnimatePresence mode="popLayout">
-          {(query ? filteredLibrary : activeGroup.items).map((item, index) => <MythCase key={item.id} item={item} index={index} />)}
-        </AnimatePresence>
-      </motion.div>
       {filteredLibrary.length === 0 && <div className="myth-search-empty"><ScanSearch /><strong>No matching case yet.</strong><p>Try a broader word or submit the claim to the foundation.</p></div>}
     </section>
 
@@ -107,7 +112,9 @@ export default function MythsExperience() {
       <div className="myth-game-tickets">
         <Link href="/discover/truth-press"><span>GAME 02 · CLAIM LAB</span><strong>The Truth Press</strong><p>Myth, fact or missing context?</p><b>Play now <ArrowRight /></b></Link>
         <Link href="/discover/grow-or-shred"><span>GAME 01 · PAPER IQ</span><strong>Grow or Shred</strong><p>Grow evidence. Shred assumptions.</p><b>Play now <ArrowRight /></b></Link>
-        <Link href="/games"><span>THE PLAYABLE EDITION</span><strong>All five games</strong><p>Choose your way into the evidence.</p><b>Open game hub <ArrowRight /></b></Link>
+        <Link href="/discover/mill-master"><span>GAME 03 · PROCESS</span><strong>Mill Shuffle</strong><p>Put the mill stages in order.</p><b>Play now <ArrowRight /></b></Link>
+        <Link href="/discover/hidden-paper"><span>GAME 04 · CLUE HUNT</span><strong>Hidden Paper</strong><p>Find fibre hiding in daily life.</p><b>Play now <ArrowRight /></b></Link>
+        <Link href="/discover/paper-word-search"><span>GAME 05 · WORD HUNT</span><strong>Fibre Word Search</strong><p>Find ten words against the clock.</p><b>Play now <ArrowRight /></b></Link>
       </div>
     </section>
 
@@ -117,7 +124,7 @@ export default function MythsExperience() {
 
 function MythCase({ item, index }: { item: HandbookCard; index: number }) {
   const [revealed, setRevealed] = useState(false);
-  return <motion.article layout initial={{ opacity: 0, y: 24, rotate: index % 2 ? 1 : -1 }} animate={{ opacity: 1, y: 0, rotate: 0 }} exit={{ opacity: 0, scale: .94 }} transition={{ delay: Math.min(index * .025, .18) }} whileHover={{ y: -9, rotate: index % 2 ? .5 : -.5 }} className={`case-tone-${index % 5 + 1} ${revealed ? "is-revealed" : ""}`}>
+  return <motion.article layout initial={{ opacity: 0, y: 24, rotate: index % 2 ? 1 : -1 }} animate={{ opacity: 1, y: 0, rotate: 0 }} exit={{ opacity: 0, scale: .94 }} transition={{ delay: Math.min(index * .025, .18) }} whileHover={{ y: -7, rotate: index % 2 ? .35 : -.35 }} className={`case-tone-${index % 5 + 1} ${revealed ? "is-revealed" : ""}`}>
     <button className="myth-case-trigger" onClick={() => setRevealed(value => !value)} aria-expanded={revealed}>
       <AnimatePresence mode="wait" initial={false}>
         {!revealed ? <motion.div className="myth-card-face myth-card-front" key="myth" initial={{ opacity: 0, rotateX: -8 }} animate={{ opacity: 1, rotateX: 0 }} exit={{ opacity: 0, rotateX: 8 }} transition={{ duration: .22 }}>

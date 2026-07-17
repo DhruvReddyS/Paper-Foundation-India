@@ -14,7 +14,6 @@ export default function SiteLayout({
 }) {
   const pathname = usePathname();
   const immersive =
-    pathname === "/journey" ||
     /^\/discover\/(grow-or-shred|truth-press|mill-master|hidden-paper|paper-word-search)$/.test(pathname);
 
   return (
