@@ -4,22 +4,24 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, ArrowRight, Check, ChevronLeft, ChevronRight, ExternalLink, Search, ScanSearch, Sparkles, Stamp, X } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, type PointerEvent } from "react";
+import handbookCards from "@/content/mythCatalog.json";
 
 type Verdict = "myth" | "fact" | "context";
-const claims: { claim: string; verdict: Verdict; short: string; explanation: string; source: string }[] = [
-  { claim: "Using paper automatically causes deforestation.", verdict: "context", short: "Source decides the story", explanation: "A paper product does not reveal its forestry outcome by material name alone. Fibre source, land-use change and management evidence determine the answer.", source: "FAO sustainable forest management guidance" },
-  { claim: "Clean, dry corrugated boxes are valuable recovered fibre.", verdict: "fact", short: "Keep the box clean and dry", explanation: "Corrugated board is a widely recovered paper grade. Flattening it and keeping it dry supports collection and mill use.", source: "Recovered-paper collection guidance" },
-  { claim: "Paper fibres can be recycled forever.", verdict: "myth", short: "The loop loses fibre", explanation: "Fibres shorten and material is lost through use and recovery. Responsible fresh fibre helps replenish a functioning loop.", source: "CEPI fibre-loop guidance" },
-  { claim: "Every paper package belongs in every paper bin.", verdict: "myth", short: "Design and contamination matter", explanation: "Food residue, wax and some barrier layers can make a package unsuitable for a local paper-recovery system.", source: "Paper packaging recyclability guidance" },
-];
-
-const library = [
-  { category: "Forests", text: "Fresh fibre always means natural forest loss.", verdict: "Context", note: "Source and forest management determine the outcome." },
-  { category: "Recovery", text: "A greasy pizza box recycles exactly like a clean carton.", verdict: "Myth", note: "Food residue and local acceptance change the route." },
-  { category: "Digital", text: "Digital communication has no material footprint.", verdict: "Myth", note: "Devices, networks, data centres and energy remain material systems." },
-  { category: "Design", text: "A paper label makes a package automatically recyclable.", verdict: "Myth", note: "Coatings, adhesives and construction still matter." },
-  { category: "Use", text: "Using paper responsibly includes using it fully.", verdict: "Fact", note: "Fit-for-purpose use protects the value already invested in fibre." },
+const categories = [
+  ["Forests & fibre", 8], ["Carbon & biodiversity", 13], ["India & agroforestry", 19],
+  ["Recovery", 30], ["Packaging", 38], ["Digital & print", 44],
+  ["Mills & chemistry", 52], ["Responsible use", 60],
 ] as const;
+const categoryFor = (index: number) => categories.find(([, end]) => index < end)?.[0] ?? "Paper systems";
+const claims = handbookCards.slice(0, 6).map((card, index) => ({
+  claim: card.myth,
+  verdict: "myth" as Verdict,
+  short: card.reality.split(/[.!?]/)[0],
+  explanation: card.reality,
+  source: card.evidence,
+  indiaContext: card.indiaContext,
+  index,
+}));
 
 export default function MythsExperience() {
   const reduced = useReducedMotion();
@@ -27,8 +29,11 @@ export default function MythsExperience() {
   const [answer, setAnswer] = useState<Verdict | null>(null);
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
   const [query, setQuery] = useState("");
+  const [openCase, setOpenCase] = useState<string | null>(handbookCards[0]?.id ?? null);
   const claim = claims[claimIndex];
-  const filteredLibrary = useMemo(() => library.filter((item) => `${item.category} ${item.text} ${item.verdict} ${item.note}`.toLowerCase().includes(query.toLowerCase())), [query]);
+  const filteredLibrary = useMemo(() => handbookCards
+    .map((card, index) => ({ ...card, category: categoryFor(index), number: index + 1 }))
+    .filter((item) => `${item.category} ${item.myth} ${item.reality} ${item.indiaContext}`.toLowerCase().includes(query.toLowerCase())), [query]);
 
   function move(event: PointerEvent<HTMLElement>) {
     if (reduced) return;
@@ -71,7 +76,28 @@ export default function MythsExperience() {
     <section className="myth-library-premium">
       <header><div><p className="premium-kicker">Searchable case library</p><h2>Find the claim<br />before sharing it.</h2></div><p>Search by subject, wording or verdict. Each case keeps the correction close to the claim.</p></header>
       <label className="myth-search-desk"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search forests, recycling, digital, design..." /><span>{String(filteredLibrary.length).padStart(2, "0")} cases</span></label>
-      <div className="myth-case-rail">{filteredLibrary.map((item, index) => <motion.article layout whileHover={{ y: -10, rotate: index % 2 ? .7 : -.7 }} key={item.text} className={`case-tone-${index % 5 + 1}`}><span>{String(index + 1).padStart(2, "0")} / {item.category}</span><strong>{item.text}</strong><p>{item.note}</p><div><small>Verdict</small><b>{item.verdict}</b></div></motion.article>)}</div>
+      <div className="myth-case-rail myth-handbook-grid">{filteredLibrary.map((item, index) => {
+        const open = openCase === item.id;
+        return <motion.article
+          layout
+          whileHover={open ? undefined : { y: -10, rotate: index % 2 ? .45 : -.45 }}
+          key={item.id}
+          className={`case-tone-${index % 5 + 1} ${open ? "is-open" : ""}`}
+          onClick={() => setOpenCase(open ? null : item.id)}
+        >
+          <button className="myth-case-trigger" aria-expanded={open}>
+            <span>{String(item.number).padStart(2, "0")} / {item.category}</span>
+            <strong>{item.myth}</strong>
+            <div><small>{open ? "Close evidence" : "Break the seal"}</small><b>{open ? "×" : "+"}</b></div>
+          </button>
+          <AnimatePresence initial={false}>{open && <motion.div className="myth-case-reveal" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
+            <p><small>Evidence-based reality</small>{item.reality}</p>
+            <p><small>Why it matters</small>{item.explanation}</p>
+            <p className="myth-india-note"><small>India context</small>{item.indiaContext}</p>
+            <footer><span>{item.evidence}</span><b>Reviewed {item.reviewed}</b></footer>
+          </motion.div>}</AnimatePresence>
+        </motion.article>;
+      })}</div>
       {filteredLibrary.length === 0 && <div className="myth-search-empty"><ScanSearch /><strong>No matching case yet.</strong><p>Try a broader word or submit the claim to the foundation.</p></div>}
     </section>
 

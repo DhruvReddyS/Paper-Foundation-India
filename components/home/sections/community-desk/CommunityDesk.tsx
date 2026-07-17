@@ -1,11 +1,39 @@
 "use client";
 
-import { ArrowRight, Check, Flag, Mail, Send, Users } from "lucide-react";
+import { ArrowRight, Building2, Flag, Mail, Users } from "lucide-react";
 import Link from "next/link";
-import { FormEvent, useState } from "react";
 import styles from "./CommunityDesk.module.css";
 
-export default function CommunityDesk(){const[kind,setKind]=useState<"Contact"|"Misinformation Report">("Misinformation Report");const[status,setStatus]=useState<"idle"|"sending"|"sent"|"error">("idle");async function submit(event:FormEvent<HTMLFormElement>){event.preventDefault();setStatus("sending");const form=new FormData(event.currentTarget);try{const response=await fetch("/api/inquiries",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:kind,name:form.get("name"),email:form.get("email"),subject:form.get("subject"),message:form.get("message")})});if(!response.ok)throw new Error();setStatus("sent");event.currentTarget.reset()}catch{setStatus("error")}}return <section className={styles.section} aria-labelledby="community-title">
- <div className={styles.join} data-reveal="left"><div className={styles.treeSeal}><Users/><i/><i/></div><p>Join the initiative</p><h2 id="community-title">Help write paper&apos;s <em>next chapter.</em></h2><span>Membership has no fee or financial commitment. It is a promise to support responsible use, challenge greenwashing and promote evidence-led understanding.</span><Link href="/join">Open the membership application <ArrowRight/></Link><div className={styles.letter}><small>Paper Foundation India · Open invitation</small><p>Love paper. Use paper responsibly. Ask better questions.</p><i/></div></div>
- <div className={styles.contact} data-reveal="right"><header><div><Mail/><span>Public correspondence desk</span></div><small>Inbox / 01</small></header>{status==="sent"?<div className={styles.success}><Check/><h3>Message placed in our inbox.</h3><p>Thank you for helping us keep the paper conversation fair.</p><button onClick={()=>setStatus("idle")}>Write another message</button></div>:<form onSubmit={submit}><div className={styles.switch}><button type="button" className={kind==="Misinformation Report"?styles.active:""} onClick={()=>setKind("Misinformation Report")}><Flag/> Report misinformation</button><button type="button" className={kind==="Contact"?styles.active:""} onClick={()=>setKind("Contact")}><Mail/> Contact us</button></div><label><span>Your name *</span><input required name="name" placeholder="Name"/></label><label><span>Email address *</span><input required type="email" name="email" placeholder="you@example.com"/></label><label><span>{kind==="Misinformation Report"?"Where did you see the claim?":"Subject"} *</span><input required name="subject" placeholder={kind==="Misinformation Report"?"Article, post, video or campaign":"How can we help?"}/></label><label><span>{kind==="Misinformation Report"?"Describe the claim and add any useful link":"Your message"} *</span><textarea required name="message" rows={5} placeholder="Write the details here"/></label><footer><p>Evidence or source links help us review reports fairly.</p><button disabled={status==="sending"} type="submit">{status==="sending"?"Sending…":"Send to the Foundation"}<Send/></button></footer>{status==="error"&&<p className={styles.error}>The message could not be sent. Please try again.</p>}</form>}</div>
- </section>}
+const doors = [
+  { href: "/about", note: "Understand the organisation", label: "About the Foundation", icon: Building2 },
+  { href: "/join", note: "Membership application", label: "Join the Foundation", icon: Users },
+  { href: "/contact", note: "Questions and partnerships", label: "Contact us", icon: Mail },
+  { href: "/report", note: "Submit a claim for review", label: "Report misinformation", icon: Flag },
+] as const;
+
+export default function CommunityDesk() {
+  return (
+    <section className={styles.section} aria-labelledby="community-title">
+      <div className={styles.join} data-reveal="left">
+        <div className={styles.treeSeal}><Users /><i /><i /></div>
+        <p>Join the initiative</p>
+        <h2 id="community-title">Help write paper&apos;s <em>next chapter.</em></h2>
+        <span>Membership has no fee or financial commitment. It is a promise to support responsible use, challenge greenwashing and promote evidence-led understanding.</span>
+        <Link href="/join">Open the membership application <ArrowRight /></Link>
+        <div className={styles.letter}><small>Paper Foundation India · Open invitation</small><p>Love paper. Use paper responsibly. Ask better questions.</p><i /></div>
+      </div>
+      <div className={`${styles.contact} foundation-directory`} data-reveal="right">
+        <header><div><Mail /><span>Foundation directory</span></div><small>Choose a desk</small></header>
+        <div className="foundation-directory-intro">
+          <p>One foundation.<br /><em>Four clear doors.</em></p>
+          <span>Applications, questions, evidence reports and information about our mission each have their own dedicated page.</span>
+        </div>
+        <nav aria-label="Foundation pages">
+          {doors.map(({ href, note, label, icon: Icon }) => (
+            <Link href={href} key={href}><Icon /><span><small>{note}</small><strong>{label}</strong></span><ArrowRight /></Link>
+          ))}
+        </nav>
+      </div>
+    </section>
+  );
+}

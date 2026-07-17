@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Keep the development compiler from rewriting a production build that is
-  // being previewed in another terminal.
-  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
+  // A single build directory prevents the development server from serving
+  // stale route chunks after a page has been rebuilt or renamed.
+  distDir: ".next",
   images: {
     remotePatterns: [
       {

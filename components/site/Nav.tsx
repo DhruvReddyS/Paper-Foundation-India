@@ -80,7 +80,6 @@ const navGroups: NavGroup[] = [
     items: [
       { href: "/about", label: "About Us", description: "Mission, principles and people", icon: Building2 },
       { href: "/join", label: "Join the Foundation", description: "Complete the membership application", icon: Users },
-      { href: "/get-involved", label: "Get Involved", description: "Contribute, collaborate or partner", icon: Users },
       { href: "/contact", label: "Contact", description: "Reach the foundation directly", icon: Mail },
       { href: "/report", label: "Report a Claim", description: "Send misinformation for review", icon: Flag },
     ],
