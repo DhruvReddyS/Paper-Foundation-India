@@ -1,6 +1,4 @@
-import ContactForm from "./sections/ContactForm";
-import ContactInfo from "./sections/ContactInfo";
-import ContactSuccess from "./sections/ContactSuccess";
+import CorrespondencePage from "@/components/site/CorrespondencePage";
 
 export const metadata = {
   title: "Contact | Paper Foundation India",
@@ -8,12 +6,5 @@ export const metadata = {
 };
 
 export default function ContactPage() {
-  return (
-    <main>
-      <ContactForm />
-      <ContactInfo />
-      {/* ContactSuccess is shown conditionally after form submit — rendered here as demo */}
-      <ContactSuccess />
-    </main>
-  );
+  return <CorrespondencePage mode="contact" />;
 }

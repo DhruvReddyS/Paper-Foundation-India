@@ -15,3 +15,24 @@
 @media(prefers-reduced-motion:reduce){.pin,.atlas article,.heatLayer i,.insights:global([data-revealed="true"]) .useLine i,.insights:global([data-revealed="true"]) .bars i{animation:none;transition:none}.useLine i{width:34%}.bars i{height:var(--bar)}}
 .heatLayer button{position:absolute;pointer-events:auto;cursor:pointer;border:0;border-radius:50%;background:radial-gradient(circle,rgba(177,91,54,.62),rgba(190,112,66,.22) 38%,transparent 68%);filter:blur(.2px);mix-blend-mode:multiply;animation:heatPulse 3.2s ease-in-out infinite;transition:filter .25s,transform .25s}.heatLayer button span{position:absolute;left:50%;top:50%;padding:.3rem .45rem;color:#663f2c;background:rgba(255,249,239,.8);font-family:var(--font-mono);font-size:.38rem;letter-spacing:.08em;text-transform:uppercase;opacity:0;transform:translate(-50%,-50%);transition:opacity .2s}.heatLayer button:hover span,.heatLayer button:focus-visible span,.heatLayer .heatActive span{opacity:1}.heatLayer button:hover,.heatLayer button:focus-visible,.heatLayer .heatActive{filter:saturate(1.35);transform:scale(1.12);outline:1px dashed rgba(121,72,47,.38);outline-offset:3px}.heatWest{animation-delay:-1.1s!important}.heatEast{animation-delay:-2.1s!important}.heatSouth{animation-delay:-.5s!important}
 @media(prefers-reduced-motion:reduce){.heatLayer button{animation:none}}
+
+/* Clipboard edition: the clean map and its evidence now read as one object. */
+.section{grid-template-columns:.72fr 1.28fr;gap:clamp(2rem,4vw,4rem);padding-block:clamp(3.3rem,5vw,5rem)}
+.copy>div:first-of-type{margin-top:1.6rem;display:flex;gap:1rem;flex-wrap:wrap}
+.copy aside{margin-top:1.5rem}
+.atlas{min-height:0;display:grid;grid-template-rows:54px 310px auto;box-shadow:16px 21px 0 rgba(45,95,62,.1),0 28px 70px rgba(52,57,49,.1);transform:rotate(.25deg)}
+.atlas:before{content:"";position:absolute;z-index:-1;inset:9px -9px -10px 10px;border:1px solid #c9bead;background:#e9dfce;transform:rotate(-.7deg)}
+.clip{width:92px;height:26px;position:absolute;z-index:5;top:-15px;left:50%;border:1px solid #8c806f;border-radius:6px 6px 2px 2px;background:linear-gradient(#c8bba8,#8f8373 48%,#b8aa97 52%);box-shadow:0 5px 10px rgba(58,51,42,.18);transform:translateX(-50%)}
+.clip:after{content:"";position:absolute;inset:5px 23px;border:1px solid rgba(69,62,53,.55);border-radius:2px;background:#dfd2bf}
+.atlas>header{height:54px}.atlas>header small{color:#8a755e}.atlas>header small i{display:none}
+.map{height:310px;border-bottom:1px solid #d4caba;background:linear-gradient(90deg,#fffdf8,#f7f5ef)}
+.map img{transform:scale(1.03);filter:grayscale(.28) sepia(.1) saturate(.65) contrast(.92)}
+.atlas>.insights{grid-column:auto;margin:0;padding:.75rem;display:grid;grid-template-columns:.95fr .92fr 1.13fr;gap:.55rem;background:#f2eadc}
+.atlas>.insights>article{min-height:176px;padding:.75rem;background:#fffdf8;box-shadow:none}
+.atlas>.insights article>header{padding-bottom:.5rem}.atlas>.insights article>header svg{width:15px}.atlas>.insights article>header span{font-size:.78rem}.atlas>.insights article>header small{font-size:.3rem}
+.atlas .recoveryChart>div{grid-template-columns:76px 1fr;gap:.65rem;margin-top:.7rem}.atlas .recoveryChart figure{width:70px}.atlas .recoveryChart figure:after{inset:9px}.atlas .recoveryChart figure strong{font-size:1.28rem}.atlas .recoveryChart p,.atlas .useChart p{font-size:.49rem;line-height:1.45}
+.atlas .useChart>div{margin-top:.6rem}.atlas .useChart>div>strong{font-size:2.05rem}.atlas .useLine{height:22px;margin:.55rem 0 .6rem}.atlas .useLine b,.atlas .useLine span{font-size:.29rem}
+.atlas .bars{height:100px;margin-top:.55rem;gap:.25rem}.atlas .bars i{width:min(25px,72%)}.atlas .bars strong{font-size:.48rem}.atlas .bars span{font-size:.27rem}
+.atlas .sourceNote{grid-column:1/-1;margin:.1rem .2rem 0;font-size:.32rem;text-align:left}
+@media(max-width:1000px){.section{grid-template-columns:1fr;background:#e7ddcd}.copy{max-width:720px}.atlas{width:min(760px,100%);grid-template-rows:54px 360px auto}.map{height:360px}}
+@media(max-width:680px){.section{padding-block:4rem}.atlas{grid-template-rows:50px 320px auto}.map{height:320px}.atlas>.insights{grid-template-columns:1fr}.atlas>.insights>article{min-height:180px}.atlas .regionChart{grid-column:auto}.clip{width:76px}.copy aside{margin-left:7%}}

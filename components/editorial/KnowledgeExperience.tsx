@@ -4,23 +4,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Clock, Compass, Factory, Leaf, Recycle, Search, Sparkles, Trees } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { articleCatalog, featuredArticles, type ArticleCatalogItem } from "@/content/articleCatalog";
 
-const features = [
-  { type: "Cover essay", time: "8 min", title: "How fibre sourcing shapes the paper story.", deck: "Read past the material label and follow the decisions that create the outcome.", category: "Forestry", icon: Trees, tone: "forest", slug: "truth-about-paper-forestry" },
-  { type: "Visual method", time: "6 min", title: "What a paper-recovery rate does not tell you.", deck: "Collection, contamination, yield and final use all sit behind one headline number.", category: "Recovery", icon: Recycle, tone: "copper", slug: "recycling-rates-compared" },
-  { type: "Mill note", time: "7 min", title: "Inside the decisions that form a sheet.", deck: "Water removal, fibre preparation and energy choices change performance at the mill.", category: "Production", icon: Factory, tone: "ink", slug: "water-usage-modern-mills" },
-] as const;
-
-const articles = [
-  { no: "01", category: "Forestry", title: "Why a fibre source needs more than a green label", time: "8 min", slug: "truth-about-paper-forestry" },
-  { no: "02", category: "Recovery", title: "Reading recovery rates without losing the fibre-level story", time: "6 min", slug: "recycling-rates-compared" },
-  { no: "03", category: "Method", title: "What life-cycle studies answer, and what they do not", time: "9 min", slug: "paper-vs-plastic-lifecycle" },
-  { no: "04", category: "Production", title: "Water, heat and the quiet engineering of a paper mill", time: "7 min", slug: "water-usage-modern-mills" },
-  { no: "05", category: "People", title: "The hands and livelihoods inside India’s fibre loop", time: "10 min", slug: "rural-livelihoods-paper" },
-  { no: "06", category: "Innovation", title: "Designing paper products for another useful life", time: "5 min", slug: "innovation-in-indian-mills" },
-] as const;
-
-const categories = ["All", "Forestry", "Recovery", "Method", "Production", "People", "Innovation"];
+const categoryIcon = (category: ArticleCatalogItem["category"]) => category === "Forestry" ? Trees : category === "Recovery" ? Recycle : category === "Production" ? Factory : Compass;
+const featureTones = ["forest", "copper", "ink"] as const;
+const features = featuredArticles.slice(0, 3).map((article, index) => ({ type: article.format, time: article.time, title: article.title, deck: article.summary, category: article.category, icon: categoryIcon(article.category), tone: featureTones[index], slug: article.slug }));
+const articles = articleCatalog.map(article => ({ no: String(article.id).padStart(2, "0"), category: article.category, title: article.title, time: article.time, slug: article.slug }));
+const categories = ["All", "Forestry", "Recovery", "Method", "Production", "Education", "Use"];
 
 const questionPaths = [
   { label: "Where did it begin?", title: "Follow the fibre source.", text: "Move from a green label to forest management, land use and traceable sourcing evidence.", category: "Forestry", icon: Trees },
@@ -45,7 +35,7 @@ export default function KnowledgeExperience() {
     <section className="knowledge-studio-hero">
       <div className="knowledge-studio-copy"><p className="premium-kicker"><span /> Public reading studio · Open access</p><h1>Make room<br />for the <em>full story.</em></h1><p>Evidence-led essays, visual methods and field notes about paper, fibre and the systems surrounding them.</p><div><a href="#reading-index">Browse the index <ArrowRight /></a><Link href="/myths">Question a claim</Link></div></div>
       <div className="knowledge-studio-object" aria-hidden="true"><motion.div animate={{ rotate: [-2, 1, -2], y: [0, -8, 0] }} transition={{ duration: 6, repeat: Infinity }}><small>OPEN / EDITION 01</small><BookOpen /><strong>CONTEXT<br />BEFORE<br />CONCLUSION</strong><span>Paper Foundation India</span></motion.div><i /><i /></div>
-      <div className="knowledge-studio-ticker"><span>New reading</span><p>How fibre sourcing shapes the paper story</p><small>08 min</small><ArrowRight /></div>
+      <div className="knowledge-studio-ticker"><span>20-source desk</span><p>{featuredArticles[0].title}</p><small>{featuredArticles[0].time}</small><ArrowRight /></div>
     </section>
 
     <section className="knowledge-question-navigator">
@@ -57,7 +47,7 @@ export default function KnowledgeExperience() {
     </section>
 
     <section className="knowledge-feature-carousel">
-      <header><div><p className="premium-kicker">Editor’s selection</p><h2>One subject.<br />Three ways in.</h2></div><div className="feature-carousel-controls"><button onClick={() => change(-1)} aria-label="Previous feature"><ChevronLeft /></button><span>{String(feature + 1).padStart(2, "0")} / 03</span><button onClick={() => change(1)} aria-label="Next feature"><ChevronRight /></button></div></header>
+      <header><div><p className="premium-kicker">Editor’s selection</p><h2>One material.<br />Three ways in.</h2></div><div className="feature-carousel-controls"><button onClick={() => change(-1)} aria-label="Previous feature"><ChevronLeft /></button><span>{String(feature + 1).padStart(2, "0")} / 03</span><button onClick={() => change(1)} aria-label="Next feature"><ChevronRight /></button></div></header>
       <div className="feature-carousel-stage">
         <AnimatePresence mode="wait"><motion.article key={feature} initial={{ opacity: 0, x: 45 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -45 }} className={`feature-tone-${active.tone}`}>
           <div className="feature-cover"><span>FIG. {String(feature + 1).padStart(2, "0")}</span><ActiveIcon /><i /><b /></div>
@@ -75,6 +65,6 @@ export default function KnowledgeExperience() {
 
     <section className="knowledge-method-strip"><div><Sparkles /><p className="premium-kicker">Our reading rule</p><h2>Source visible.<br />Method legible.<br />Corrections permanent.</h2></div><div className="method-strip-cards"><article><span>01</span><strong>Trace the claim</strong><p>Find the source behind the confident sentence.</p></article><article><span>02</span><strong>Read the boundary</strong><p>Check what the number includes and excludes.</p></article><article><span>03</span><strong>Keep it correctable</strong><p>Good public knowledge can show its revisions.</p></article></div></section>
 
-    <section className="knowledge-studio-cta"><Leaf /><h2>Start with one better question.</h2><p>Then follow it through the evidence.</p><Link href="/knowledge/truth-about-paper-forestry">Read the cover essay <ArrowRight /></Link></section>
+    <section className="knowledge-studio-cta"><Leaf /><h2>Start with one better question.</h2><p>Then follow it through the evidence.</p><Link href={`/knowledge/${featuredArticles[0].slug}`}>Read the cover essay <ArrowRight /></Link></section>
   </div>;
 }

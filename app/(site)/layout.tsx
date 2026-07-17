@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Footer from "@/components/site/Footer";
 import Nav from "@/components/site/Nav";
+import PaperCursor from "@/components/site/PaperCursor";
 
 /* ── Layout ──────────────────────────────────────────── */
 export default function SiteLayout({
@@ -15,6 +16,7 @@ export default function SiteLayout({
 
   return (
     <>
+      <PaperCursor />
       <Nav />
       <main className="min-h-screen">{children}</main>
       {!immersive && <Footer />}

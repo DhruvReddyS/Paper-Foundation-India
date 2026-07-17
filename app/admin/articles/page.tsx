@@ -1,2 +1,5 @@
-import React from 'react';
-export default function AdminArticles() { return <div>Articles Manager</div>; }
+import ArticleManager from "@/components/admin/ArticleManager";
+
+export default function AdminArticles() {
+  return <ArticleManager />;
+}

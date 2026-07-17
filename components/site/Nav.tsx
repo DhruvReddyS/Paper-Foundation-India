@@ -10,7 +10,9 @@ import {
   Building2,
   ChevronDown,
   FileText,
+  Flag,
   Gamepad2,
+  HeartHandshake,
   Library,
   Mail,
   MapPinned,
@@ -80,6 +82,7 @@ const navGroups: NavGroup[] = [
       { href: "/join", label: "Join the Foundation", description: "Complete the membership application", icon: Users },
       { href: "/get-involved", label: "Get Involved", description: "Contribute, collaborate or partner", icon: Users },
       { href: "/contact", label: "Contact", description: "Reach the foundation directly", icon: Mail },
+      { href: "/report", label: "Report a Claim", description: "Send misinformation for review", icon: Flag },
     ],
   },
 ];
@@ -142,6 +145,10 @@ export default function Nav() {
         </ul>
 
         <div className="site-nav-actions">
+          <div className="site-nav-quick hidden xl:flex">
+            <Link href="/join" className="site-nav-join"><HeartHandshake /> Join us</Link>
+            <Link href="/contact" className="site-nav-contact"><Mail /> Contact</Link>
+          </div>
           <Link href="/search" className="site-search" aria-label="Search"><Search size={17} /></Link>
           <button type="button" className="site-menu-toggle xl:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} aria-controls="mobile-navigation">
             {mobileOpen ? <X size={21} /> : <Menu size={21} />}
@@ -153,6 +160,7 @@ export default function Nav() {
         <div id="mobile-navigation" className="site-mobile-menu max-h-[calc(100svh-72px)] overflow-y-auto xl:hidden">
           <div className="container-wide py-3">
             <div className="site-mobile-primary"><Link href="/">Home</Link><Link href="/myths">Myths vs Facts</Link><Link href="/journey">Paper Journey</Link></div>
+            <div className="site-mobile-actions"><Link href="/join"><HeartHandshake /> Join us</Link><Link href="/contact"><Mail /> Contact</Link><Link href="/report"><Flag /> Report a claim</Link></div>
             {navGroups.map((group) => {
               const expanded = mobileGroup === group.slug;
               return (

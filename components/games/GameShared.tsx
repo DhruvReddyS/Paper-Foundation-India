@@ -91,12 +91,16 @@ export function ResultPanel({
   onReplay: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const shareText = `I scored ${score}/${outOf} in ${game} and earned “${badge}”. Can you beat my Paper IQ?`;
+  const shareText = `Paper can surprise you. I scored ${score}/${outOf} in ${game} and earned “${badge}” at Paper Foundation India. Can you beat my Paper IQ?`;
 
   const shareUrl = typeof window === "undefined" ? "" : window.location.href;
 
   async function nativeShare() {
-    if (navigator.share) await navigator.share({ title: game, text: shareText, url: shareUrl });
+    const canvas = buildScoreCanvas();
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+    const file = blob ? new File([blob], `${game.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-score.png`, { type: "image/png" }) : null;
+    if (navigator.share && file && navigator.canShare?.({ files: [file] })) await navigator.share({ title: `${game} result`, text: shareText, url: shareUrl, files: [file] });
+    else if (navigator.share) await navigator.share({ title: game, text: shareText, url: shareUrl });
     else await copyResult();
   }
 
@@ -106,32 +110,41 @@ export function ResultPanel({
     window.setTimeout(() => setCopied(false), 1800);
   }
 
-  function downloadCard() {
+  function buildScoreCanvas() {
     const canvas = document.createElement("canvas");
     canvas.width = 1080;
     canvas.height = 1080;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) return canvas;
     ctx.fillStyle = "#f2ede7";
     ctx.fillRect(0, 0, 1080, 1080);
-    ctx.fillStyle = "#244d32";
-    ctx.fillRect(70, 70, 940, 940);
+    ctx.fillStyle = "#244d32"; ctx.fillRect(54, 54, 972, 972);
+    ctx.strokeStyle = "rgba(250,248,245,.18)"; ctx.lineWidth = 2; ctx.strokeRect(78, 78, 924, 924);
+    for (let y = 100; y < 1000; y += 26) { ctx.strokeStyle = "rgba(255,255,255,.018)"; ctx.beginPath(); ctx.moveTo(80, y); ctx.lineTo(1000, y + 5); ctx.stroke(); }
+    ctx.fillStyle = "#c4956a"; ctx.beginPath(); ctx.moveTo(130, 126); ctx.quadraticCurveTo(185, 82, 210, 142); ctx.quadraticCurveTo(165, 194, 130, 126); ctx.fill();
     ctx.fillStyle = "#faf8f5";
-    ctx.font = "700 72px Georgia";
-    ctx.fillText(game, 130, 210, 820);
+    ctx.font = "700 68px Georgia"; ctx.fillText(game, 130, 245, 820);
     ctx.fillStyle = "#c4956a";
     ctx.font = "500 30px Arial";
-    ctx.fillText("PAPER FOUNDATION INDIA · GAME RESULT", 130, 285);
+    ctx.fillText("PAPER FOUNDATION INDIA · THE PLAYABLE EDITION", 130, 312);
     ctx.fillStyle = "#faf8f5";
     ctx.font = "700 220px Georgia";
-    ctx.fillText(String(score), 130, 585);
+    ctx.fillText(String(score), 130, 615);
     ctx.font = "500 52px Arial";
-    ctx.fillText(`/ ${outOf}`, 475, 575);
+    ctx.fillText(`/ ${outOf}`, 475, 605);
     ctx.fillStyle = "#e8ddd0";
     ctx.font = "700 52px Georgia";
-    ctx.fillText(badge, 130, 720, 820);
+    ctx.fillText(badge, 130, 745, 820);
     ctx.font = "400 32px Arial";
-    wrapCanvasText(ctx, message, 130, 790, 800, 46);
+    wrapCanvasText(ctx, message, 130, 815, 800, 43);
+    ctx.strokeStyle = "rgba(250,248,245,.25)"; ctx.beginPath(); ctx.moveTo(130, 930); ctx.lineTo(950, 930); ctx.stroke();
+    ctx.fillStyle = "#c4956a"; ctx.font = "500 24px Arial"; ctx.fillText("PLAY · LEARN · SHARE THE CONTEXT", 130, 972);
+    ctx.fillStyle = "#faf8f5"; ctx.textAlign = "right"; ctx.fillText(new URL(shareUrl || window.location.href).host, 950, 972); ctx.textAlign = "left";
+    return canvas;
+  }
+
+  function downloadCard() {
+    const canvas = buildScoreCanvas();
     const link = document.createElement("a");
     link.download = `${game.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-result.png`;
     link.href = canvas.toDataURL("image/png");

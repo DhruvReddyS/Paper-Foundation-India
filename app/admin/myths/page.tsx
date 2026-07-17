@@ -1,2 +1,5 @@
-import React from 'react';
-export default function AdminMyths() { return <div>Myths Manager</div>; }
+import MythManager from "@/components/admin/MythManager";
+
+export default function AdminMyths() {
+  return <MythManager />;
+}
