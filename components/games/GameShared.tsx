@@ -3,21 +3,30 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, Copy, Download, ExternalLink, Layers3, Share2, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function GameFrame({
   title,
   kicker,
   progress,
+  immersive = false,
   children,
 }: {
   title: string;
   kicker: string;
   progress?: number;
+  immersive?: boolean;
   children: React.ReactNode;
 }) {
+  useEffect(() => {
+    if (!immersive) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [immersive]);
+
   return (
-    <div className="game-page min-h-screen pb-24 pt-8">
+    <div className={`game-page min-h-screen ${immersive ? "game-page-immersive" : "pb-24 pt-8"}`}>
       <div className="game-shell">
         <div className="game-session-header">
           <Link href="/games" className="game-back-link">
@@ -94,21 +103,30 @@ export function ResultPanel({
   onReplay: () => void;
 }) {
   const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const shareText = `Paper can surprise you. I scored ${score}/${outOf} in ${game} and earned “${badge}” at Paper Foundation India. Can you beat my Paper IQ?`;
 
   const shareUrl = typeof window === "undefined" ? "" : window.location.href;
 
   async function nativeShare() {
-    const canvas = buildScoreCanvas();
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
-    const file = blob ? new File([blob], `${game.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-score.png`, { type: "image/png" }) : null;
-    if (navigator.share && file && navigator.canShare?.({ files: [file] })) await navigator.share({ title: `${game} result`, text: shareText, url: shareUrl, files: [file] });
-    else if (navigator.share) await navigator.share({ title: game, text: shareText, url: shareUrl });
-    else await copyResult();
+    if (sharing) return;
+    setSharing(true);
+    try {
+      const canvas = buildScoreCanvas();
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+      const file = blob ? new File([blob], `${game.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-score.png`, { type: "image/png" }) : null;
+      if (navigator.share && file && navigator.canShare?.({ files: [file] })) await navigator.share({ title: `${game} result`, text: shareText, url: shareUrl, files: [file] });
+      else if (navigator.share) await navigator.share({ title: game, text: shareText, url: shareUrl });
+      else await copyResult();
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === "AbortError")) await copyResult();
+    } finally {
+      setSharing(false);
+    }
   }
 
   async function copyResult() {
-    await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+    if (navigator.clipboard) await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   }
@@ -161,21 +179,24 @@ export function ResultPanel({
 
   return (
     <motion.section initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="game-result-panel">
-      <div className="game-result-edition"><span>THE PLAYABLE EDITION</span><small>PAPER FOUNDATION INDIA</small></div>
-      <div className="game-result-stamp">{badge}</div>
-      <p className="game-kicker">Your result</p>
-      <h1>{score}<span> / {outOf}</span></h1>
-      <h2>{game}</h2>
-      <p className="game-result-message">{message}</p>
+      <div className="game-result-card-preview">
+        <div className="game-result-edition"><span>THE PLAYABLE EDITION</span><small>PAPER FOUNDATION INDIA</small></div>
+        <div className="game-result-stamp">{badge}</div>
+        <p className="game-kicker">Your Paper IQ result</p>
+        <h1>{score}<span> / {outOf}</span></h1>
+        <h2>{game}</h2>
+        <p className="game-result-message">{message}</p>
+        <footer><span>PLAY · LEARN · SHARE THE CONTEXT</span><b>paperfoundation.in</b></footer>
+      </div>
       {children}
       <div className="game-share-row">
-        <button onClick={nativeShare}><Share2 size={16} /> Share</button>
+        <button onClick={nativeShare} disabled={sharing}><Share2 size={16} /> {sharing ? "Preparing…" : "Share scorecard"}</button>
         <a href={linkedIn} target="_blank" rel="noreferrer">in LinkedIn <ExternalLink size={14} /></a>
         <a href={xShare} target="_blank" rel="noreferrer">X <ExternalLink size={14} /></a>
         <a href={facebook} target="_blank" rel="noreferrer">Facebook <ExternalLink size={14} /></a>
         <a href={whatsApp} target="_blank" rel="noreferrer">WhatsApp <ExternalLink size={14} /></a>
         <button onClick={copyResult}><Copy size={16} /> {copied ? "Copied" : "Copy"}</button>
-        <button onClick={downloadCard}><Download size={16} /> Instagram card</button>
+        <button onClick={downloadCard}><Download size={16} /> Download PNG</button>
       </div>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button onClick={onReplay} className="game-primary-button">Play again</button>

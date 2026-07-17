@@ -51,7 +51,7 @@ export default function GrowOrShredGame() {
   const badge = correctAnswers >= 6 ? "Canopy Scholar" : correctAnswers >= 4 ? "Fibre Thinker" : "Curious Sapling";
 
   return (
-    <GameFrame title="Grow or Shred" kicker="Game 01 · Paper IQ" progress={phase === "play" ? ((index + (selected === null ? 0 : 1)) / quizQuestions.length) * 100 : undefined}>
+    <GameFrame immersive={phase === "play"} title="Grow or Shred" kicker="Game 01 · Paper IQ" progress={phase === "play" ? ((index + (selected === null ? 0 : 1)) / quizQuestions.length) * 100 : undefined}>
       {phase === "intro" && (
         <GameIntro
           eyebrow="The flagship Paper IQ game"

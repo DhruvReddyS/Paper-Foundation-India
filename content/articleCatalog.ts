@@ -38,3 +38,7 @@ export const articleCatalog: ArticleCatalogItem[] = [
 ];
 
 export const featuredArticles = articleCatalog.filter(article => article.featured);
+
+/** Every public article has its own title-specific editorial cover. */
+export const articleCoverImage = (article: Pick<ArticleCatalogItem, "slug">) =>
+  `/images/knowledge/articles/${article.slug}.jpg`;

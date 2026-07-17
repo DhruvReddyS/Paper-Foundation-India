@@ -78,7 +78,7 @@ export default function MillMasterGame() {
   const badge = finalScore >= 720 ? "Mill Line Master" : finalScore >= 560 ? "Process Engineer" : "Fibre Apprentice";
 
   return (
-    <GameFrame title="Paper Mill Shuffle" kicker="Game 03 · Build the Process" progress={phase === "play" ? correctCount / millSteps.length * 100 : undefined}>
+    <GameFrame immersive={phase === "play"} title="Paper Mill Shuffle" kicker="Game 03 · Build the Process" progress={phase === "play" ? correctCount / millSteps.length * 100 : undefined}>
       {phase === "intro" && (
         <GameIntro
           eyebrow="A drag-and-drop process game"

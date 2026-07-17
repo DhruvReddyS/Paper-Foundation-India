@@ -1,5 +1,3 @@
-import ResourcesHero from "./sections/ResourcesHero";
-import ResourceFilter from "./sections/ResourceFilter";
 import ResourceGrid from "./sections/ResourceGrid";
 
 export const metadata = {
@@ -9,11 +7,5 @@ export const metadata = {
 };
 
 export default function ResourcesPage() {
-  return (
-    <main>
-      <ResourcesHero />
-      <ResourceFilter />
-      <ResourceGrid />
-    </main>
-  );
+  return <ResourceGrid />;
 }

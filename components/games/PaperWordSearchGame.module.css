@@ -3,3 +3,12 @@
 @media(max-width:520px){.hero{gap:2rem;padding-inline:18px}.hero h1{font-size:clamp(3.4rem,14vw,4.6rem)}.game{padding-inline:10px}.boardWrap{padding:.5rem}.board button{font-size:.55rem}.boardWrap footer{align-items:flex-start;flex-direction:column}.words{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){.board button{transition:none}}
 .edition{max-width:620px!important;display:flex!important;gap:1.2rem!important;margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.15);color:#d6a574!important;font-family:var(--font-mono);font-size:.45rem;letter-spacing:.12em}.edition span{color:#d6a574!important}.share{display:flex;gap:.6rem;margin-top:1.6rem}.share button{min-height:44px;padding:.7rem 1rem;border:1px solid rgba(255,255,255,.22);color:#f8f3e9!important;background:rgba(255,255,255,.06)}.share button svg{width:15px}@media(max-width:520px){.edition{gap:.5rem!important;justify-content:space-between}.edition span{font-size:.36rem}.share{flex-direction:column}}
+
+/* Compact immersive layout: the puzzle, not the website chrome, owns the screen. */
+.hero{min-height:310px;grid-template-columns:1fr 250px;gap:3rem;padding:2rem max(24px,calc((100% - 1280px)/2))}
+.hero p{margin-top:1.5rem}.hero h1{margin:.5rem 0 .7rem;font-size:clamp(3rem,5.8vw,5.8rem)}.timer{min-height:190px}
+.game{min-height:calc(100svh - 310px);padding:1.2rem max(16px,calc((100% - 1280px)/2)) 2rem;grid-template-columns:minmax(0,1fr) 270px}
+.board{width:min(100%,calc(100svh - 415px));min-width:540px;margin:auto}
+.result{z-index:9100;background:radial-gradient(circle at 70% 20%,rgba(91,132,87,.38),transparent 28rem),rgba(13,30,19,.985);backdrop-filter:blur(18px)}
+@media(max-width:800px){.hero{grid-template-columns:1fr;gap:1.5rem;padding-top:2rem}.timer{min-height:150px}.game{grid-template-columns:1fr}.board{width:100%;min-width:0}}
+@media(max-width:520px){.hero{gap:1.2rem;padding-inline:18px}.hero h1{font-size:clamp(3.1rem,14vw,4.4rem)}}

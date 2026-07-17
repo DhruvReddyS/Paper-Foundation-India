@@ -5,6 +5,7 @@ import { ArrowDown, ArrowRight, Check, ExternalLink, Gamepad2, Search, ScanSearc
 import Link from "next/link";
 import { useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import handbookCards from "@/content/mythCatalog.json";
+import heroStyles from "./MythsHero.module.css";
 
 type HandbookCard = (typeof handbookCards)[number] & { category: string; number: number };
 
@@ -37,30 +38,38 @@ export default function MythsExperience() {
   }
 
   return <div className="myths-premium">
-    <section className="myths-premium-hero myths-card-deck-hero" onPointerMove={move}>
-      <div className="myths-hero-card-stack" aria-hidden="true">
+    <section className={`myths-premium-hero myths-card-deck-hero ${heroStyles.hero}`} onPointerMove={move}>
+      <div className={`myths-hero-card-stack ${heroStyles.stack}`} aria-hidden="true">
         {library.slice(0, 10).map((item, index) => {
           const rotations = [-13, 2, -5, 8, -2, 12, -8, 5, -4, 9];
           return <motion.article
             key={item.id}
+            className={heroStyles.card}
             initial={{ opacity: 0, scale: .86, rotate: rotations[index] }}
             animate={{ opacity: 1, y: pointer.y * (8 + index), x: pointer.x * (9 + index * 1.5), rotate: rotations[index] + pointer.x * 1.4, scale: 1 }}
             transition={{ delay: index * .045, type: "spring", stiffness: 80, damping: 19 }}
             style={{ "--deck-index": index } as CSSProperties}
           >
+            <span className={heroStyles.pin} />
             <header><span>CASE {String(item.number).padStart(2, "0")}</span><small>{item.category}</small></header>
-            <strong>{item.myth}</strong>
+            <strong title={item.myth}>{item.myth}</strong>
+            <p className={heroStyles.cardNote}>Filed for evidence review</p>
             <footer><b>MYTH</b><i /><em>FACT</em></footer>
           </motion.article>;
         })}
       </div>
-      <motion.div className="myths-hero-copy" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .22 }}>
+      <motion.div className={`myths-hero-copy ${heroStyles.copy}`} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .22 }}>
         <p className="premium-kicker"><span /> Sixty claims · evidence attached</p>
         <h1>What if the claim<br /><em>is only half the story?</em></h1>
         <p>Pull one from the pile. Break its seal. Decide whether it is a myth, a fact—or a sentence missing the context that changes everything.</p>
+        <div className={heroStyles.reviewLine}>
+          <span>01 · read the claim</span>
+          <span>02 · reveal the context</span>
+          <span>03 · inspect the evidence</span>
+        </div>
         <a href="#myth-library">Choose an evidence category <ArrowDown /></a>
       </motion.div>
-      <div className="myths-hero-metrics"><span><b>60</b> handbook claims</span><span><b>08</b> evidence categories</span><span><b>01</b> claim at a time</span></div>
+      <div className={`myths-hero-metrics ${heroStyles.metrics}`}><span><b>60</b> handbook claims</span><span><b>08</b> evidence categories</span><span><b>01</b> claim at a time</span></div>
     </section>
 
     <section id="myth-library" className="myth-library-premium myth-evidence-wall">

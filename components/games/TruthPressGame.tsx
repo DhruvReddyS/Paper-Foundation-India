@@ -34,7 +34,7 @@ export default function TruthPressGame() {
   const badge = correct === truthClaims.length ? "Chief Fact Checker" : correct >= 3 ? "Context Keeper" : "Evidence Apprentice";
 
   return (
-    <GameFrame title="The Truth Press" kicker="Game 02 · Claim investigation" progress={phase === "play" ? ((index + (selected ? 1 : 0)) / truthClaims.length) * 100 : undefined}>
+    <GameFrame immersive={phase === "play"} title="The Truth Press" kicker="Game 02 · Claim investigation" progress={phase === "play" ? ((index + (selected ? 1 : 0)) / truthClaims.length) * 100 : undefined}>
       {phase === "intro" && <GameIntro eyebrow="Myth, fact, or missing context?" title="Do not repeat the claim. Put it through the press." description="A claim can be false, true, or technically true while hiding the part that matters. Stamp your verdict, inspect the evidence and repair weak wording." rules={["Read the printed claim and choose Myth, Fact or Missing Context.", "Compare your verdict with the evidence and original source.", "When a claim is incomplete, read the repaired sentence that should be shared instead."]} accent="ink" onStart={() => setPhase("play")} />}
 
       {phase === "play" && (

@@ -1,5 +1,3 @@
-import GlossaryHero from "./sections/GlossaryHero";
-import AlphabetNav from "./sections/AlphabetNav";
 import GlossaryTermList from "./sections/GlossaryTermList";
 
 export const metadata = {
@@ -9,11 +7,5 @@ export const metadata = {
 };
 
 export default function GlossaryPage() {
-  return (
-    <main>
-      <GlossaryHero />
-      <AlphabetNav />
-      <GlossaryTermList />
-    </main>
-  );
+  return <GlossaryTermList />;
 }

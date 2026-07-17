@@ -4,9 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, BookOpen, Clock, Quote, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { featuredArticles, type ArticleCatalogItem } from "@/content/articleCatalog";
-
-const articleImage = (category: ArticleCatalogItem["category"]) => `/images/knowledge/editorial-v2/${category.toLowerCase()}.jpg`;
+import { articleCoverImage, featuredArticles } from "@/content/articleCatalog";
 const editorialNotes = [
   "A systems essay for anyone tired of one-word material verdicts.",
   "A comparison desk that keeps use, geography and end-of-life inside the frame.",
@@ -22,7 +20,7 @@ export default function FeaturedArticlesExperience() {
       {featuredArticles.map((article, index) => <motion.article key={article.slug} initial={{ opacity: 0, y: 35, rotate: index % 2 ? .6 : -.6 }} whileInView={{ opacity: 1, y: 0, rotate: 0 }} viewport={{ once: true, amount: .18 }} transition={{ duration: .55, delay: index * .045 }}>
         <Link href={`/knowledge/${article.slug}`}>
           <div className="featured-cover-art">
-            <Image src={articleImage(article.category)} alt={`Cover for ${article.title}`} fill sizes="(max-width: 760px) 94vw, 50vw" />
+            <Image src={articleCoverImage(article)} alt={`Cover for ${article.title}`} fill sizes="(max-width: 760px) 94vw, 50vw" />
             <span>FEATURE {String(index + 1).padStart(2, "0")}</span>
             <em>{article.category}</em>
             <i />

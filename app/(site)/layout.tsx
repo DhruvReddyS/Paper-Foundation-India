@@ -13,12 +13,14 @@ export default function SiteLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const immersive = pathname === "/journey";
+  const immersive =
+    pathname === "/journey" ||
+    /^\/discover\/(grow-or-shred|truth-press|mill-master|hidden-paper|paper-word-search)$/.test(pathname);
 
   return (
     <>
       <PaperCursor />
-      <Nav />
+      {!immersive && <Nav />}
       <main className="min-h-screen"><PageTransition>{children}</PageTransition></main>
       {!immersive && <Footer />}
     </>

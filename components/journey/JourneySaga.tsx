@@ -51,12 +51,12 @@ export default function JourneySaga() {
 
         <div className={styles.bookWindow}>
           <InteractiveBook
-            coverImage="/images/journey/spreads-v2/cover.jpg"
+            coverImage="/images/journey/paper-journey-cover.svg"
             bookTitle="The Paper Journey"
             bookAuthor="Paper Foundation India"
             pages={journeyPages}
-            width={360}
-            height={510}
+            width={430}
+            height={600}
             className={styles.book}
             insideCoverContent={<ProcessNotes spread={journeySpreads[0]} />}
             onPageChange={updateChapter}

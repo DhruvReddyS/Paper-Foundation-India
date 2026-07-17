@@ -5,9 +5,7 @@ import { ArrowRight, Clock, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { articleCatalog, type ArticleCatalogItem } from "@/content/articleCatalog";
-
-const articleImage = (category: ArticleCatalogItem["category"]) => `/images/knowledge/editorial-v2/${category.toLowerCase()}.jpg`;
+import { articleCatalog, articleCoverImage } from "@/content/articleCatalog";
 const categories = ["All", "Forestry", "Recovery", "Method", "Production", "Education", "Use"];
 
 export default function KnowledgeExperience() {
@@ -37,7 +35,7 @@ export default function KnowledgeExperience() {
         {filtered.map((article, index) => <motion.article layout key={article.slug} initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: .96 }} transition={{ delay: Math.min(index * .035, .2) }} className={`article-paper-card article-paper-tone-${index % 4 + 1}`}>
           <Link href={`/knowledge/${article.slug}`}>
             <div className="article-paper-cover">
-              <Image src={articleImage(article.category)} alt="" fill sizes="(max-width: 680px) 94vw, (max-width: 1050px) 47vw, 31vw" />
+              <Image src={articleCoverImage(article)} alt={`Editorial cover for ${article.title}`} fill sizes="(max-width: 680px) 94vw, (max-width: 1050px) 47vw, 31vw" />
               <span>{String(article.id).padStart(2, "0")}</span>
               <small>{article.category}</small>
               <i aria-hidden="true" />

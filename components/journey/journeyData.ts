@@ -327,29 +327,55 @@ export const journeySpreads: JourneySpread[] = [
   },
   {
     id: 12,
-    chapter: "Finale",
-    eyebrow: "Keep useful fibre moving",
-    processStep: "Recover + renew",
-    title: "The next life begins with a decision",
+    chapter: "Chapter XI",
+    eyebrow: "The hand-off after use",
+    processStep: "Separate + return",
+    title: "A useful next life starts at the bin",
     body: [
-      "After use, suitable paper can be kept clean, separated and collected for another papermaking cycle. Some fibre is lost or becomes too short through repeated processing, so circular systems still need responsible fresh-fibre inputs.",
-      "Circularity is not a promise printed on a label. It is the result of connected choices across sourcing, design, collection, sorting and mill operations.",
+      "After use, suitable paper needs to stay clean, dry and separate from food, liquids and mixed materials. That everyday decision protects the fibre before collection begins.",
+      "Clear local guidance matters because collection systems and accepted grades differ. A well-designed product still needs the right return route to become useful mill furnish.",
     ],
-    stat: "CONTINUE",
-    statLabel: "Source responsibly · design intelligently · recover effectively",
+    stat: "RETURN WELL",
+    statLabel: "Keep it clean · follow local guidance · protect the fibre",
     image: "/images/journey/spreads-v2/spread2.jpg",
     images: [
       {
         src: "/images/journey/spreads-v2/spread2.jpg",
-        alt: "A used sheet returning through collection toward a new reel of paper",
-        caption: "A loop works only when every hand-off works.",
+        alt: "Clean used paper being separated into the correct collection stream",
+        caption: "The recovery route begins with a small, deliberate hand-off.",
       },
       {
         src: "/images/journey/spreads-v2/spread5.jpg",
-        alt: "Natural paper-fibre loop connecting recovery with responsible fresh fibre",
+        alt: "Collected paper kept dry and ready for grading",
       },
     ],
     accent: "#688968",
+  },
+  {
+    id: 13,
+    chapter: "Finale",
+    eyebrow: "Keep useful fibre moving",
+    processStep: "Recover + renew",
+    title: "The next sheet begins with connected choices",
+    body: [
+      "Collected paper is graded and prepared to enter another papermaking cycle when its fibre and condition suit the next product. Yield is never absolute: contaminants are removed and fibres gradually shorten through repeated processing.",
+      "Circular paper systems therefore connect effective recovery with responsible fresh-fibre inputs. The loop is not a claim on a label—it is the result of sourcing, design, use, collection and mill decisions working together.",
+    ],
+    stat: "CONTINUE",
+    statLabel: "Source responsibly · design intelligently · recover effectively",
+    image: "/images/journey/spreads-v2/spread5.jpg",
+    images: [
+      {
+        src: "/images/journey/spreads-v2/spread5.jpg",
+        alt: "Recovered fibre and responsible fresh fibre joining a new papermaking cycle",
+        caption: "A loop works only when every hand-off works.",
+      },
+      {
+        src: "/images/journey/spreads-v2/spread2.jpg",
+        alt: "A finished sheet beside recovered fibre ready for its next useful life",
+      },
+    ],
+    accent: "#537b5b",
   },
 ];
 
