@@ -25,7 +25,7 @@ const articles: Article[] = [
     tags: ["Trees", "Plantations"],
   },
   {
-    slug: "recycling-rates-compared",
+    slug: "after-the-paper-bin",
     category: "Recycling",
     title: "India vs World: Paper Recycling Rates Compared",
     excerpt: "At 75%, India's recycled fibre usage outpaces the EU, US, and Japan.",
@@ -34,7 +34,7 @@ const articles: Article[] = [
     tags: ["Recycling", "Global"],
   },
   {
-    slug: "water-usage-modern-mills",
+    slug: "science-behind-paper-recycling",
     category: "Sustainability",
     title: "How Modern Mills Cut Water Usage by 80%",
     excerpt: "Closed-loop systems mean today's mills use a fraction of what they once did.",
@@ -52,7 +52,7 @@ const articles: Article[] = [
     tags: ["Rural", "Economy"],
   },
   {
-    slug: "paper-vs-plastic-lifecycle",
+    slug: "paper-vs-plastic-beyond-headlines",
     category: "Sustainability",
     title: "Paper vs Plastic: A Full Lifecycle Analysis",
     excerpt: "Breaking down the environmental impact from cradle to grave.",

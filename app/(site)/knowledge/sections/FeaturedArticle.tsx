@@ -15,7 +15,7 @@ export function FeaturedArticle() {
     </motion.div>
     <div className="knowledge-feature-stack">
       <motion.article initial={{ rotate: 8, x: 40, opacity: 0 }} animate={{ rotate: 2, x: 0, opacity: 1 }} transition={{ delay: .18, type: "spring" }}>
-        <span>Cover essay · 08 min</span><BookOpen /><h2>How fibre sourcing shapes the paper story.</h2><p>Forestry · Recovery · Context</p><Link href="/knowledge/truth-about-paper-forestry">Read the feature <ArrowRight /></Link>
+        <span>Cover essay · 13 min</span><BookOpen /><h2>Sustainable forestry makes paper renewable.</h2><p>Forestry · Traceability · Context</p><Link href="/knowledge/sustainable-forestry-makes-paper-renewable">Read the feature <ArrowRight /></Link>
       </motion.article>
       <aside><TrendingUp /><small>Research habit</small><strong>Read the method before the headline.</strong></aside>
     </div>

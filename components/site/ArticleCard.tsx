@@ -20,7 +20,7 @@ export default function ArticleCard({
   excerpt,
   slug,
   category = 'Sustainability',
-  coverImage = '/images/placeholder-article.jpg',
+  coverImage = '/images/knowledge/editorial-v2/method.jpg',
   readingTime = 5,
   date,
   className = '',

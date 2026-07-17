@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // A single build directory prevents the development server from serving
-  // stale route chunks after a page has been rebuilt or renamed.
-  distDir: ".next",
+  // Keep development chunks separate from production builds. Running
+  // `next build` while a dev server is open must not replace the CSS/JS files
+  // that the browser is currently requesting.
+  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   images: {
     remotePatterns: [
       {

@@ -6,9 +6,9 @@ import Link from "next/link";
 import styles from "./KnowledgeHub.module.css";
 
 const reads = [
-  { no: "FEATURE / 01", type: "Forestry", time: "8 min read", title: "How fibre sourcing shapes the paper story", deck: "Follow the sheet backwards—from the label to land, management and the decisions that create the outcome.", href: "/knowledge/truth-about-paper-forestry", Icon: Trees, image: "/images/knowledge/fibre-sourcing.jpg", tone: "forest" },
-  { no: "FIELD NOTE / 02", type: "Recovery", time: "6 min read", title: "What a recovery rate leaves out", deck: "Collection is only the beginning. Yield, contamination and final use complete the number.", href: "/knowledge/recycling-rates-compared", Icon: Recycle, image: "/images/knowledge/recovery-floor.jpg", tone: "copper" },
-  { no: "MILL NOTE / 03", type: "Production", time: "7 min read", title: "Inside the decisions that form a sheet", deck: "Fibre preparation, water removal and energy choices all change performance.", href: "/knowledge/water-usage-modern-mills", Icon: Factory, image: "/images/knowledge/forming-sheet.jpg", tone: "sage" },
+  { no: "FEATURE / 01", type: "Forestry", time: "8 min read", title: "How fibre sourcing shapes the paper story", deck: "Follow the sheet backwards—from the label to land, management and the decisions that create the outcome.", href: "/knowledge/sustainable-forestry-makes-paper-renewable", Icon: Trees, image: "/images/knowledge/fibre-sourcing.jpg", tone: "forest" },
+  { no: "FIELD NOTE / 02", type: "Recovery", time: "6 min read", title: "What a recovery rate leaves out", deck: "Collection is only the beginning. Yield, contamination and final use complete the number.", href: "/knowledge/after-the-paper-bin", Icon: Recycle, image: "/images/knowledge/recovery-floor.jpg", tone: "copper" },
+  { no: "MILL NOTE / 03", type: "Production", time: "7 min read", title: "Inside the decisions that form a sheet", deck: "Fibre preparation, water removal and energy choices all change performance.", href: "/knowledge/science-behind-paper-recycling", Icon: Factory, image: "/images/knowledge/forming-sheet.jpg", tone: "sage" },
 ] as const;
 
 export default function KnowledgeHub() {
