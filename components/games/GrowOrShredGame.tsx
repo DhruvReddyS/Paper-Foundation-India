@@ -128,7 +128,7 @@ export default function GrowOrShredGame() {
 
 function TreeVisual({ correct, wrong, streak, compact = false }: { correct: number; wrong: number; streak: number; compact?: boolean }) {
   const reducedMotion = useReducedMotion();
-  const leafCount = Math.min(treeCanopy.length, Math.max(5, correct * 7 + streak * 2));
+  const leafCount = correct === 0 ? 0 : Math.min(treeCanopy.length, correct * 7 + streak * 2);
   return (
     <div className={`knowledge-tree ${compact ? "knowledge-tree-compact" : ""}`}>
       <svg viewBox="0 0 420 460" role="img" aria-label={`Evidence tree with ${correct} correct answers and ${wrong} recovered mistakes`}>
@@ -147,6 +147,28 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
           {correct >= 4 && <Branch d="M211 217 C248 194 266 158 270 116" delay={0.24} />}
           {correct >= 5 && <Branch d="M216 171 C194 143 190 111 198 76" delay={0.32} />}
           {correct >= 6 && <Branch d="M211 190 C228 163 235 132 229 96" delay={0.38} />}
+          {growthClusters.slice(0, correct).map((cluster, clusterIndex) => (
+            <motion.g
+              key={`growth-${clusterIndex}`}
+              initial={{ opacity: 0, scale: 0, rotate: clusterIndex % 2 ? 7 : -7 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 155, damping: 13, delay: .16 }}
+              style={{ transformOrigin: `${cluster.x}px ${cluster.y}px` }}
+            >
+              <circle cx={cluster.x} cy={cluster.y} r="17" fill="rgba(120,145,106,.14)" />
+              {[-22, -11, 0, 11, 22].map((rotation, leafIndex) => (
+                <motion.path
+                  key={rotation}
+                  d={`M${cluster.x} ${cluster.y} C${cluster.x - 9} ${cluster.y - 8} ${cluster.x - 8} ${cluster.y - 22} ${cluster.x + 1} ${cluster.y - 30} C${cluster.x + 13} ${cluster.y - 20} ${cluster.x + 12} ${cluster.y - 7} ${cluster.x} ${cluster.y} Z`}
+                  fill={leafIndex % 2 ? "#76906a" : "#315f40"}
+                  transform={`rotate(${rotation} ${cluster.x} ${cluster.y})`}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ delay: .2 + leafIndex * .045, duration: .42 }}
+                />
+              ))}
+            </motion.g>
+          ))}
           {treeCanopy.slice(0, leafCount).map((leaf, i) => (
             <motion.g
               key={`${leaf.x}-${leaf.y}`}
@@ -185,3 +207,12 @@ const treeCanopy = Array.from({ length: 58 }, (_, i) => {
     scale: .62 + (i % 5) * .08,
   };
 });
+
+const growthClusters = [
+  { x: 119, y: 220 },
+  { x: 298, y: 181 },
+  { x: 149, y: 140 },
+  { x: 270, y: 116 },
+  { x: 198, y: 76 },
+  { x: 229, y: 96 },
+];

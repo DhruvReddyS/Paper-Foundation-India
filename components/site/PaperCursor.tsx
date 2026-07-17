@@ -32,10 +32,12 @@ export default function PaperCursor() {
 
     function hover(event: PointerEvent) {
       const target = event.target instanceof Element ? event.target.closest(interactiveSelector) : null;
+      const explicitLabel = target?.getAttribute("data-cursor-label");
       cursorRef.current?.classList.toggle("is-hovering", Boolean(target));
       cursorRef.current?.classList.toggle("is-writing", Boolean(target?.matches("input, textarea, select")));
+      cursorRef.current?.classList.toggle("is-dragging", explicitLabel === "DRAGGING");
       if (labelRef.current) {
-        labelRef.current.textContent = target?.getAttribute("data-cursor-label")
+        labelRef.current.textContent = explicitLabel
           ?? (target?.matches("input, textarea, select") ? "TYPE" : target ? "OPEN" : "");
       }
     }

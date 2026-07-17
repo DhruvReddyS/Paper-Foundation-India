@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { RefreshCcw, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCcw, X } from 'lucide-react';
 
 export interface BookPage {
     title?: string;
@@ -20,6 +20,10 @@ export interface InteractiveBookProps {
     className?: string;
     width?: number | string;
     height?: number | string;
+    insideCoverContent?: React.ReactNode;
+    onPageChange?: (pageIndex: number) => void;
+    showNavigation?: boolean;
+    requestedPageIndex?: number;
 }
 
 export default function InteractiveBook({
@@ -30,10 +34,16 @@ export default function InteractiveBook({
     className,
     width = 350,
     height = 500,
+    insideCoverContent,
+    onPageChange,
+    showNavigation = true,
+    requestedPageIndex,
 }: InteractiveBookProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [currentPageIndex, setCurrentPageIndex] = useState(-1);
     const [isHovering, setIsHovering] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const closeTimerRef = useRef<number | null>(null);
 
     // Calculate dynamic width/height values for animations
     const widthNum = typeof width === 'number' ? width : 350;
@@ -42,13 +52,25 @@ export default function InteractiveBook({
     const BOOK_OPEN_DURATION = 1.5;
     const EASING: [number, number, number, number] = [0.25, 0, 0, 1]; // milder smoothing
 
-    const handleOpenBook = useCallback(() => setIsOpen(true), []);
+    const handleOpenBook = useCallback(() => {
+        if (isClosing) return;
+        setIsOpen(true);
+    }, [isClosing]);
 
     const handleCloseBook = useCallback((e?: React.MouseEvent) => {
         e?.stopPropagation();
-        setIsOpen(false);
+        if (isClosing) return;
+        if (currentPageIndex < 0) {
+            setIsOpen(false);
+            return;
+        }
+        setIsClosing(true);
         setCurrentPageIndex(-1);
-    }, []);
+        closeTimerRef.current = window.setTimeout(() => {
+            setIsOpen(false);
+            setIsClosing(false);
+        }, 760);
+    }, [currentPageIndex, isClosing]);
 
     const nextPage = useCallback((e?: React.MouseEvent) => {
         e?.stopPropagation();
@@ -80,6 +102,21 @@ export default function InteractiveBook({
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleCloseBook, isOpen, nextPage, prevPage]);
+
+    useEffect(() => () => {
+        if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
+    }, []);
+
+    useEffect(() => {
+        onPageChange?.(currentPageIndex);
+    }, [currentPageIndex, onPageChange]);
+
+    useEffect(() => {
+        if (requestedPageIndex === undefined) return;
+        const safeIndex = Math.min(Math.max(requestedPageIndex, -1), pages.length - 1);
+        setIsOpen(true);
+        setCurrentPageIndex(safeIndex);
+    }, [pages.length, requestedPageIndex]);
 
     return (
         <div
@@ -147,11 +184,13 @@ export default function InteractiveBook({
                             prevPage();
                         }}
                     >
-                        <div className="flex-1 flex flex-col justify-center items-center text-center opacity-80">
-                            <h2 className="text-2xl font-serif text-neutral-800 mb-2 tracking-wide">{bookTitle}</h2>
-                            <div className="w-8 h-[1px] bg-neutral-300 mb-3" />
-                            <p className="text-xs text-neutral-500 uppercase tracking-widest">Interactive Edition</p>
-                        </div>
+                        {insideCoverContent ?? (
+                            <div className="flex-1 flex flex-col justify-center items-center text-center opacity-80">
+                                <h2 className="text-2xl font-serif text-neutral-800 mb-2 tracking-wide">{bookTitle}</h2>
+                                <div className="w-8 h-[1px] bg-neutral-300 mb-3" />
+                                <p className="text-xs text-neutral-500 uppercase tracking-widest">Interactive Edition</p>
+                            </div>
+                        )}
                     </div>
                 </motion.div>
 
@@ -173,8 +212,8 @@ export default function InteractiveBook({
                                     zIndex: isFlipped ? index + 1 : pages.length - index
                                 }}
                                 transition={{
-                                    duration: 0.6,
-                                    ease: [0.645, 0.045, 0.355, 1]
+                                    duration: 0.74,
+                                    ease: [0.58, 0.02, 0.24, 1]
                                 }}
                             >
                                 {/* Front Face (Right Side) */}
@@ -261,16 +300,47 @@ export default function InteractiveBook({
             <AnimatePresence>
                 {isOpen && (
                     <>
-                        {/* Close Button */}
-                        <motion.button
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            onClick={handleCloseBook}
-                            className="absolute top-8 right-8 p-2 rounded-full bg-white/50 dark:bg-neutral-800/50 hover:bg-white dark:hover:bg-neutral-800 border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 backdrop-blur-sm text-neutral-800 dark:text-neutral-100 z-[1000] transition-all hover:scale-110 shadow-sm hover:shadow-xl"
-                        >
-                            <X size={24} />
-                        </motion.button>
+                        {showNavigation && (
+                            <motion.nav
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 8 }}
+                                className="absolute bottom-5 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-2 rounded-full border border-white/20 bg-[#102017]/85 p-1.5 text-white shadow-xl backdrop-blur-md"
+                                aria-label="Book pages"
+                            >
+                                <button
+                                    type="button"
+                                    onClick={prevPage}
+                                    disabled={currentPageIndex < 0 || isClosing}
+                                    aria-label="Previous page"
+                                    className="grid size-9 place-items-center rounded-full transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-30"
+                                >
+                                    <ChevronLeft size={18} />
+                                </button>
+                                <span className="min-w-16 text-center text-[10px] font-medium uppercase tracking-[0.16em] text-white/75">
+                                    {currentPageIndex + 2} / {pages.length + 1}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={nextPage}
+                                    disabled={currentPageIndex >= pages.length - 1 || isClosing}
+                                    aria-label="Next page"
+                                    className="grid size-9 place-items-center rounded-full transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-30"
+                                >
+                                    <ChevronRight size={18} />
+                                </button>
+                                <span className="mx-0.5 h-5 w-px bg-white/20" aria-hidden="true" />
+                                <button
+                                    type="button"
+                                    onClick={handleCloseBook}
+                                    disabled={isClosing}
+                                    aria-label="Close book"
+                                    className="grid size-9 place-items-center rounded-full transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-30"
+                                >
+                                    <X size={17} />
+                                </button>
+                            </motion.nav>
+                        )}
                     </>
                 )}
             </AnimatePresence>

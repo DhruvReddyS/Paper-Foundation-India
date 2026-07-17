@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowRight, Check, ExternalLink, Gamepad2, Search, ScanSearch, Sparkles, X } from "lucide-react";
+import { ArrowDown, ArrowRight, Check, ExternalLink, Gamepad2, Search, ScanSearch, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import handbookCards from "@/content/mythCatalog.json";
@@ -21,7 +21,6 @@ export default function MythsExperience() {
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState(categories[0][0] as string);
-  const [selectedCase, setSelectedCase] = useState<HandbookCard | null>(null);
   const library = useMemo(() => handbookCards.map((card, index) => ({ ...card, category: categoryFor(index), number: index + 1 })), []);
   const grouped = useMemo(() => categories.map(([name], index) => ({
     name,
@@ -39,20 +38,14 @@ export default function MythsExperience() {
 
   return <div className="myths-premium">
     <section className="myths-premium-hero myths-card-deck-hero" onPointerMove={move}>
-      <div className="myths-hero-copy">
-        <p className="premium-kicker"><span /> Sixty claims · evidence attached</p>
-        <h1>What if the claim<br /><em>is only half the story?</em></h1>
-        <p>Pull one from the pile. Break its seal. Decide whether it is a myth, a fact—or a sentence missing the context that changes everything.</p>
-        <a href="#myth-library">Choose an evidence category <ArrowDown /></a>
-      </div>
-      <div className="myths-hero-card-stack" aria-label="A stack of paper claims">
-        {library.slice(0, 5).map((item, index) => {
-          const offsets = [-2, -1, 0, 1, 2];
+      <div className="myths-hero-card-stack" aria-hidden="true">
+        {library.slice(0, 10).map((item, index) => {
+          const rotations = [-13, 2, -5, 8, -2, 12, -8, 5, -4, 9];
           return <motion.article
             key={item.id}
-            initial={{ opacity: 0, y: 70, rotate: offsets[index] * 6 }}
-            animate={{ opacity: 1, y: pointer.y * (10 + index * 3), x: pointer.x * (18 + index * 4), rotate: offsets[index] * 6 + pointer.x * 2 }}
-            transition={{ delay: index * .07, type: "spring", stiffness: 90, damping: 18 }}
+            initial={{ opacity: 0, scale: .86, rotate: rotations[index] }}
+            animate={{ opacity: 1, y: pointer.y * (8 + index), x: pointer.x * (9 + index * 1.5), rotate: rotations[index] + pointer.x * 1.4, scale: 1 }}
+            transition={{ delay: index * .045, type: "spring", stiffness: 80, damping: 19 }}
             style={{ "--deck-index": index } as CSSProperties}
           >
             <header><span>CASE {String(item.number).padStart(2, "0")}</span><small>{item.category}</small></header>
@@ -61,20 +54,13 @@ export default function MythsExperience() {
           </motion.article>;
         })}
       </div>
+      <motion.div className="myths-hero-copy" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .22 }}>
+        <p className="premium-kicker"><span /> Sixty claims · evidence attached</p>
+        <h1>What if the claim<br /><em>is only half the story?</em></h1>
+        <p>Pull one from the pile. Break its seal. Decide whether it is a myth, a fact—or a sentence missing the context that changes everything.</p>
+        <a href="#myth-library">Choose an evidence category <ArrowDown /></a>
+      </motion.div>
       <div className="myths-hero-metrics"><span><b>60</b> handbook claims</span><span><b>08</b> evidence categories</span><span><b>01</b> claim at a time</span></div>
-    </section>
-
-    <section className="myth-game-bridge">
-      <div>
-        <p className="premium-kicker"><Gamepad2 /> Ready for the game version?</p>
-        <h2>Read a claim here.<br /><em>Put it under pressure there.</em></h2>
-        <p>Turn the same evidence habit into a quick challenge. Stamp a verdict, repair missing context or grow a tree by choosing the stronger answer.</p>
-      </div>
-      <div className="myth-game-tickets">
-        <Link href="/discover/truth-press"><span>GAME 02 · CLAIM LAB</span><strong>The Truth Press</strong><p>Myth, fact or missing context?</p><b>Play now <ArrowRight /></b></Link>
-        <Link href="/discover/grow-or-shred"><span>GAME 01 · PAPER IQ</span><strong>Grow or Shred</strong><p>Grow evidence. Shred assumptions.</p><b>Play now <ArrowRight /></b></Link>
-        <Link href="/games"><span>THE PLAYABLE EDITION</span><strong>All five games</strong><p>Choose your way into the evidence.</p><b>Open game hub <ArrowRight /></b></Link>
-      </div>
     </section>
 
     <section id="myth-library" className="myth-library-premium myth-evidence-wall">
@@ -92,7 +78,7 @@ export default function MythsExperience() {
 
       <motion.div layout className="myth-evidence-grid">
         <AnimatePresence mode="popLayout">
-          {(query ? filteredLibrary : activeGroup.items).map((item, index) => <MythCase key={item.id} item={item} index={index} onOpen={() => setSelectedCase(item)} />)}
+          {(query ? filteredLibrary : activeGroup.items).map((item, index) => <MythCase key={item.id} item={item} index={index} />)}
         </AnimatePresence>
       </motion.div>
       {filteredLibrary.length === 0 && <div className="myth-search-empty"><ScanSearch /><strong>No matching case yet.</strong><p>Try a broader word or submit the claim to the foundation.</p></div>}
@@ -103,34 +89,41 @@ export default function MythsExperience() {
       <div className="credibility-stack">{["Who made the claim?", "What boundaries were used?", "Can the method be inspected?", "Does local context change it?"].map((item, index) => <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * .09 }} key={item}><span>{index + 1}</span><strong>{item}</strong><Check /></motion.div>)}</div>
     </section>
 
-    <section className="myth-premium-cta"><Sparkles /><p>Keep following the evidence</p><h2>Read the long-form<br />editorial selection.</h2><Link href="/knowledge/featured">Explore featured articles <ArrowRight /></Link><a href="https://www.fao.org/sustainable-forest-management/toolbox/modules/management-of-planted-forests/further-learning/en/" target="_blank" rel="noreferrer">Inspect a primary source <ExternalLink /></a></section>
+    <section className="myth-game-bridge">
+      <div>
+        <p className="premium-kicker"><Gamepad2 /> Ready for the game version?</p>
+        <h2>Read a claim here.<br /><em>Put it under pressure there.</em></h2>
+        <p>Turn the same evidence habit into a quick challenge. Stamp a verdict, repair missing context or grow a tree by choosing the stronger answer.</p>
+      </div>
+      <div className="myth-game-tickets">
+        <Link href="/discover/truth-press"><span>GAME 02 · CLAIM LAB</span><strong>The Truth Press</strong><p>Myth, fact or missing context?</p><b>Play now <ArrowRight /></b></Link>
+        <Link href="/discover/grow-or-shred"><span>GAME 01 · PAPER IQ</span><strong>Grow or Shred</strong><p>Grow evidence. Shred assumptions.</p><b>Play now <ArrowRight /></b></Link>
+        <Link href="/games"><span>THE PLAYABLE EDITION</span><strong>All five games</strong><p>Choose your way into the evidence.</p><b>Open game hub <ArrowRight /></b></Link>
+      </div>
+    </section>
 
-    <AnimatePresence>{selectedCase && <EvidenceDossier item={selectedCase} onClose={() => setSelectedCase(null)} />}</AnimatePresence>
+    <section className="myth-premium-cta"><Sparkles /><p>Keep following the evidence</p><h2>Read the long-form<br />editorial selection.</h2><Link href="/knowledge/featured">Explore featured articles <ArrowRight /></Link><a href="https://www.fao.org/sustainable-forest-management/toolbox/modules/management-of-planted-forests/further-learning/en/" target="_blank" rel="noreferrer">Inspect a primary source <ExternalLink /></a></section>
   </div>;
 }
 
-function MythCase({ item, index, onOpen }: { item: HandbookCard; index: number; onOpen: () => void }) {
-  return <motion.article layout initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: .94 }} transition={{ delay: Math.min(index * .025, .18) }} whileHover={{ y: -8, rotate: index % 2 ? .25 : -.25 }} className={`case-tone-${index % 5 + 1}`}>
-    <button className="myth-case-trigger" onClick={onOpen}>
-      <span>{String(item.number).padStart(2, "0")} / {item.category}</span>
-      <strong>{item.myth}</strong>
-      <div><small>Open evidence dossier</small><b>↗</b></div>
-      <em className="myth-card-stamp">MYTH</em>
+function MythCase({ item, index }: { item: HandbookCard; index: number }) {
+  const [revealed, setRevealed] = useState(false);
+  return <motion.article layout initial={{ opacity: 0, y: 24, rotate: index % 2 ? 1 : -1 }} animate={{ opacity: 1, y: 0, rotate: 0 }} exit={{ opacity: 0, scale: .94 }} transition={{ delay: Math.min(index * .025, .18) }} whileHover={{ y: -9, rotate: index % 2 ? .5 : -.5 }} className={`case-tone-${index % 5 + 1} ${revealed ? "is-revealed" : ""}`}>
+    <button className="myth-case-trigger" onClick={() => setRevealed(value => !value)} aria-expanded={revealed}>
+      <AnimatePresence mode="wait" initial={false}>
+        {!revealed ? <motion.div className="myth-card-face myth-card-front" key="myth" initial={{ opacity: 0, rotateX: -8 }} animate={{ opacity: 1, rotateX: 0 }} exit={{ opacity: 0, rotateX: 8 }} transition={{ duration: .22 }}>
+          <span>{String(item.number).padStart(2, "0")} / {item.category}</span>
+          <strong>{item.myth}</strong>
+          <div><small>Break the seal to reveal</small><b>↗</b></div>
+          <em className="myth-card-stamp">MYTH</em>
+        </motion.div> : <motion.div className="myth-card-face myth-card-fact" key="fact" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: .28 }}>
+          <span>EVIDENCE-BASED REALITY / {item.category}</span>
+          <strong>{item.reality}</strong>
+          <p>{item.indiaContext}</p>
+          <div><small>{item.evidence}</small><b>↙</b></div>
+          <em className="myth-card-stamp">FACT</em>
+        </motion.div>}
+      </AnimatePresence>
     </button>
   </motion.article>;
-}
-
-function EvidenceDossier({ item, onClose }: { item: HandbookCard; onClose: () => void }) {
-  return <motion.div className="myth-dossier-backdrop" role="dialog" aria-modal="true" aria-label={`Evidence for ${item.myth}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
-    <motion.article initial={{ opacity: 0, y: 60, rotate: 1.5 }} animate={{ opacity: 1, y: 0, rotate: 0 }} exit={{ opacity: 0, y: 30 }} transition={{ type: "spring", stiffness: 160, damping: 22 }} onClick={(event) => event.stopPropagation()}>
-      <header><span>CASE {String(item.number).padStart(2, "0")} · {item.category}</span><button onClick={onClose} aria-label="Close evidence dossier"><X /></button></header>
-      <div className="myth-dossier-claim"><small>Claim in circulation</small><h2>{item.myth}</h2><b>MYTH</b></div>
-      <div className="myth-dossier-columns">
-        <section><span>01 · Evidence-based reality</span><p>{item.reality}</p></section>
-        <section><span>02 · Why it matters</span><p>{item.explanation}</p></section>
-        <section><span>03 · India context</span><p>{item.indiaContext}</p></section>
-      </div>
-      <footer><div><small>Evidence route</small><p>{item.evidence}</p></div><strong>REVIEWED<br />{item.reviewed}</strong></footer>
-    </motion.article>
-  </motion.div>;
 }

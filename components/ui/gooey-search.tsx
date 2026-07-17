@@ -30,13 +30,13 @@ function useDebounce<T>(value: T, delay: number): T {
 // ── Animation variants ───────────────────────────────────────────────────────
 
 const buttonMotionVariants = {
-  step1: { x: 0, width: 100 },
-  step2: { x: -30, width: 180 },
+  step1: { width: 100 },
+  step2: { width: 184 },
 };
 
 const iconMotionVariants = {
-  hidden: { x: -50, opacity: 0 },
-  visible: { x: 16, opacity: 1 },
+  hidden: { x: -34, scale: 0.72, opacity: 0 },
+  visible: { x: 0, scale: 1, opacity: 1 },
 };
 
 const getResultVariants = (index: number, unsupported: boolean) => ({
@@ -224,7 +224,12 @@ export function GooeySearch({
   const resultPadding = isUnsupported ? "7.5px 10px" : "12.5px 20px";
 
   return (
-    <div className={cn("relative inline-flex items-center justify-center", className)}>
+    <motion.div
+      className={cn("relative inline-flex items-center justify-end", className)}
+      initial={false}
+      animate={{ width: step === 1 ? 100 : 238 }}
+      transition={{ duration: 0.72, type: "spring", bounce: 0.12 }}
+    >
       {/* Keyframe injection for loading spinner */}
       <style>{`
         .gooey-search-loading {
@@ -256,8 +261,10 @@ export function GooeySearch({
         style={{
           filter: isUnsupported ? "none" : `url(#${filterId})`,
           cursor: "pointer",
-          maxWidth: "max-content",
+          width: step === 1 ? 100 : 238,
+          height: 46,
           position: "relative",
+          transition: "width .72s cubic-bezier(.22,1,.36,1)",
         }}
       >
         {/* Results — z-index -1 so they live "behind" the button until animated out */}
@@ -266,7 +273,7 @@ export function GooeySearch({
             key="results-wrapper"
             role="listbox"
             aria-label="Search results"
-            style={{ position: "relative", zIndex: -1 }}
+            style={{ position: "absolute", zIndex: -1, left: 0, top: 0, width: 184 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ delay: isUnsupported ? 0.5 : 1.25, duration: 0.5 }}
           >
@@ -291,7 +298,7 @@ export function GooeySearch({
                     width: "100%",
                     color: "var(--background)",
                     position: "absolute",
-                    left: isUnsupported ? 0 : -30,
+                    left: 0,
                     fontSize: 14,
                     cursor: "pointer",
                   }}
@@ -325,6 +332,10 @@ export function GooeySearch({
           role={step === 1 ? "button" : undefined}
           aria-label={step === 1 ? "Open search" : undefined}
           style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            minHeight: 46,
             backgroundColor: "var(--foreground)",
             color: "var(--background)",
             cursor: "pointer",
@@ -385,8 +396,8 @@ export function GooeySearch({
                 backgroundColor: "var(--foreground)",
                 width: isUnsupported ? 36 : 46,
                 height: isUnsupported ? 36 : 46,
-                right: -5,
-                top: -1,
+                right: 0,
+                top: 0,
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -399,7 +410,7 @@ export function GooeySearch({
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
