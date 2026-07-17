@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Check, Droplets, ExternalLink, Factory, Leaf, PauseCircle, PenLine, PlayCircle, Recycle, RotateCcw, Sparkles, Trees, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Check, ExternalLink, Factory, Leaf, PauseCircle, PenLine, PlayCircle, RotateCcw, Sparkles, Trees, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type WheelEvent } from "react";
 import { journeySpreads, journeyTotal, type JourneySpread } from "./journeyData";
 
@@ -20,7 +20,8 @@ export default function JourneySaga() {
   const [helpOpen, setHelpOpen] = useState(true);
   const stageRef = useRef<HTMLElement>(null);
   const wheelRef = useRef(0);
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const touchStart = useRef<{ x: number; y: number; time: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const goTo = useCallback((next: number) => {
     if (turn || next === current || next < 0 || next >= journeyTotal) return;
@@ -47,6 +48,16 @@ export default function JourneySaga() {
   useEffect(() => {
     if (current === journeyTotal - 1) setAutoplay(false);
   }, [current]);
+
+  useEffect(() => {
+    if (!turn) return;
+    const isCoverTurn = turn.from === 0 || turn.to === 0;
+    const timer = window.setTimeout(() => {
+      setCurrent(turn.to);
+      setTurn(null);
+    }, prefersReducedMotion ? 40 : isCoverTurn ? 1380 : 1080);
+    return () => window.clearTimeout(timer);
+  }, [prefersReducedMotion, turn]);
 
   function finishTurn() {
     if (!turn) return;
@@ -75,18 +86,25 @@ export default function JourneySaga() {
       previous();
     } else if (event.key === "Home") goTo(0);
     else if (event.key === "End") goTo(journeyTotal - 1);
+    else if (event.key === "Escape" && current > 0) goTo(0);
   }
 
   function onPointerDown(event: PointerEvent<HTMLElement>) {
-    touchStart.current = { x: event.clientX, y: event.clientY };
+    if (event.button !== 0 || (event.target as HTMLElement).closest("button, input, a, [role='button']")) return;
+    touchStart.current = { x: event.clientX, y: event.clientY, time: performance.now() };
+    setIsDragging(true);
   }
 
   function onPointerUp(event: PointerEvent<HTMLElement>) {
-    if (!touchStart.current || turn) return;
+    if (!touchStart.current) return;
     const dx = event.clientX - touchStart.current.x;
     const dy = event.clientY - touchStart.current.y;
+    const elapsed = Math.max(1, performance.now() - touchStart.current.time);
+    const velocity = Math.abs(dx) / elapsed;
     touchStart.current = null;
-    if (Math.abs(dx) < 48 || Math.abs(dx) <= Math.abs(dy)) return;
+    setIsDragging(false);
+    stageRef.current?.style.setProperty("--journey-drag", "0");
+    if (turn || (Math.abs(dx) < 48 && velocity < .42) || Math.abs(dx) <= Math.abs(dy)) return;
     if (dx < 0) next();
     else previous();
   }
@@ -98,11 +116,18 @@ export default function JourneySaga() {
     const y = (event.clientY - bounds.top) / bounds.height - .5;
     stageRef.current.style.setProperty("--journey-pointer-x", x.toFixed(3));
     stageRef.current.style.setProperty("--journey-pointer-y", y.toFixed(3));
+    if (touchStart.current) {
+      const dx = Math.max(-160, Math.min(160, event.clientX - touchStart.current.x));
+      stageRef.current.style.setProperty("--journey-drag", (dx / 160).toFixed(3));
+    }
   }
 
   function resetPointer() {
     stageRef.current?.style.setProperty("--journey-pointer-x", "0");
     stageRef.current?.style.setProperty("--journey-pointer-y", "0");
+    stageRef.current?.style.setProperty("--journey-drag", "0");
+    touchStart.current = null;
+    setIsDragging(false);
   }
 
   const visiblePage = turn ? turn.to : current;
@@ -121,6 +146,7 @@ export default function JourneySaga() {
         onPointerUp={onPointerUp}
         onPointerMove={onPointerMove}
         onPointerLeave={resetPointer}
+        onPointerCancel={resetPointer}
       >
         <div className="journey-forest" />
         <JourneyAtmosphere reducedMotion={Boolean(prefersReducedMotion)} />
@@ -132,8 +158,16 @@ export default function JourneySaga() {
         </header>
 
         <div className="journey-book-stage">
-          <div className="journey-book-rig">
-            <BookView current={current} turn={turn} onOpen={openBook} onTurnComplete={finishTurn} reducedMotion={Boolean(prefersReducedMotion)} />
+          <div className={`journey-book-rig ${isDragging ? "is-dragging" : ""}`}>
+            <BookView
+              current={current}
+              turn={turn}
+              onOpen={openBook}
+              onNext={next}
+              onPrevious={previous}
+              onTurnComplete={finishTurn}
+              reducedMotion={Boolean(prefersReducedMotion)}
+            />
           </div>
         </div>
 
@@ -151,6 +185,12 @@ export default function JourneySaga() {
           <button onClick={() => setAutoplay((value) => !value)} aria-label={autoplay ? "Pause story" : "Auto play"} aria-pressed={autoplay}>{autoplay ? <PauseCircle /> : <PlayCircle />}<span>{autoplay ? "Pause story" : "Auto play"}</span></button>
           <button onClick={() => goTo(0)} disabled={current === 0 || Boolean(turn)} aria-label="Restart story"><RotateCcw /><span>Restart</span></button>
         </div>
+
+        {current > 0 && !turn && (
+          <div className="journey-swipe-affordance" aria-hidden="true">
+            <ArrowLeft /><span>drag or swipe the paper</span><ArrowRight />
+          </div>
+        )}
 
         <AnimatePresence>
           {helpOpen && current === 0 && (
@@ -178,7 +218,23 @@ export default function JourneySaga() {
   );
 }
 
-function BookView({ current, turn, onOpen, onTurnComplete, reducedMotion }: { current: number; turn: Turn; onOpen: () => void; onTurnComplete: () => void; reducedMotion: boolean }) {
+function BookView({
+  current,
+  turn,
+  onOpen,
+  onNext,
+  onPrevious,
+  onTurnComplete,
+  reducedMotion,
+}: {
+  current: number;
+  turn: Turn;
+  onOpen: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  onTurnComplete: () => void;
+  reducedMotion: boolean;
+}) {
   if (current === 0 && !turn) return <ClosedCover onOpen={onOpen} />;
 
   const forward = turn?.direction !== -1;
@@ -211,6 +267,23 @@ function BookView({ current, turn, onOpen, onTurnComplete, reducedMotion }: { cu
       <PageText spread={leftBase} side="left" />
       <PageImage spread={rightBase} side="right" />
       <div className="journey-gutter" />
+      {!turn && (
+        <>
+          <button
+            className="journey-page-corner journey-page-corner-left"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={onPrevious}
+            aria-label="Turn to the previous chapter"
+          ><ArrowLeft /><span>Previous</span></button>
+          <button
+            className="journey-page-corner journey-page-corner-right"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={onNext}
+            disabled={current === journeyTotal - 1}
+            aria-label="Turn to the next chapter"
+          ><span>{current === journeyTotal - 1 ? "The end" : "Turn page"}</span><ArrowRight /></button>
+        </>
+      )}
 
       {turn && (
         <motion.div
@@ -227,6 +300,8 @@ function BookView({ current, turn, onOpen, onTurnComplete, reducedMotion }: { cu
           <div className="journey-turn-face journey-turn-back">
             {coverTurn && turn.to === 0 ? <CoverFace /> : forward ? <PageText spread={toSpread} side="turn" /> : <PageImage spread={toSpread} side="turn" />}
           </div>
+          <div className="journey-turn-fold" aria-hidden="true" />
+          <div className="journey-turn-edge" aria-hidden="true" />
         </motion.div>
       )}
     </motion.div>
@@ -247,7 +322,7 @@ function ClosedCover({ onOpen }: { onOpen: () => void }) {
 function CoverFace() {
   return (
     <div className="journey-cover-face">
-      <Image src="/images/journey/spreads/cover.jpg" alt="Leather-bound storybook in a forest" fill sizes="(max-width: 768px) 78vw, 480px" priority className="object-cover" />
+      <Image src="/images/journey/spreads-v2/cover.jpg" alt="Leather-bound storybook in a forest" fill sizes="(max-width: 768px) 78vw, 480px" priority className="object-cover" />
       <div className="journey-cover-corners" aria-hidden="true"><i /><i /><i /><i /></div>
       <div className="journey-cover-overlay"><small>Paper Foundation India</small><b>SOURCE · FIBRE · SHEET · RETURN</b><strong>How Paper<br />Is Made.</strong><span>The whole truth needs the whole journey</span><em>Open the book</em></div>
     </div>
@@ -258,7 +333,7 @@ function PageText({ spread, side }: { spread: JourneySpread; side: "left" | "tur
   return (
     <article className={`journey-page-paper journey-page-text journey-page-${side}`} style={{ "--journey-accent": spread.accent } as CSSProperties}>
       <div className="journey-page-border" />
-      <p className="journey-chapter">{spread.chapter}</p>
+      <div className="journey-page-heading"><p className="journey-chapter">{spread.chapter}</p><span>{spread.processStep}</span></div>
       <span className="journey-page-rule" />
       <h2>{spread.title}</h2>
       <div className="journey-page-body">{spread.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
@@ -272,15 +347,16 @@ function JourneyPageInteraction({ spread }: { spread: JourneySpread }) {
   const stop = (event: { stopPropagation: () => void }) => event.stopPropagation();
 
   if (spread.id === 1) return <BlankPagePlay onStop={stop} />;
-  if (spread.id === 2) return <RecoveryLoop onStop={stop} />;
+  if (spread.id === 2) return <SourceLens onStop={stop} />;
   if (spread.id === 3) return <SortFibre onStop={stop} />;
   if (spread.id === 4) return <PulpMixer onStop={stop} />;
-  if (spread.id === 5) return <SourceLens onStop={stop} />;
-  if (spread.id === 6) return <FibreBalance onStop={stop} />;
-  if (spread.id === 7) return <MillScrubber onStop={stop} />;
-  if (spread.id === 8) return <ProductDial onStop={stop} />;
-  if (spread.id === 9) return <KnowledgeStamp onStop={stop} />;
-  if (spread.id === 10) return <RecoveryChoice onStop={stop} />;
+  if (spread.id === 5) return <CleaningCascade onStop={stop} />;
+  if (spread.id === 6) return <DeinkLab onStop={stop} />;
+  if (spread.id === 7) return <FibreBondLab onStop={stop} />;
+  if (spread.id === 8) return <SheetFormer onStop={stop} />;
+  if (spread.id === 9) return <MillScrubber onStop={stop} />;
+  if (spread.id === 10) return <ProductDial onStop={stop} />;
+  if (spread.id === 11) return <KnowledgeStamp onStop={stop} />;
   return <FinalPledge onStop={stop} />;
 }
 
@@ -290,11 +366,6 @@ function BlankPagePlay({ onStop }: StopProps) {
   const [mark, setMark] = useState(0);
   const words = ["idea", "lesson", "promise", "story"];
   return <div className="journey-page-widget widget-blank" onPointerDown={onStop} onPointerUp={onStop}><button onClick={(event) => { onStop(event); setMark((value) => (value + 1) % words.length); }}><PenLine /> Touch the blank page</button><motion.strong key={mark} initial={{ opacity: 0, scale: .4, rotate: -12 }} animate={{ opacity: 1, scale: 1, rotate: -3 }}>{words[mark]}</motion.strong></div>;
-}
-
-function RecoveryLoop({ onStop }: StopProps) {
-  const [returned, setReturned] = useState(false);
-  return <div className="journey-page-widget widget-recovery" onPointerDown={onStop} onPointerUp={onStop}><button onClick={(event) => { onStop(event); setReturned((value) => !value); }}><motion.span animate={{ rotate: returned ? 360 : 0 }}><Recycle /></motion.span>{returned ? "Fibre is back in the loop" : "Return this used sheet"}</button><i className={returned ? "is-returned" : ""} /></div>;
 }
 
 function SortFibre({ onStop }: StopProps) {
@@ -308,24 +379,30 @@ function PulpMixer({ onStop }: StopProps) {
   return <div className="journey-page-widget widget-pulp" onPointerDown={onStop} onPointerUp={onStop}><div className="pulp-vessel"><motion.i animate={{ rotate: mixed * 3.6 }} /><b style={{ transform: `scale(${.55 + mixed / 220})` }} /></div><label>Loosen the sheet <input aria-label="Mix paper into pulp" type="range" min="0" max="100" value={mixed} onChange={(event) => setMixed(Number(event.target.value))} /></label><span>{mixed > 76 ? "Fibres released" : "Add water + motion"}</span></div>;
 }
 
+function CleaningCascade({ onStop }: StopProps) {
+  const stages = ["Screen", "Clean", "Inspect"];
+  const [stage, setStage] = useState(0);
+  return <div className="journey-page-widget widget-cleaning" onPointerDown={onStop} onPointerUp={onStop}><div className="cleaning-stream">{stages.map((item,index)=><button key={item} className={index<=stage?"is-active":""} onClick={(event)=>{onStop(event);setStage(index);}}><i />{item}</button>)}</div><motion.p key={stage} initial={{opacity:0,y:4}} animate={{opacity:1,y:0}}>{stage===0?"Separate by size and shape.":stage===1?"Remove grit and dense contaminants.":"Check the furnish before it moves on."}</motion.p></div>;
+}
+
+function DeinkLab({ onStop }: StopProps) {
+  const [active, setActive] = useState(false);
+  return <div className="journey-page-widget widget-deink" onPointerDown={onStop} onPointerUp={onStop}><button aria-pressed={active} onClick={(event)=>{onStop(event);setActive(value=>!value);}}><span><motion.i animate={{y:active?-19:0,opacity:active ? .25 : 1}} /><motion.i animate={{y:active?-13:0,opacity:active ? .2 : 1}} /><motion.i animate={{y:active?-23:0,opacity:active ? .3 : 1}} /></span><b>{active?"Ink lifted":"Printed furnish"}</b></button><p>{active?"Detached ink follows air bubbles away.":"Use this route only when the next grade needs it."}</p></div>;
+}
+
+function FibreBondLab({ onStop }: StopProps) {
+  const [refined, setRefined] = useState(35);
+  return <div className="journey-page-widget widget-bond" onPointerDown={onStop} onPointerUp={onStop}><div className="bond-fibres"><motion.i animate={{rotate:-12-refined/12,x:refined/16}}/><motion.i animate={{rotate:18+refined/15,x:-refined/18}}/><motion.i animate={{rotate:-2,y:refined/28}}/></div><label>Refining level <input type="range" min="0" max="100" value={refined} onChange={(event)=>setRefined(Number(event.target.value))}/></label><span>{refined<30?"Fibres need more contact":refined>78?"Too much treatment can slow drainage":"Bonding surface developing"}</span></div>;
+}
+
+function SheetFormer({ onStop }: StopProps) {
+  const [flow, setFlow] = useState(22);
+  return <div className="journey-page-widget widget-former" onPointerDown={onStop} onPointerUp={onStop}><div><motion.span style={{width:`${Math.max(18,flow)}%`}} /><i /></div><label>Open the fibre flow <input type="range" min="18" max="100" value={flow} onChange={(event)=>setFlow(Number(event.target.value))}/></label><strong>{flow>78?"A continuous wet web appears":"Furnish meets the forming fabric"}</strong></div>;
+}
+
 function SourceLens({ onStop }: StopProps) {
   const [responsible, setResponsible] = useState(true);
   return <div className="journey-page-widget widget-source" onPointerDown={onStop} onPointerUp={onStop}><button onClick={(event) => { onStop(event); setResponsible((value) => !value); }} aria-pressed={responsible}><motion.span animate={{ x: responsible ? 34 : 0 }}><Trees /></motion.span></button><div><strong>{responsible ? "Source verified" : "Source unknown"}</strong><span>{responsible ? "Management evidence changes the answer." : "A tree claim without sourcing is incomplete."}</span></div></div>;
-}
-
-function FibreBalance({ onStop }: StopProps) {
-  const [recovered, setRecovered] = useState(75);
-  const [message, setMessage] = useState("A broad Indian fibre mix is led by recovered paper.");
-  useEffect(() => {
-    if (recovered === 75) return;
-    setMessage(recovered > 75 ? "More recovered? Good instinct—but fibres shorten. Fresh fibre replenishes the loop." : "More fresh fibre can add strength, while recovery keeps useful material circulating.");
-    const timer = window.setTimeout(() => {
-      setRecovered(75);
-      setMessage("Back to the broad 75 / 25 reference mix—not a universal recipe for every paper grade.");
-    }, 720);
-    return () => window.clearTimeout(timer);
-  }, [recovered]);
-  return <div className="journey-page-widget widget-balance" onPointerDown={onStop} onPointerUp={onStop}><div className="balance-numbers"><strong>{recovered}%<small>recovered</small></strong><strong>{100 - recovered}%<small>fresh</small></strong></div><div className="balance-control"><button aria-label="Use less recovered fibre" onClick={(event) => { onStop(event); setRecovered((value) => Math.max(35, value - 10)); }}>−</button><input aria-label="Explore recovered and fresh fibre balance" type="range" min="35" max="95" value={recovered} onChange={(event) => setRecovered(Number(event.target.value))} /><button aria-label="Use more recovered fibre" onClick={(event) => { onStop(event); setRecovered((value) => Math.min(95, value + 10)); }}>+</button></div><motion.p key={message} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>{message}</motion.p></div>;
 }
 
 function MillScrubber({ onStop }: StopProps) {
@@ -345,11 +422,6 @@ function KnowledgeStamp({ onStop }: StopProps) {
   return <div className="journey-page-widget widget-knowledge" onPointerDown={onStop} onPointerUp={onStop}><button onClick={(event) => { onStop(event); setStamped(true); }}><motion.span animate={stamped ? { y: [0, 8, -2, 0], scale: [1, .92, 1.04, 1] } : undefined}><PenLine /></motion.span>Press an idea into paper</button><AnimatePresence>{stamped && <motion.strong initial={{ opacity: 0, scale: 1.6, rotate: 9 }} animate={{ opacity: 1, scale: 1, rotate: -3 }}>REMEMBERED</motion.strong>}</AnimatePresence></div>;
 }
 
-function RecoveryChoice({ onStop }: StopProps) {
-  const [choice, setChoice] = useState<"clean" | "dirty" | null>(null);
-  return <div className="journey-page-widget widget-choice" onPointerDown={onStop} onPointerUp={onStop}><div><button onClick={(event) => { onStop(event); setChoice("clean"); }}><Recycle /> Clean + dry</button><button onClick={(event) => { onStop(event); setChoice("dirty"); }}><Droplets /> Wet + soiled</button></div>{choice && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{choice === "clean" ? "The mill route stays open." : "This fibre may be lost from recovery."}</motion.p>}</div>;
-}
-
 function FinalPledge({ onStop }: StopProps) {
   const [pledges, setPledges] = useState<string[]>([]);
   const options = ["Source", "Use well", "Recover"];
@@ -357,13 +429,15 @@ function FinalPledge({ onStop }: StopProps) {
 }
 
 function PageImage({ spread, side }: { spread: JourneySpread; side: "right" | "turn" }) {
+  const specified = spread.images?.length ? spread.images : [{ src: spread.image, alt: spread.title }];
+  const images = specified;
   return (
-    <div className={`journey-page-paper journey-page-image journey-page-${side} ${spread.id === 11 ? "journey-final-page" : ""}`}>
-      <Image src={spread.image} alt={spread.title} fill sizes="(max-width: 768px) 44vw, 520px" priority={spread.id <= 2} className="object-cover" />
+    <div className={`journey-page-paper journey-page-image journey-page-${side} ${spread.id === journeySpreads.length ? "journey-final-page" : ""}`}>
+      <div className={`journey-image-gallery gallery-count-${Math.min(images.length,3)}`}>{images.slice(0,3).map((image,index)=><div key={`${image.src}-${index}`} className={`journey-gallery-shot shot-${index+1}`}><Image src={image.src} alt={image.alt} fill sizes="(max-width: 768px) 44vw, 520px" priority={spread.id <= 2 && index===0} /></div>)}</div>
       <div className="journey-image-wash" />
       <div className="journey-image-life" aria-hidden="true"><motion.i animate={{ y: [0, -13, 0], rotate: [8, 18, 8] }} transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }} /><motion.i animate={{ y: [0, 11, 0], x: [0, -7, 0], rotate: [-18, -4, -18] }} transition={{ duration: 5.4, repeat: Infinity, ease: "easeInOut" }} /><span /></div>
-      <div className="journey-image-caption"><small>{spread.chapter}</small><strong>{spread.title}</strong></div>
-      {spread.id === 11 && <div className="journey-back-mark"><span>PFI</span><p>Love paper.<br />Use paper responsibly.</p><small>Hyderabad · 2025</small></div>}
+      <div className="journey-image-caption"><small>{spread.eyebrow}</small><strong>{images[0]?.caption ?? spread.title}</strong></div>
+      {spread.id === journeySpreads.length && <div className="journey-back-mark"><span>PFI</span><p>Love paper.<br />Use paper responsibly.</p><small>Hyderabad · 2026</small></div>}
     </div>
   );
 }
