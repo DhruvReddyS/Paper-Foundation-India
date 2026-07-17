@@ -49,7 +49,7 @@ export default function KnowledgeExperience() {
     </section>
 
     <section className="knowledge-feature-carousel">
-      <header><div><p className="premium-kicker">Editor’s selection</p><h2>One material.<br />Three ways in.</h2></div><div className="feature-carousel-controls"><button onClick={() => change(-1)} aria-label="Previous feature"><ChevronLeft /></button><span>{String(feature + 1).padStart(2, "0")} / 03</span><button onClick={() => change(1)} aria-label="Next feature"><ChevronRight /></button></div></header>
+      <header><div><p className="premium-kicker">Editor’s selection</p><h2>One material.<br />Three ways in.</h2><Link className="knowledge-all-features" href="/knowledge/featured">Enter the featured reading room <ArrowRight /></Link></div><div className="feature-carousel-controls"><button onClick={() => change(-1)} aria-label="Previous feature"><ChevronLeft /></button><span>{String(feature + 1).padStart(2, "0")} / 03</span><button onClick={() => change(1)} aria-label="Next feature"><ChevronRight /></button></div></header>
       <div className="feature-carousel-stage">
         <AnimatePresence mode="wait"><motion.article key={feature} initial={{ opacity: 0, x: 45 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -45 }} className={`feature-tone-${active.tone}`}>
           <div className="feature-cover"><Image src={active.image} alt="" fill sizes="(max-width: 700px) 100vw, 430px" /><span>FIG. {String(feature + 1).padStart(2, "0")}</span><ActiveIcon /><i /><b /></div>

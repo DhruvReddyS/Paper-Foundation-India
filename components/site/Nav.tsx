@@ -42,7 +42,7 @@ const navGroups: NavGroup[] = [
     introduction: "Read researched perspectives, consult source material and understand the language of paper.",
     items: [
       { href: "/knowledge", label: "Articles", description: "Editorial stories and explainers", icon: BookOpen },
-      { href: "/knowledge/truth-about-paper-forestry", label: "Featured Article", description: "Our current long-form read", icon: FileText },
+      { href: "/knowledge/featured", label: "Featured Articles", description: "Our special long-form reading room", icon: FileText },
       { href: "/resources", label: "Resources", description: "Reports, guides and source documents", icon: Library },
       { href: "/glossary", label: "Glossary", description: "Clear definitions for paper terminology", icon: BookMarked },
     ],

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, Copy, Download, ExternalLink, Share2 } from "lucide-react";
+import { ArrowLeft, Copy, Download, ExternalLink, Layers3, Share2, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 export function GameFrame({
@@ -19,14 +19,15 @@ export function GameFrame({
   return (
     <div className="game-page min-h-screen pb-24 pt-8">
       <div className="game-shell">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div className="game-session-header">
           <Link href="/games" className="game-back-link">
             <ArrowLeft size={16} /> Game hub
           </Link>
-          <div className="text-right">
+          <div className="game-session-title">
             <p className="game-kicker">{kicker}</p>
             <p className="font-serif text-xl font-bold text-charcoal">{title}</p>
           </div>
+          <div className="game-session-live"><i /><span>Playable edition<br /><b>Session ready</b></span></div>
         </div>
         {typeof progress === "number" && (
           <div className="game-progress" aria-label={`${Math.round(progress)}% complete`}>
@@ -57,18 +58,20 @@ export function GameIntro({
   return (
     <motion.section initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className={`game-intro game-accent-${accent}`}>
       <div className="game-intro-copy">
+        <div className="game-intro-seal"><Sparkles /><span>PFI<br />PLAY</span></div>
         <p className="game-kicker">{eyebrow}</p>
         <h1>{title}</h1>
         <p>{description}</p>
         <button className="game-primary-button" onClick={onStart}>Start playing <span>→</span></button>
       </div>
       <div className="game-rules-card">
-        <p className="game-kicker">How to play</p>
+        <header><div><Layers3 /><p className="game-kicker">How to play</p></div><span>01—03</span></header>
         <ol>
           {rules.map((rule, index) => <li key={rule}><span>{index + 1}</span>{rule}</li>)}
         </ol>
-        <p className="game-access-note">No login. No gaming experience needed. Works with touch, mouse and keyboard.</p>
+        <p className="game-access-note">No login · Touch, mouse and keyboard · Branded result card included</p>
       </div>
+      <div className="game-intro-folio"><span>PLAY</span><span>LEARN</span><span>PROVE</span></div>
     </motion.section>
   );
 }
@@ -158,6 +161,7 @@ export function ResultPanel({
 
   return (
     <motion.section initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="game-result-panel">
+      <div className="game-result-edition"><span>THE PLAYABLE EDITION</span><small>PAPER FOUNDATION INDIA</small></div>
       <div className="game-result-stamp">{badge}</div>
       <p className="game-kicker">Your result</p>
       <h1>{score}<span> / {outOf}</span></h1>

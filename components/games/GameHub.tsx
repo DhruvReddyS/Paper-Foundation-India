@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Brain, Factory, Fingerprint, Grid3X3, Leaf, ScanSearch, Stamp, Timer, Trophy } from "lucide-react";
-import { useCallback, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode, type WheelEvent } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ArrowRight, Brain, Factory, Fingerprint, Grid3X3, Leaf, ScanSearch, Stamp, Timer, Trophy } from "lucide-react";
+import { useState, type ReactNode } from "react";
 
 const games = [
   {
@@ -76,47 +76,8 @@ const games = [
 export default function GameHub() {
   const reducedMotion = useReducedMotion();
   const [active, setActive] = useState(0);
-  const wheelLock = useRef(false);
-  const pointerStart = useRef<number | null>(null);
-
-  const changeGame = useCallback((direction: -1 | 1) => {
-    setActive((current) => (current + direction + games.length) % games.length);
-  }, []);
-
-  function getOffset(index: number) {
-    let offset = index - active;
-    if (offset > games.length / 2) offset -= games.length;
-    if (offset < -games.length / 2) offset += games.length;
-    return offset;
-  }
-
-  function onWheel(event: WheelEvent<HTMLDivElement>) {
-    const horizontalIntent = Math.abs(event.deltaX) > Math.abs(event.deltaY) || event.shiftKey;
-    if (!horizontalIntent || wheelLock.current) return;
-    event.preventDefault();
-    const delta = event.deltaX || event.deltaY;
-    if (Math.abs(delta) < 8) return;
-    wheelLock.current = true;
-    changeGame(delta > 0 ? 1 : -1);
-    window.setTimeout(() => { wheelLock.current = false; }, 520);
-  }
-
-  function onPointerDown(event: PointerEvent<HTMLDivElement>) {
-    pointerStart.current = event.clientX;
-  }
-
-  function onPointerUp(event: PointerEvent<HTMLDivElement>) {
-    if (pointerStart.current === null) return;
-    const distance = event.clientX - pointerStart.current;
-    pointerStart.current = null;
-    if (Math.abs(distance) < 45) return;
-    changeGame(distance < 0 ? 1 : -1);
-  }
-
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "ArrowRight") { event.preventDefault(); changeGame(1); }
-    if (event.key === "ArrowLeft") { event.preventDefault(); changeGame(-1); }
-  }
+  const selectedGame = games[active];
+  const SelectedIcon = selectedGame.icon;
 
   return (
     <div className="game-hub-page">
@@ -154,77 +115,23 @@ export default function GameHub() {
         </div>
       </section>
 
-      <section id="game-index" className="game-carousel-section">
-        <div className="game-shell game-carousel-heading">
-          <div>
-            <p className="game-kicker">Choose your way in</p>
-            <h2 className="game-section-title">Pick a poster.<br />Enter the game.</h2>
+      <section id="game-index" className="game-switchboard-section">
+        <div className="game-shell">
+          <header className="game-switchboard-heading"><div><p className="game-kicker">The playable edition · Issue 01</p><h2 className="game-section-title">Choose the skill.<br />Open the game.</h2></div><p>Each game has its own mechanic, pace and evidence habit. Select a numbered tab to inspect the experience before entering.</p></header>
+          <nav className="game-switchboard-tabs" aria-label="Choose a paper game">{games.map((game, index) => <button key={game.number} onClick={() => setActive(index)} className={active === index ? "is-active" : ""} aria-current={active === index ? "true" : undefined}><span>{game.number}</span><strong>{game.title}</strong><small>{game.action}</small></button>)}</nav>
+          <div className="game-switchboard">
+            <AnimatePresence mode="wait">
+              <motion.article key={selectedGame.number} initial={{ opacity: 0, x: 35 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -25 }} transition={{ duration: .42 }} className={`game-switchboard-poster ${selectedGame.className}`}>
+                <div className="game-switchboard-art"><span>GAME {selectedGame.number}</span><GamePosterArt game={active} icon={<SelectedIcon />} active reducedMotion={Boolean(reducedMotion)} /></div>
+                <div className="game-switchboard-copy">
+                  <p>{selectedGame.subtitle}</p><h3>{selectedGame.title}</h3><em>{selectedGame.hook}</em><span>{selectedGame.description}</span>
+                  <div>{[selectedGame.action, selectedGame.duration, selectedGame.difficulty].map(item => <small key={item}>{item}</small>)}</div>
+                  <Link href={selectedGame.href}>Enter this game <ArrowRight /></Link>
+                </div>
+              </motion.article>
+            </AnimatePresence>
+            <aside><span>WHAT YOU PRACTISE</span><strong>{active === 0 ? "Evidence recall" : active === 1 ? "Claim verification" : active === 2 ? "Process sequencing" : active === 3 ? "Material observation" : "Fast vocabulary"}</strong><p>Every result creates a branded share card—no login and no account setup required.</p><div><Trophy /><span>Score locally<br /><b>Share responsibly</b></span></div></aside>
           </div>
-          <div className="game-carousel-copy">
-            <p>Every card behaves differently because every game asks for a different skill. Swipe the deck, use the arrows, or scroll sideways.</p>
-            <div className="game-carousel-readout" aria-live="polite"><span>{games[active].number}</span><strong>{games[active].title}</strong></div>
-          </div>
-        </div>
-
-        <div
-          className="game-carousel"
-          tabIndex={0}
-          role="region"
-          aria-roledescription="carousel"
-          aria-label="Paper games"
-          onWheel={onWheel}
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onPointerCancel={() => { pointerStart.current = null; }}
-          onKeyDown={onKeyDown}
-        >
-          <div className="game-carousel-orbit" aria-hidden="true"><span /><span /><span /></div>
-          <div className="game-carousel-deck">
-            {games.map((game, index) => {
-              const Icon = game.icon;
-              const offset = getOffset(index);
-              const selected = index === active;
-              const distance = Math.abs(offset);
-              return (
-                <motion.article
-                  key={game.title}
-                  className={`hub-game-card ${game.className} ${selected ? "is-active" : ""}`}
-                  animate={{
-                    x: `${offset * 88}%`,
-                    y: distance * 20,
-                    scale: selected ? 1 : Math.max(.76, 1 - distance * .12),
-                    rotate: offset * 2.4,
-                    rotateY: offset * -5,
-                    opacity: distance > 1 ? .16 : selected ? 1 : .58,
-                    filter: selected ? "brightness(1) saturate(1)" : "brightness(.82) saturate(.72)",
-                  }}
-                  transition={reducedMotion ? { duration: .01 } : { type: "spring", stiffness: 135, damping: 24, mass: .82 }}
-                  style={{ zIndex: 10 - distance, pointerEvents: distance > 1 ? "none" : "auto" }}
-                  onClick={() => !selected && setActive(index)}
-                  aria-hidden={!selected}
-                >
-                  <div className="hub-poster-no">GAME {game.number}</div>
-                  <GamePosterArt game={index} icon={<Icon />} active={selected} reducedMotion={Boolean(reducedMotion)} />
-                  <div className="hub-poster-copy">
-                    <p className="hub-game-subtitle">{game.subtitle}</p>
-                    <div className="hub-game-title-block"><h3>{game.title}</h3><strong className="hub-game-hook">{game.hook}</strong></div>
-                    <p className="hub-game-description">{game.description}</p>
-                    <div className="hub-game-footer"><div className="hub-game-tags"><span>{game.action}</span><span>{game.duration}</span><span>{game.difficulty}</span></div>{selected && <Link href={game.href}>Play now <ArrowRight size={17} /></Link>}</div>
-                  </div>
-                  <div className="hub-poster-edge" />
-                </motion.article>
-              );
-            })}
-          </div>
-
-          <div className="game-carousel-controls">
-            <button onClick={() => changeGame(-1)} aria-label="Previous game"><ArrowLeft /></button>
-            <div className="game-carousel-dots">
-              {games.map((game, index) => <button key={game.title} onClick={() => setActive(index)} className={index === active ? "is-active" : ""} aria-label={`Show ${game.title}`} aria-current={index === active ? "true" : undefined}><span /></button>)}
-            </div>
-            <button onClick={() => changeGame(1)} aria-label="Next game"><ArrowRight /></button>
-          </div>
-          <p className="game-carousel-hint"><span>←</span> swipe · drag · arrow keys <span>→</span></p>
         </div>
       </section>
 

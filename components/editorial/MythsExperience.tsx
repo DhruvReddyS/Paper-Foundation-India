@@ -1,12 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowRight, Check, ChevronLeft, ChevronRight, ExternalLink, Search, ScanSearch, Sparkles, Stamp, X } from "lucide-react";
+import { ArrowDown, ArrowRight, Check, ExternalLink, Gamepad2, Search, ScanSearch, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import handbookCards from "@/content/mythCatalog.json";
 
-type Verdict = "myth" | "fact" | "context";
 type HandbookCard = (typeof handbookCards)[number] & { category: string; number: number };
 
 const categories = [
@@ -16,24 +15,13 @@ const categories = [
 ] as const;
 const categoryFor = (index: number) => categories.find(([, end]) => index < end)?.[0] ?? "Paper systems";
 const categorySlug = (category: string) => category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const claims = handbookCards.slice(0, 6).map((card, index) => ({
-  claim: card.myth,
-  verdict: "myth" as Verdict,
-  short: card.reality.split(/[.!?]/)[0],
-  explanation: card.reality,
-  source: card.evidence,
-  index,
-}));
 
 export default function MythsExperience() {
   const reduced = useReducedMotion();
-  const [claimIndex, setClaimIndex] = useState(0);
-  const [answer, setAnswer] = useState<Verdict | null>(null);
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
   const [query, setQuery] = useState("");
-  const [openCase, setOpenCase] = useState<string | null>(null);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const claim = claims[claimIndex];
+  const [activeCategory, setActiveCategory] = useState(categories[0][0] as string);
+  const [selectedCase, setSelectedCase] = useState<HandbookCard | null>(null);
   const library = useMemo(() => handbookCards.map((card, index) => ({ ...card, category: categoryFor(index), number: index + 1 })), []);
   const grouped = useMemo(() => categories.map(([name], index) => ({
     name,
@@ -41,13 +29,13 @@ export default function MythsExperience() {
     items: library.slice(index === 0 ? 0 : categories[index - 1][1], categories[index][1]),
   })), [library]);
   const filteredLibrary = useMemo(() => library.filter((item) => `${item.category} ${item.myth} ${item.reality} ${item.indiaContext}`.toLowerCase().includes(query.toLowerCase())), [library, query]);
+  const activeGroup = grouped.find((group) => group.name === activeCategory) ?? grouped[0];
 
   function move(event: PointerEvent<HTMLElement>) {
     if (reduced) return;
     const box = event.currentTarget.getBoundingClientRect();
     setPointer({ x: (event.clientX - box.left) / box.width - .5, y: (event.clientY - box.top) / box.height - .5 });
   }
-  function change(direction: -1 | 1) { setAnswer(null); setClaimIndex((claimIndex + direction + claims.length) % claims.length); }
 
   return <div className="myths-premium">
     <section className="myths-premium-hero myths-card-deck-hero" onPointerMove={move}>
@@ -55,7 +43,7 @@ export default function MythsExperience() {
         <p className="premium-kicker"><span /> Sixty claims · evidence attached</p>
         <h1>What if the claim<br /><em>is only half the story?</em></h1>
         <p>Pull one from the pile. Break its seal. Decide whether it is a myth, a fact—or a sentence missing the context that changes everything.</p>
-        <a href="#claim-lab">Test your first claim <ArrowDown /></a>
+        <a href="#myth-library">Choose an evidence category <ArrowDown /></a>
       </div>
       <div className="myths-hero-card-stack" aria-label="A stack of paper claims">
         {library.slice(0, 5).map((item, index) => {
@@ -73,38 +61,40 @@ export default function MythsExperience() {
           </motion.article>;
         })}
       </div>
-      <div className="myths-hero-metrics"><span><b>60</b> handbook claims</span><span><b>08</b> evidence categories</span><span><b>03</b> possible verdicts</span></div>
+      <div className="myths-hero-metrics"><span><b>60</b> handbook claims</span><span><b>08</b> evidence categories</span><span><b>01</b> claim at a time</span></div>
     </section>
 
-    <section id="claim-lab" className="claim-lab-premium">
-      <div className="claim-lab-heading"><div><p className="premium-kicker">Interactive claim press</p><h2>What would<br />you print?</h2></div><p>Choose a verdict. The desk compares it with the evidence and repairs the sentence when important context is missing.</p></div>
-      <div className="claim-workbench">
-        <aside><span>Case queue</span>{claims.map((item, index) => <button key={item.claim} onClick={() => { setClaimIndex(index); setAnswer(null); }} className={index === claimIndex ? "is-active" : ""}><i>{String(index + 1).padStart(2, "0")}</i><b>{item.short}</b></button>)}</aside>
-        <div className="claim-paper-stage">
-          <AnimatePresence mode="wait"><motion.article key={claimIndex} initial={{ opacity: 0, y: 24, rotate: 1 }} animate={{ opacity: 1, y: 0, rotate: -.5 }} exit={{ opacity: 0, y: -18 }}>
-            <header><span>CLAIM {String(claimIndex + 1).padStart(2, "0")}</span><small>Choose the stamp</small></header>
-            <blockquote>{claim.claim}</blockquote>
-            <div className="claim-verdict-buttons">{(["myth", "fact", "context"] as Verdict[]).map(verdict => <button key={verdict} onClick={() => setAnswer(verdict)} className={answer === verdict ? "is-selected" : ""}><Stamp />{verdict === "context" ? "Needs context" : verdict}</button>)}</div>
-            <AnimatePresence>{answer && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className={`claim-lab-result ${answer === claim.verdict ? "is-right" : "is-repair"}`}><span>{answer === claim.verdict ? <Check /> : <X />}{answer === claim.verdict ? "Defensible verdict" : `Better verdict: ${claim.verdict}`}</span><p>{claim.explanation}</p><small>Evidence route · {claim.source}</small></motion.div>}</AnimatePresence>
-          </motion.article></AnimatePresence>
-          <div className="claim-stage-controls"><button onClick={() => change(-1)} aria-label="Previous claim"><ChevronLeft /></button><span>{claimIndex + 1} / {claims.length}</span><button onClick={() => change(1)} aria-label="Next claim"><ChevronRight /></button></div>
-        </div>
+    <section className="myth-game-bridge">
+      <div>
+        <p className="premium-kicker"><Gamepad2 /> Ready for the game version?</p>
+        <h2>Read a claim here.<br /><em>Put it under pressure there.</em></h2>
+        <p>Turn the same evidence habit into a quick challenge. Stamp a verdict, repair missing context or grow a tree by choosing the stronger answer.</p>
+      </div>
+      <div className="myth-game-tickets">
+        <Link href="/discover/truth-press"><span>GAME 02 · CLAIM LAB</span><strong>The Truth Press</strong><p>Myth, fact or missing context?</p><b>Play now <ArrowRight /></b></Link>
+        <Link href="/discover/grow-or-shred"><span>GAME 01 · PAPER IQ</span><strong>Grow or Shred</strong><p>Grow evidence. Shred assumptions.</p><b>Play now <ArrowRight /></b></Link>
+        <Link href="/games"><span>THE PLAYABLE EDITION</span><strong>All five games</strong><p>Choose your way into the evidence.</p><b>Open game hub <ArrowRight /></b></Link>
       </div>
     </section>
 
-    <section className="myth-library-premium myth-streaming-library">
-      <header><div><p className="premium-kicker">Browse by evidence category</p><h2>Choose a shelf.<br />Then break a seal.</h2></div><p>Like a documentary library, every subject has its own rail. Open a case to reveal the reality, explanation, India context and evidence route.</p></header>
+    <section id="myth-library" className="myth-library-premium myth-evidence-wall">
+      <header><div><p className="premium-kicker">Browse by evidence category</p><h2>Choose a subject.<br />Open one dossier.</h2></div><p>No collapsing shelves and no broken grid. Pick a category, then open any card in a focused evidence reader without disturbing the wall behind it.</p></header>
       <label className="myth-search-desk"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search all sixty claims..." /><span>{String(filteredLibrary.length).padStart(2, "0")} cases</span></label>
 
-      {query ? <div className="myth-handbook-grid myth-search-results">{filteredLibrary.map((item, index) => <MythCase key={item.id} item={item} index={index} open={openCase === item.id} onToggle={() => setOpenCase(openCase === item.id ? null : item.id)} />)}</div> :
-        <div className="myth-category-shelves">{grouped.map((group, groupIndex) => {
-          const expanded = expandedCategory === group.slug;
-          const visible = expanded ? group.items : group.items.slice(0, 6);
-          return <section className={`myth-category-shelf shelf-tone-${groupIndex % 4 + 1}`} id={group.slug} key={group.slug}>
-            <header><div><span>{String(groupIndex + 1).padStart(2, "0")}</span><h3>{group.name}</h3><small>{group.items.length} cases</small></div><button onClick={() => setExpandedCategory(expanded ? null : group.slug)}>{expanded ? "Collapse shelf" : "View all"} <ArrowRight /></button></header>
-            <div className={expanded ? "myth-shelf-grid" : "myth-shelf-rail"}>{visible.map((item, index) => <MythCase key={item.id} item={item} index={index} open={openCase === item.id} onToggle={() => setOpenCase(openCase === item.id ? null : item.id)} />)}</div>
-          </section>;
-        })}</div>}
+      {!query && <nav className="myth-category-index" aria-label="Myth categories">
+        {grouped.map((group, index) => <button key={group.slug} onClick={() => setActiveCategory(group.name)} className={activeCategory === group.name ? "is-active" : ""}><span>{String(index + 1).padStart(2, "0")}</span><strong>{group.name}</strong><small>{group.items.length}</small></button>)}
+      </nav>}
+
+      <div className="myth-wall-heading">
+        <div><span>{query ? "SEARCH RESULTS" : activeGroup.slug.replaceAll("-", " / ").toUpperCase()}</span><h3>{query ? `${filteredLibrary.length} matching dossiers` : activeGroup.name}</h3></div>
+        <p>Click a seal to open that claim on its own reading desk.</p>
+      </div>
+
+      <motion.div layout className="myth-evidence-grid">
+        <AnimatePresence mode="popLayout">
+          {(query ? filteredLibrary : activeGroup.items).map((item, index) => <MythCase key={item.id} item={item} index={index} onOpen={() => setSelectedCase(item)} />)}
+        </AnimatePresence>
+      </motion.div>
       {filteredLibrary.length === 0 && <div className="myth-search-empty"><ScanSearch /><strong>No matching case yet.</strong><p>Try a broader word or submit the claim to the foundation.</p></div>}
     </section>
 
@@ -113,23 +103,34 @@ export default function MythsExperience() {
       <div className="credibility-stack">{["Who made the claim?", "What boundaries were used?", "Can the method be inspected?", "Does local context change it?"].map((item, index) => <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * .09 }} key={item}><span>{index + 1}</span><strong>{item}</strong><Check /></motion.div>)}</div>
     </section>
 
-    <section className="myth-premium-cta"><Sparkles /><p>Ready for the game version?</p><h2>Put claims through<br />The Truth Press.</h2><Link href="/discover/truth-press">Play the verification game <ArrowRight /></Link><a href="https://www.fao.org/sustainable-forest-management/toolbox/modules/management-of-planted-forests/further-learning/en/" target="_blank" rel="noreferrer">Inspect a primary source <ExternalLink /></a></section>
+    <section className="myth-premium-cta"><Sparkles /><p>Keep following the evidence</p><h2>Read the long-form<br />editorial selection.</h2><Link href="/knowledge/featured">Explore featured articles <ArrowRight /></Link><a href="https://www.fao.org/sustainable-forest-management/toolbox/modules/management-of-planted-forests/further-learning/en/" target="_blank" rel="noreferrer">Inspect a primary source <ExternalLink /></a></section>
+
+    <AnimatePresence>{selectedCase && <EvidenceDossier item={selectedCase} onClose={() => setSelectedCase(null)} />}</AnimatePresence>
   </div>;
 }
 
-function MythCase({ item, index, open, onToggle }: { item: HandbookCard; index: number; open: boolean; onToggle: () => void }) {
-  return <motion.article layout whileHover={open ? undefined : { y: -9, rotate: index % 2 ? .35 : -.35 }} className={`case-tone-${index % 5 + 1} ${open ? "is-open" : ""}`}>
-    <button className="myth-case-trigger" aria-expanded={open} onClick={onToggle}>
+function MythCase({ item, index, onOpen }: { item: HandbookCard; index: number; onOpen: () => void }) {
+  return <motion.article layout initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: .94 }} transition={{ delay: Math.min(index * .025, .18) }} whileHover={{ y: -8, rotate: index % 2 ? .25 : -.25 }} className={`case-tone-${index % 5 + 1}`}>
+    <button className="myth-case-trigger" onClick={onOpen}>
       <span>{String(item.number).padStart(2, "0")} / {item.category}</span>
       <strong>{item.myth}</strong>
-      <div><small>{open ? "Close evidence" : "Break the seal"}</small><b>{open ? "×" : "+"}</b></div>
+      <div><small>Open evidence dossier</small><b>↗</b></div>
       <em className="myth-card-stamp">MYTH</em>
     </button>
-    <AnimatePresence initial={false}>{open && <motion.div className="myth-case-reveal" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-      <p><small>Evidence-based reality</small>{item.reality}</p>
-      <p><small>Why it matters</small>{item.explanation}</p>
-      <p className="myth-india-note"><small>India context</small>{item.indiaContext}</p>
-      <footer><span>{item.evidence}</span><b>Reviewed {item.reviewed}</b></footer>
-    </motion.div>}</AnimatePresence>
   </motion.article>;
+}
+
+function EvidenceDossier({ item, onClose }: { item: HandbookCard; onClose: () => void }) {
+  return <motion.div className="myth-dossier-backdrop" role="dialog" aria-modal="true" aria-label={`Evidence for ${item.myth}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+    <motion.article initial={{ opacity: 0, y: 60, rotate: 1.5 }} animate={{ opacity: 1, y: 0, rotate: 0 }} exit={{ opacity: 0, y: 30 }} transition={{ type: "spring", stiffness: 160, damping: 22 }} onClick={(event) => event.stopPropagation()}>
+      <header><span>CASE {String(item.number).padStart(2, "0")} · {item.category}</span><button onClick={onClose} aria-label="Close evidence dossier"><X /></button></header>
+      <div className="myth-dossier-claim"><small>Claim in circulation</small><h2>{item.myth}</h2><b>MYTH</b></div>
+      <div className="myth-dossier-columns">
+        <section><span>01 · Evidence-based reality</span><p>{item.reality}</p></section>
+        <section><span>02 · Why it matters</span><p>{item.explanation}</p></section>
+        <section><span>03 · India context</span><p>{item.indiaContext}</p></section>
+      </div>
+      <footer><div><small>Evidence route</small><p>{item.evidence}</p></div><strong>REVIEWED<br />{item.reviewed}</strong></footer>
+    </motion.article>
+  </motion.div>;
 }
