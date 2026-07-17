@@ -1,1 +1,1 @@
-export const cn = (...classes: string[]) => classes.filter(Boolean).join(" ");
+export const cn = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");

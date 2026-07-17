@@ -144,6 +144,9 @@ export default function GameHub() {
               <strong>PAPER<br />IQ</strong>
               <small>Issue 01 · India</small>
             </div>
+            <div className="game-hero-ticket-stack">
+              {games.map((game, index) => <motion.span key={game.number} animate={reducedMotion ? undefined : { y: [0, index % 2 ? 7 : -7, 0], rotate: [index * 3 - 6, index * 3 - 3, index * 3 - 6] }} transition={{ duration: 4.5 + index * .5, repeat: Infinity }}><b>{game.number}</b><i>{game.title}</i></motion.span>)}
+            </div>
             <motion.div className="machine-fibre fibre-one" animate={reducedMotion ? undefined : { x: [0, 16, -6, 0], y: [0, -12, 8, 0], rotate: [12, 24, -8, 12] }} transition={{ duration: 7, repeat: Infinity }} />
             <motion.div className="machine-fibre fibre-two" animate={reducedMotion ? undefined : { x: [0, -18, 5, 0], y: [0, 10, -14, 0], rotate: [-18, -4, -28, -18] }} transition={{ duration: 8, repeat: Infinity }} />
             <motion.div className="machine-fibre fibre-three" animate={reducedMotion ? undefined : { x: [0, 8, -12, 0], y: [0, -15, 4, 0], rotate: [42, 58, 31, 42] }} transition={{ duration: 6, repeat: Infinity }} />

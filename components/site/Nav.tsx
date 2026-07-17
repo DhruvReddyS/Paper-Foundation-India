@@ -27,8 +27,9 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { GooeySearch } from "@/components/ui/gooey-search";
 
 type NavItem = { href: string; label: string; description: string; icon: LucideIcon };
 type NavGroup = { label: string; slug: string; eyebrow: string; introduction: string; items: NavItem[] };
@@ -86,6 +87,13 @@ const navGroups: NavGroup[] = [
   },
 ];
 
+const navSearchEntries = [
+  { label: "Home", href: "/" },
+  { label: "Myths vs Facts", href: "/myths" },
+  { label: "Paper Journey", href: "/journey" },
+  ...navGroups.flatMap((group) => group.items.map((item) => ({ label: item.label, href: item.href }))),
+];
+
 function routeMatches(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   if (href === "/games") return pathname === "/games" || pathname === "/discover";
@@ -94,6 +102,7 @@ function routeMatches(pathname: string, href: string) {
 
 export default function Nav() {
   const pathname = usePathname();
+  const router = useRouter();
   const desktopMenuRef = useRef<HTMLUListElement>(null);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -133,6 +142,7 @@ export default function Nav() {
       <nav className="container-wide flex h-[72px] items-center justify-between" aria-label="Primary navigation">
         <Link href="/" className="site-brand" aria-label="Paper Foundation India home">
           <Image src="/images/brand/paper-foundation-nav-logo.png" alt="" width={40} height={49} priority />
+          <span><strong>Paper Foundation</strong><small>India</small></span>
         </Link>
 
         <ul ref={desktopMenuRef} className="site-desktop-nav hidden items-center xl:flex">
@@ -148,7 +158,19 @@ export default function Nav() {
             <Link href="/join" className="site-nav-join"><HeartHandshake /> Join us</Link>
             <Link href="/contact" className="site-nav-contact"><Mail /> Contact</Link>
           </div>
-          <Link href="/search" className="site-search" aria-label="Search"><Search size={17} /></Link>
+          <GooeySearch
+            className="site-gooey-search hidden md:inline-flex"
+            items={navSearchEntries.map((item) => item.label)}
+            buttonLabel="Search"
+            placeholder="Find a page..."
+            maxResults={5}
+            debounceMs={180}
+            onSelect={(label) => {
+              const result = navSearchEntries.find((item) => item.label === label);
+              if (result) router.push(result.href);
+            }}
+          />
+          <Link href="/search" className="site-search md:hidden" aria-label="Search the site"><span>⌕</span></Link>
           <button type="button" className="site-menu-toggle xl:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} aria-controls="mobile-navigation">
             {mobileOpen ? <X size={21} /> : <Menu size={21} />}
           </button>

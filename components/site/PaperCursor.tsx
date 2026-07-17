@@ -6,6 +6,7 @@ const interactiveSelector = "a, button, input, textarea, select, summary, [role=
 
 export default function PaperCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
   const rafRef = useRef<number | null>(null);
   const pointRef = useRef({ x: -80, y: -80 });
 
@@ -33,6 +34,10 @@ export default function PaperCursor() {
       const target = event.target instanceof Element ? event.target.closest(interactiveSelector) : null;
       cursorRef.current?.classList.toggle("is-hovering", Boolean(target));
       cursorRef.current?.classList.toggle("is-writing", Boolean(target?.matches("input, textarea, select")));
+      if (labelRef.current) {
+        labelRef.current.textContent = target?.getAttribute("data-cursor-label")
+          ?? (target?.matches("input, textarea, select") ? "TYPE" : target ? "OPEN" : "");
+      }
     }
 
     function press() { cursorRef.current?.classList.add("is-pressed"); }
@@ -56,5 +61,5 @@ export default function PaperCursor() {
     };
   }, []);
 
-  return <div ref={cursorRef} className="paper-cursor" aria-hidden="true"><i /><span>OPEN</span></div>;
+  return <div ref={cursorRef} className="paper-cursor" aria-hidden="true"><i /><b /><span ref={labelRef} /></div>;
 }
