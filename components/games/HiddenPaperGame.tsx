@@ -44,7 +44,7 @@ export default function HiddenPaperGame() {
   const badge = averageClues <= 1.8 ? "Fibre Visionary" : averageClues <= 2.8 ? "Material Detective" : "Curious Observer";
 
   return (
-    <GameFrame gameId="hidden-paper" immersive={phase === "play"} title="Hidden Paper" kicker="Game 04 · The clue hunt" progress={phase === "play" ? ((index + (solved ? 1 : 0)) / products.length) * 100 : undefined}>
+    <GameFrame gameId="hidden-paper" immersive={phase !== "intro"} title="Hidden Paper" kicker="Game 04 · The clue hunt" progress={phase === "play" ? ((index + (solved ? 1 : 0)) / products.length) * 100 : undefined}>
       {phase === "intro" && <GameIntro gameId="hidden-paper" eyebrow="Unexpected paper, hiding in plain sight" title="How soon can you see the paper?" description="Identify five products using the fewest clues possible. Begin with language, then unlock material behaviour and a clearer visual—but every clue costs points." rules={["Read the first cryptic clue and make a guess or request another clue.", "A wrong guess automatically reveals more information and lowers the available score.", "After solving, peel back the object to learn exactly why a paper component works there."]} onStart={() => setPhase("play")} />}
 
       {phase === "play" && (

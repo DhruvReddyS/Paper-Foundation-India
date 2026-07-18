@@ -1786,3 +1786,131 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Full-screen result desk: scorecard and actions remain visible together. */
+.game-rework.game-page-immersive .game-result-panel {
+  width: min(1380px, 100%);
+  height: calc(100svh - 96px);
+  min-height: 0;
+  margin: 12px auto 8px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(390px, .72fr);
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.game-rework.game-page-immersive .game-result-card-preview {
+  min-height: 0;
+  height: 100%;
+  padding: clamp(1.25rem, 2.4vw, 2.2rem);
+  box-shadow: none;
+}
+
+.game-rework.game-page-immersive .game-result-card-preview > .game-kicker { margin-top: auto; }
+.game-rework.game-page-immersive .game-result-card-preview h1 { font-size: clamp(5.2rem, 10.5vw, 9.2rem); }
+.game-rework.game-page-immersive .game-result-card-preview h2 { margin: .45rem 0; font-size: clamp(2rem, 3.5vw, 3.8rem); }
+.game-rework.game-page-immersive .game-result-stamp { margin: .2rem 0 .55rem; }
+.game-rework.game-page-immersive .game-result-message { font-size: .72rem; line-height: 1.45; }
+.game-rework.game-page-immersive .game-result-card-preview > footer { margin-top: .75rem; }
+
+.game-rework .game-result-control-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--game-ink) 18%, transparent);
+  padding: clamp(1rem, 2vw, 1.6rem);
+  background: color-mix(in srgb, var(--game-paper) 88%, white);
+}
+
+.game-rework .game-result-control-panel .game-result-summary {
+  flex: none;
+  margin: 0;
+}
+
+.game-rework .game-result-control-panel .game-result-summary > span { min-height: 78px; padding: .75rem; }
+.game-rework .game-result-control-panel .game-result-summary strong { font-size: 1.45rem; }
+.game-rework .game-result-extra {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.game-rework .game-result-extra > * { max-width: 100%; max-height: 100%; margin-block: .55rem !important; }
+.game-rework .game-result-extra .knowledge-tree { height: 100%; }
+.game-rework .game-result-extra .knowledge-tree svg { height: min(29svh, 245px); }
+.game-rework .game-result-extra .tree-legend { font-size: .48rem; }
+.game-rework .game-result-extra .clue-result-grid,
+.game-rework .game-result-extra .result-newspaper,
+.game-rework .game-result-extra .mill-result-receipt,
+.game-rework .game-result-extra .word-result-proof { transform: scale(.82); transform-origin: center; }
+
+.game-rework .game-result-control-panel .game-share-row {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .4rem;
+  margin-top: .5rem;
+}
+.game-rework .game-result-control-panel .game-share-row > * {
+  min-width: 0;
+  min-height: 39px;
+  justify-content: center;
+  padding: .55rem .45rem;
+  font-size: .53rem;
+  white-space: nowrap;
+}
+.game-rework .game-result-control-panel .game-share-row > button:first-child {
+  grid-column: span 2;
+  color: var(--game-paper);
+  background: var(--game-ink);
+}
+.game-rework .game-result-control-panel .game-result-actions {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: .55rem;
+}
+.game-rework .game-result-control-panel .game-result-actions > * { width: 100%; min-height: 41px; padding: .6rem; }
+
+@media (min-width: 801px) {
+  .game-rework.game-page-immersive .quiz-stage,
+  .game-rework.game-page-immersive .truth-stage,
+  .game-rework.game-page-immersive .hidden-stage {
+    height: calc(100svh - 80px);
+    min-height: 0;
+  }
+}
+
+@media (max-width: 800px) {
+  .game-rework.game-page-immersive .game-result-panel {
+    height: calc(100svh - 72px);
+    margin: 6px auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(210px, .72fr) minmax(0, 1fr);
+    gap: .55rem;
+  }
+  .game-rework.game-page-immersive .game-result-card-preview { padding: 1rem; }
+  .game-rework.game-page-immersive .game-result-card-preview > header { padding-bottom: .55rem; }
+  .game-rework.game-page-immersive .game-result-card-preview h1 { font-size: clamp(4.2rem, 18vw, 6.5rem); }
+  .game-rework.game-page-immersive .game-result-card-preview h2 { font-size: clamp(1.5rem, 7vw, 2.3rem); }
+  .game-rework.game-page-immersive .game-result-card-preview .game-result-stamp,
+  .game-rework.game-page-immersive .game-result-card-preview .game-result-message { display: none; }
+  .game-rework.game-page-immersive .game-result-card-preview > footer { margin-top: auto; }
+  .game-rework .game-result-control-panel { padding: .65rem; }
+  .game-rework .game-result-control-panel .game-result-summary > span { min-height: 57px; padding: .45rem; }
+  .game-rework .game-result-control-panel .game-result-summary small { font-size: .4rem; }
+  .game-rework .game-result-control-panel .game-result-summary strong { font-size: 1.05rem; }
+  .game-rework .game-result-extra { display: none; }
+  .game-rework .game-result-control-panel .game-share-row { margin-top: .45rem; grid-template-columns: 1fr 1fr; }
+  .game-rework .game-result-control-panel .game-share-row > a { display: none; }
+  .game-rework .game-result-control-panel .game-share-row > button:first-child { grid-column: 1 / -1; }
+}
+
+@media (max-height: 700px) and (min-width: 801px) {
+  .game-rework.game-page-immersive .game-result-panel { height: calc(100svh - 82px); margin-top: 5px; }
+  .game-rework .game-result-extra { display: none; }
+  .game-rework.game-page-immersive .game-result-card-preview h1 { font-size: 5.4rem; }
+  .game-rework.game-page-immersive .game-result-card-preview h2 { font-size: 2.3rem; }
+}

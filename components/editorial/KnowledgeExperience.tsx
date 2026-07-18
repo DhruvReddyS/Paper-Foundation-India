@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Clock, Feather, Layers3, Search, Sparkles, Sprout } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { articleCatalog, articleCoverImage } from "@/content/articleCatalog";
 const categories = ["All", "Forestry", "Recovery", "Method", "Production", "Education", "Use"];
 const deskNotes = [
@@ -37,6 +37,24 @@ export default function KnowledgeExperience() {
       {categories.map(item => <button key={item} onClick={() => setCategory(item)} className={category === item ? "is-active" : ""}>{item}</button>)}
       <Link href="/knowledge/featured"><Sparkles /> {featured.length} featured stories <ArrowRight /></Link>
     </nav>
+
+    {!query && category === "All" && (
+      <Link href="/knowledge/featured" className="articles-featured-ribbon">
+        <div>
+          <span><Sparkles /> The editorial selection</span>
+          <strong>Ten slower reads,<br />kept in one folio.</strong>
+          <small>Open featured articles <ArrowRight /></small>
+        </div>
+        <div className="articles-featured-ribbon-covers" aria-hidden="true">
+          {featured.slice(0, 3).map((article, index) => (
+            <i key={article.slug} style={{ "--ribbon-index": index } as CSSProperties}>
+              <Image src={articleCoverImage(article)} alt="" fill sizes="160px" />
+            </i>
+          ))}
+        </div>
+        <p>Long-form essays selected for method, context and visual storytelling.</p>
+      </Link>
+    )}
 
     <section className="articles-paper-grid" aria-live="polite">
       <AnimatePresence mode="popLayout">

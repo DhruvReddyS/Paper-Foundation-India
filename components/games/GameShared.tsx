@@ -244,6 +244,10 @@ export function ResultPanel({
         await navigator.share({ title: `${game} result`, text: shareText, url: shareUrl });
       } else {
         await copyResult();
+        const link = document.createElement("a");
+        link.download = `${gameId}-paper-iq.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
       }
     } catch (error) {
       if (!(error instanceof DOMException && error.name === "AbortError")) await copyResult();
@@ -302,51 +306,53 @@ export function ResultPanel({
         </footer>
       </div>
 
-      <div className="game-result-summary">
-        <span>
-          <small>Final score</small>
-          <strong>{percent}%</strong>
-        </span>
-        <span>
-          <small>Time played</small>
-          <strong>{formatTime(durationSeconds)}</strong>
-        </span>
-        <span>
-          <small>Personal best</small>
-          <strong>{best ?? score}</strong>
-        </span>
-      </div>
+      <div className="game-result-control-panel">
+        <div className="game-result-summary">
+          <span>
+            <small>Final score</small>
+            <strong>{percent}%</strong>
+          </span>
+          <span>
+            <small>Time played</small>
+            <strong>{formatTime(durationSeconds)}</strong>
+          </span>
+          <span>
+            <small>Personal best</small>
+            <strong>{best ?? score}</strong>
+          </span>
+        </div>
 
-      {children}
+        <div className="game-result-extra">{children}</div>
 
-      <div className="game-share-row">
-        <button onClick={nativeShare} disabled={sharing}>
-          <Share2 size={16} /> {sharing ? "Preparing…" : "Share scorecard"}
-        </button>
-        <button onClick={downloadCard}>
-          <Download size={16} /> Download PNG
-        </button>
-        <button onClick={copyResult}>
-          <Copy size={16} /> {copied ? "Copied" : "Copy result"}
-        </button>
-        <a href={social.linkedIn} target="_blank" rel="noreferrer">
-          LinkedIn <ExternalLink size={13} />
-        </a>
-        <a href={social.x} target="_blank" rel="noreferrer">
-          X <ExternalLink size={13} />
-        </a>
-        <a href={social.whatsApp} target="_blank" rel="noreferrer">
-          WhatsApp <ExternalLink size={13} />
-        </a>
-      </div>
+        <div className="game-share-row">
+          <button onClick={nativeShare} disabled={sharing}>
+            <Share2 size={16} /> {sharing ? "Preparing…" : "Share image + caption"}
+          </button>
+          <button onClick={downloadCard}>
+            <Download size={16} /> Download PNG
+          </button>
+          <button onClick={copyResult}>
+            <Copy size={16} /> {copied ? "Copied" : "Copy caption + link"}
+          </button>
+          <a href={social.linkedIn} target="_blank" rel="noreferrer" aria-label="Share result link on LinkedIn">
+            LinkedIn <ExternalLink size={13} />
+          </a>
+          <a href={social.x} target="_blank" rel="noreferrer" aria-label="Share result link on X">
+            X <ExternalLink size={13} />
+          </a>
+          <a href={social.whatsApp} target="_blank" rel="noreferrer" aria-label="Share result link on WhatsApp">
+            WhatsApp <ExternalLink size={13} />
+          </a>
+        </div>
 
-      <div className="game-result-actions">
-        <button onClick={onReplay} className="game-primary-button">
-          <RotateCcw size={16} /> Play a new round
-        </button>
-        <Link href="/games" className="game-secondary-button">
-          Explore all games
-        </Link>
+        <div className="game-result-actions">
+          <button onClick={onReplay} className="game-primary-button">
+            <RotateCcw size={16} /> Play a new round
+          </button>
+          <Link href="/games" className="game-secondary-button">
+            Explore all games
+          </Link>
+        </div>
       </div>
     </motion.section>
   );

@@ -180,7 +180,7 @@ export default function PaperWordSearchGame() {
   return (
     <GameFrame
       gameId="paper-word-search"
-      immersive={phase === "play"}
+      immersive={phase !== "intro"}
       title="Fibre Word Search"
       kicker="Game 05 · A fresh grid every round"
       progress={phase === "play" ? (found.length / WORD_COUNT) * 100 : undefined}

@@ -55,7 +55,7 @@ export default function GrowOrShredGame() {
   const badge = correctAnswers >= 6 ? "Canopy Scholar" : correctAnswers >= 4 ? "Fibre Thinker" : "Curious Sapling";
 
   return (
-    <GameFrame gameId="grow-or-shred" immersive={phase === "play"} title="Grow or Shred" kicker="Game 01 · Paper IQ" progress={phase === "play" ? ((index + (selected === null ? 0 : 1)) / questions.length) * 100 : undefined}>
+    <GameFrame gameId="grow-or-shred" immersive={phase !== "intro"} title="Grow or Shred" kicker="Game 01 · Paper IQ" progress={phase === "play" ? ((index + (selected === null ? 0 : 1)) / questions.length) * 100 : undefined}>
       {phase === "intro" && (
         <GameIntro
           gameId="grow-or-shred"
@@ -133,91 +133,98 @@ export default function GrowOrShredGame() {
 
 function TreeVisual({ correct, wrong, streak, compact = false }: { correct: number; wrong: number; streak: number; compact?: boolean }) {
   const reducedMotion = useReducedMotion();
-  const leafCount = correct === 0 ? 0 : Math.min(treeCanopy.length, correct * 7 + streak * 2);
+  const visibleBranches = botanicalBranches.filter((branch) => correct >= branch.level);
+  const visibleLeaves = botanicalLeaves.filter((leaf) => correct >= leaf.level);
   return (
     <div className={`knowledge-tree ${compact ? "knowledge-tree-compact" : ""}`}>
-      <svg viewBox="0 0 420 460" role="img" aria-label={`Evidence tree with ${correct} correct answers and ${wrong} recovered mistakes`}>
+      <svg viewBox="0 0 460 500" role="img" aria-label={`Evidence tree with ${correct} correct answers and ${wrong} recovered mistakes`}>
         <defs>
-          <linearGradient id="trunk" x1="0" y1="0" x2="1" y2="0"><stop stopColor="#5f3f2a" /><stop offset="1" stopColor="#9a6d48" /></linearGradient>
-          <linearGradient id="leafLight" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#78916a" /><stop offset="1" stopColor="#2d5f3e" /></linearGradient>
-          <filter id="treeShadow"><feDropShadow dx="0" dy="8" stdDeviation="8" floodOpacity=".2" /></filter>
+          <linearGradient id="livingTrunk" x1="0" y1="0" x2="1" y2="0"><stop stopColor="#503624" /><stop offset=".5" stopColor="#855b3b" /><stop offset="1" stopColor="#b1845b" /></linearGradient>
+          <linearGradient id="livingLeaf" x1="0" y1="1" x2="1" y2="0"><stop stopColor="#214d32" /><stop offset=".55" stopColor="#4f7650" /><stop offset="1" stopColor="#9bad78" /></linearGradient>
+          <radialGradient id="groundWash"><stop stopColor="#9caf7c" stopOpacity=".34" /><stop offset="1" stopColor="#9caf7c" stopOpacity="0" /></radialGradient>
+          <filter id="livingShadow"><feDropShadow dx="0" dy="7" stdDeviation="6" floodColor="#173727" floodOpacity=".18" /></filter>
         </defs>
-        <path d="M58 425 Q210 386 362 425 L362 460 L58 460 Z" fill="#ddd7c1" />
-        <motion.g animate={reducedMotion ? undefined : { rotate: [-.65, .8, -.65] }} transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }} style={{ transformOrigin: "210px 420px" }}>
-          <motion.path initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.15, ease: "easeOut" }} d="M208 424 C194 352 222 302 207 238 C195 187 210 136 222 91" fill="none" stroke="url(#trunk)" strokeWidth="26" strokeLinecap="round" filter="url(#treeShadow)" />
-          <motion.path initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.1 }} d="M207 385 C220 368 224 350 222 329" fill="none" stroke="#a47b54" strokeWidth="3" strokeLinecap="round" opacity=".55" />
-          {correct >= 1 && <Branch d="M209 315 C169 291 141 262 119 220" />}
-          {correct >= 2 && <Branch d="M211 285 C251 260 279 228 298 181" delay={0.08} />}
-          {correct >= 3 && <Branch d="M208 246 C173 220 151 183 149 140" delay={0.16} />}
-          {correct >= 4 && <Branch d="M211 217 C248 194 266 158 270 116" delay={0.24} />}
-          {correct >= 5 && <Branch d="M216 171 C194 143 190 111 198 76" delay={0.32} />}
-          {correct >= 6 && <Branch d="M211 190 C228 163 235 132 229 96" delay={0.38} />}
-          {growthClusters.slice(0, correct).map((cluster, clusterIndex) => (
-            <motion.g
-              key={`growth-${clusterIndex}`}
-              initial={{ opacity: 0, scale: 0, rotate: clusterIndex % 2 ? 7 : -7 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 155, damping: 13, delay: .16 }}
-              style={{ transformOrigin: `${cluster.x}px ${cluster.y}px` }}
-            >
-              <circle cx={cluster.x} cy={cluster.y} r="17" fill="rgba(120,145,106,.14)" />
-              {[-22, -11, 0, 11, 22].map((rotation, leafIndex) => (
-                <motion.path
-                  key={rotation}
-                  d={`M${cluster.x} ${cluster.y} C${cluster.x - 9} ${cluster.y - 8} ${cluster.x - 8} ${cluster.y - 22} ${cluster.x + 1} ${cluster.y - 30} C${cluster.x + 13} ${cluster.y - 20} ${cluster.x + 12} ${cluster.y - 7} ${cluster.x} ${cluster.y} Z`}
-                  fill={leafIndex % 2 ? "#76906a" : "#315f40"}
-                  transform={`rotate(${rotation} ${cluster.x} ${cluster.y})`}
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ delay: .2 + leafIndex * .045, duration: .42 }}
-                />
-              ))}
-            </motion.g>
+        <ellipse cx="230" cy="451" rx="175" ry="35" fill="url(#groundWash)" />
+        <motion.path initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }} transition={{ duration: .8 }} d="M226 442 C181 451 145 466 119 485 M229 443 C276 451 313 467 340 484 M225 445 C208 463 196 477 191 491 M235 444 C251 462 264 479 267 492" fill="none" stroke="#745039" strokeWidth="8" strokeLinecap="round" opacity=".7" />
+        <motion.g animate={reducedMotion ? undefined : { rotate: [-.35, .45, -.35] }} transition={{ duration: 6.8, repeat: Infinity, ease: "easeInOut" }} style={{ transformOrigin: "230px 445px" }}>
+          <motion.path initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.05, ease: "easeOut" }} d="M231 448 C218 396 239 356 225 312 C211 267 228 227 219 190 C210 152 224 119 233 83" fill="none" stroke="url(#livingTrunk)" strokeWidth="29" strokeLinecap="round" filter="url(#livingShadow)" />
+          <path d="M232 435 C221 394 243 355 229 313 C218 268 233 229 224 191 C216 154 229 119 236 87" fill="none" stroke="#d2b28a" strokeWidth="3" strokeLinecap="round" opacity=".5" />
+          {visibleBranches.map((branch, branchIndex) => (
+            <Branch key={branch.d} d={branch.d} width={branch.width} delay={branchIndex * .07} />
           ))}
-          {treeCanopy.slice(0, leafCount).map((leaf, i) => (
-            <motion.g
-              key={`${leaf.x}-${leaf.y}`}
-              transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.rotate}) scale(${leaf.scale})`}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={reducedMotion ? { opacity: 1, scale: 1 } : { opacity: 1, scale: [1, 1.045, 1], rotate: [0, i % 2 ? 2.5 : -2, 0] }}
-              transition={{ opacity: { delay: .12 + i * .022 }, scale: { duration: 3.2 + (i % 4) * .5, repeat: Infinity, ease: "easeInOut" }, rotate: { duration: 3.8 + (i % 5) * .4, repeat: Infinity, ease: "easeInOut" } }}
-            >
-              <path d="M0 0 C-11 -9 -11 -24 1 -34 C15 -24 15 -8 0 0 Z" fill={i % 8 === 0 ? "#c4956a" : i % 4 === 0 ? "#8b9d77" : "url(#leafLight)"} />
-              <path d="M0 -2 L1 -29" stroke="rgba(246,243,232,.5)" strokeWidth="1" />
-            </motion.g>
+          {visibleLeaves.map((leaf, i) => (
+            <g key={`${leaf.x}-${leaf.y}-${i}`} transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.rotate}) scale(${leaf.scale})`}>
+              <motion.path
+                d="M0 0 C-13 -7 -18 -24 -2 -36 C15 -28 18 -9 0 0 Z"
+                fill={i % 7 === 0 ? "#b78355" : i % 4 === 0 ? "#789267" : "url(#livingLeaf)"}
+                initial={{ opacity: 0, pathLength: 0 }}
+                animate={{ opacity: 1, pathLength: 1 }}
+                transition={{ delay: .12 + (i % 9) * .025, duration: .42 }}
+              />
+              <motion.path
+                d="M0 -2 C0 -12 0 -23 -2 -33"
+                stroke="rgba(247,242,224,.55)"
+                strokeWidth="1.2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: .25 + (i % 9) * .025 }}
+              />
+            </g>
           ))}
-          {streak >= 3 && [165, 214, 265].map((x, i) => <motion.g key={x} transform={`translate(${x} ${122 + i * 28})`} initial={{ scale: 0 }} animate={{ scale: [1, 1.2, 1], rotate: [0, 20, 0] }} transition={{ delay: .4 + i * .1, duration: 2.8, repeat: Infinity }}><circle r="7" fill="#e8cfa8" /><circle r="2.5" fill="#b97f50" /></motion.g>)}
+          {streak >= 3 && blossomPoints.slice(0, Math.min(streak, blossomPoints.length)).map(([x, y], i) => (
+            <g key={`${x}-${y}`} transform={`translate(${x} ${y})`}>
+              <motion.g initial={{ opacity: 0 }} animate={reducedMotion ? { opacity: 1 } : { opacity: [1, .82, 1] }} transition={{ delay: .35 + i * .08, duration: 3.2, repeat: Infinity }}>
+                <circle cy="-6" r="6" fill="#e8d0a9" /><circle cx="6" r="6" fill="#f1dfbd" /><circle cx="-6" r="6" fill="#d9b98b" /><circle r="2.8" fill="#a66e47" />
+              </motion.g>
+            </g>
+          ))}
         </motion.g>
-        {Array.from({ length: wrong * 6 }).map((_, i) => {
-          const startX = 142 + (i * 37) % 145;
-          return <motion.path key={`f-${i}`} d="M0 0 C4 4 5 12 1 20 C-3 14 -4 6 0 0 Z" fill={i % 3 === 0 ? "#c4956a" : "#8b9d77"} initial={{ opacity: 0, x: startX, y: 180 + (i % 4) * 18, rotate: i * 17 }} animate={reducedMotion ? { opacity: .55, y: 404 } : { opacity: [0, .8, .65, 0], x: [startX, startX + (i % 2 ? 24 : -22), startX + (i % 2 ? -12 : 18)], y: [185, 300, 418], rotate: [i * 17, i * 17 + 90, i * 17 + 190] }} transition={{ duration: 3.4 + (i % 4) * .35, delay: i * .15, repeat: Infinity, repeatDelay: .8, ease: "easeIn" }} />;
+        {Array.from({ length: wrong * 3 }).map((_, i) => {
+          const startX = 164 + (i * 43) % 140;
+          return <motion.path key={`f-${i}`} d="M0 0 C7 3 9 12 2 20 C-5 15 -6 6 0 0 Z" fill={i % 3 === 0 ? "#b78355" : "#789267"} initial={{ opacity: 0, x: startX, y: 215 + (i % 4) * 16, rotate: i * 21 }} animate={reducedMotion ? { opacity: .48, y: 432 } : { opacity: [0, .75, .6, 0], x: [startX, startX + (i % 2 ? 20 : -18), startX + (i % 2 ? -8 : 14)], y: [215, 328, 448], rotate: [i * 21, i * 21 + 105, i * 21 + 210] }} transition={{ duration: 3 + (i % 3) * .32, delay: i * .2, repeat: Infinity, repeatDelay: 1.4, ease: "easeIn" }} />;
         })}
       </svg>
-      <div className="tree-legend"><span>{correct} evidence leaves</span><span>{wrong} ideas recycled</span></div>
+      <div className="tree-legend"><span>{correct} living branches</span><span>{wrong} ideas returned to fibre</span></div>
     </div>
   );
 }
 
-function Branch({ d, delay = 0 }: { d: string; delay?: number }) {
-  return <motion.path initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay, duration: .78, ease: "easeOut" }} d={d} fill="none" stroke="#79543a" strokeWidth="13" strokeLinecap="round" />;
+function Branch({ d, width, delay = 0 }: { d: string; width: number; delay?: number }) {
+  return <motion.path initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay, duration: .82, ease: "easeOut" }} d={d} fill="none" stroke="#6f4b34" strokeWidth={width} strokeLinecap="round" />;
 }
 
-const treeCanopy = Array.from({ length: 58 }, (_, i) => {
-  const angle = (i * 137.5 * Math.PI) / 180;
-  const radius = 36 + (i % 8) * 13;
-  return {
-    x: 210 + Math.cos(angle) * radius,
-    y: 185 + Math.sin(angle) * radius * .72 - (i % 4) * 9,
-    rotate: (i * 47) % 180 - 90,
-    scale: .62 + (i % 5) * .08,
-  };
-});
-
-const growthClusters = [
-  { x: 119, y: 220 },
-  { x: 298, y: 181 },
-  { x: 149, y: 140 },
-  { x: 270, y: 116 },
-  { x: 198, y: 76 },
-  { x: 229, y: 96 },
+const botanicalBranches = [
+  { level: 1, width: 15, d: "M227 334 C193 315 164 286 137 246 C118 219 99 204 78 195" },
+  { level: 1, width: 8, d: "M148 258 C119 253 94 239 72 220" },
+  { level: 2, width: 15, d: "M225 301 C265 284 292 253 318 211 C332 189 351 173 377 160" },
+  { level: 2, width: 8, d: "M306 229 C337 225 360 211 382 190" },
+  { level: 3, width: 13, d: "M222 257 C187 235 169 206 158 169 C151 145 137 126 116 111" },
+  { level: 3, width: 7, d: "M166 188 C137 184 115 172 96 153" },
+  { level: 4, width: 13, d: "M222 232 C259 213 278 184 286 150 C292 125 307 105 329 89" },
+  { level: 4, width: 7, d: "M278 171 C310 165 334 151 353 129" },
+  { level: 5, width: 11, d: "M222 190 C199 169 192 145 195 116 C197 94 188 74 172 57" },
+  { level: 5, width: 7, d: "M198 124 C175 114 159 99 149 80" },
+  { level: 6, width: 10, d: "M225 165 C248 143 255 118 251 91 C248 68 257 48 276 30" },
+  { level: 6, width: 6, d: "M253 100 C278 91 296 75 309 53" },
 ];
+
+const branchTips = [
+  { level: 1, x: 78, y: 195 }, { level: 1, x: 70, y: 220 }, { level: 1, x: 112, y: 230 },
+  { level: 2, x: 377, y: 160 }, { level: 2, x: 382, y: 190 }, { level: 2, x: 338, y: 203 },
+  { level: 3, x: 116, y: 111 }, { level: 3, x: 96, y: 153 }, { level: 3, x: 143, y: 145 },
+  { level: 4, x: 329, y: 89 }, { level: 4, x: 353, y: 129 }, { level: 4, x: 304, y: 130 },
+  { level: 5, x: 172, y: 57 }, { level: 5, x: 149, y: 80 }, { level: 5, x: 194, y: 94 },
+  { level: 6, x: 276, y: 30 }, { level: 6, x: 309, y: 53 }, { level: 6, x: 242, y: 66 },
+];
+
+const botanicalLeaves = branchTips.flatMap((tip, tipIndex) =>
+  [-42, -18, 8, 34].map((offset, leafIndex) => ({
+    level: tip.level,
+    x: tip.x + (leafIndex - 1.5) * 7,
+    y: tip.y + Math.abs(leafIndex - 1.5) * 5,
+    rotate: offset + (tipIndex % 2 ? 16 : -8),
+    scale: .72 + ((tipIndex + leafIndex) % 3) * .1,
+  }))
+);
+
+const blossomPoints: [number, number][] = [[78, 195], [377, 160], [116, 111], [329, 89], [172, 57], [276, 30]];
