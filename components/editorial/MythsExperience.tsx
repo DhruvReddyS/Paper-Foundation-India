@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowRight, Check, ExternalLink, Gamepad2, Search, ScanSearch, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ExternalLink, Gamepad2, Search, ScanSearch, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import handbookCards from "@/content/mythCatalog.json";
@@ -40,8 +40,9 @@ export default function MythsExperience() {
   return <div className="myths-premium">
     <section className={`myths-premium-hero myths-card-deck-hero ${heroStyles.hero}`} onPointerMove={move}>
       <div className={`myths-hero-card-stack ${heroStyles.stack}`} aria-hidden="true">
-        {library.slice(0, 10).map((item, index) => {
-          const rotations = [-13, 2, -5, 8, -2, 12, -8, 5, -4, 9];
+        {library.slice(0, 16).map((item, index) => {
+          const rotations = [-13, 2, -5, 8, -2, 12, -8, 5, -4, 9, -11, 6, 13, -6, 3, -9];
+          const showsFact = index % 3 === 1;
           return <motion.article
             key={item.id}
             className={heroStyles.card}
@@ -52,24 +53,16 @@ export default function MythsExperience() {
           >
             <span className={heroStyles.pin} />
             <header><span>CASE {String(item.number).padStart(2, "0")}</span><small>{item.category}</small></header>
-            <strong title={item.myth}>{item.myth}</strong>
-            <p className={heroStyles.cardNote}>Filed for evidence review</p>
-            <footer><b>MYTH</b><i /><em>FACT</em></footer>
+            <strong title={showsFact ? item.reality : item.myth}>{showsFact ? item.reality : item.myth}</strong>
+            <p className={heroStyles.cardNote}>{showsFact ? "Context recovered" : "Filed for evidence review"}</p>
+            <footer><b>{showsFact ? "FACT" : "MYTH"}</b><i /><em>{showsFact ? "EVIDENCE" : "REVIEW"}</em></footer>
           </motion.article>;
         })}
       </div>
       <motion.div className={`myths-hero-copy ${heroStyles.copy}`} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .22 }}>
-        <p className="premium-kicker"><span /> Sixty claims · evidence attached</p>
         <h1>What if the claim<br /><em>is only half the story?</em></h1>
         <p>Pull one from the pile. Break its seal. Decide whether it is a myth, a fact—or a sentence missing the context that changes everything.</p>
-        <div className={heroStyles.reviewLine}>
-          <span>01 · read the claim</span>
-          <span>02 · reveal the context</span>
-          <span>03 · inspect the evidence</span>
-        </div>
-        <a href="#myth-library">Choose an evidence category <ArrowDown /></a>
       </motion.div>
-      <div className={`myths-hero-metrics ${heroStyles.metrics}`}><span><b>60</b> handbook claims</span><span><b>08</b> evidence categories</span><span><b>01</b> claim at a time</span></div>
     </section>
 
     <section id="myth-library" className="myth-library-premium myth-evidence-wall">
@@ -99,8 +92,8 @@ export default function MythsExperience() {
     </section>
 
     <section className="myth-method-premium">
-      <div><p className="premium-kicker">Before you share</p><h2>A fast four-part<br />credibility scan.</h2><p>Good verification is a repeatable habit, not an instinct.</p></div>
-      <div className="credibility-stack">{["Who made the claim?", "What boundaries were used?", "Can the method be inspected?", "Does local context change it?"].map((item, index) => <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * .09 }} key={item}><span>{index + 1}</span><strong>{item}</strong><Check /></motion.div>)}</div>
+      <div><p className="premium-kicker">Before you share</p><h2>Pause the headline.<br />Read what surrounds it.</h2><p>Paper Foundation examines claims through source, boundary, method and Indian context—then publishes the evidence trail.</p></div>
+      <div className="credibility-stack">{["Source — who made the claim?", "Boundary — what was included?", "Method — can it be inspected?", "Context — does place change it?"].map((item, index) => <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * .09 }} key={item}><span>{index + 1}</span><strong>{item}</strong><Check /></motion.div>)}</div>
     </section>
 
     <section className="myth-game-bridge">

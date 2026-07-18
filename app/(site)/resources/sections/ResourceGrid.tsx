@@ -4,21 +4,14 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpRight, BarChart3, BookOpen, FileText,
-  GraduationCap, Library, Play, Search, SlidersHorizontal, X,
+  GraduationCap, Library, Search, SlidersHorizontal, X,
 } from "lucide-react";
+import { resourceCatalog as resources } from "@/content/resources";
 import styles from "./Resources.module.css";
 
-const resources = [
-  { title: "India's Paper Industry: 2024 Sustainability Report", type: "Report", source: "Government", publisher: "Ministry of Environment", date: "March 2024", description: "A sector-wide view of resource use, recovery systems, and sustainability practices across more than 120 mills.", format: "PDF · 8.4 MB", icon: BarChart3, accent: "green" },
-  { title: "Recycling Myths vs. Facts: A Visual Guide", type: "Infographic", source: "NGO", publisher: "Paper Foundation India", date: "January 2024", description: "A printable visual guide that places ten familiar recycling claims beside the context they often leave out.", format: "PDF · 3.1 MB", icon: FileText, accent: "copper" },
-  { title: "Forest Stewardship in India: Research Findings", type: "Research Paper", source: "Academic", publisher: "IIT Delhi", date: "November 2023", description: "Peer-reviewed research on plantation forestry, fibre sourcing, and forest-management outcomes in India.", format: "PDF · 5.7 MB", icon: BookOpen, accent: "sage" },
-  { title: "Educator's Toolkit: Teaching Paper Sustainability", type: "Toolkit", source: "NGO", publisher: "Paper Foundation India", date: "September 2023", description: "Lesson plans, discussion prompts, activities, and printable worksheets designed for grades 6–12.", format: "ZIP · 12 MB", icon: GraduationCap, accent: "kraft" },
-  { title: "Carbon Footprint Comparison: Paper vs. Digital", type: "Research Paper", source: "Academic", publisher: "TERI", date: "August 2023", description: "A life-cycle reading of paper and digital media that makes assumptions, boundaries, and trade-offs visible.", format: "PDF · 4.2 MB", icon: BookOpen, accent: "green" },
-  { title: "How Paper is Made: Video Series", type: "Video", source: "Industry", publisher: "Paper Foundation India", date: "July 2023", description: "A five-part field series following fibre from preparation and pulping through forming, drying, and recovery.", format: "5 episodes · 42 min", icon: Play, accent: "copper" },
-];
-
-const types = ["All", "Research Paper", "Report", "Toolkit", "Infographic", "Video"];
-const sources = ["All sources", "Government", "NGO", "Academic", "Industry"];
+const types = ["All", "Report", "Guide", "Standard", "Data portal", "Toolkit", "Research"];
+const sources = ["All sources", "Government", "Intergovernmental", "Standards body"];
+const iconFor = (type: string) => type === "Data portal" ? BarChart3 : type === "Toolkit" ? GraduationCap : type === "Standard" ? FileText : type === "Report" || type === "Research" ? BookOpen : Library;
 
 export default function ResourceGrid() {
   const [query, setQuery] = useState("");
@@ -42,7 +35,7 @@ export default function ResourceGrid() {
         <motion.div className={styles.compactIntro} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
           <div><p className={styles.eyebrow}>Public evidence desk / open access</p><h1>Resources</h1></div>
           <p>Reports, methods and teaching tools—each labelled with publisher, format and date before you open it.</p>
-          <aside><Library /><span>READING ROOM</span><strong>06</strong><small>documents on this shelf</small></aside>
+          <aside><Library /><span>READING ROOM</span><strong>{resources.length}</strong><small>official sources on this shelf</small></aside>
         </motion.div>
         <header className={styles.archiveHeader}>
           <div>
@@ -84,7 +77,7 @@ export default function ResourceGrid() {
         <div className={styles.resourceList} aria-live="polite">
           <AnimatePresence mode="popLayout">
             {filtered.map((resource, index) => {
-              const Icon = resource.icon;
+              const Icon = iconFor(resource.type);
               return (
                 <motion.article
                   layout
@@ -103,10 +96,10 @@ export default function ResourceGrid() {
                     <p>{resource.description}</p>
                     <div><span>{resource.format}</span><span>{resource.source}</span></div>
                   </div>
-                  <button type="button" className={styles.openButton} aria-label={`Open ${resource.title}`}>
-                    <span>{resource.type === "Video" ? "Watch" : "Open file"}</span>
+                  <a href={resource.href} target="_blank" rel="noreferrer" className={styles.openButton} aria-label={`Open ${resource.title}`}>
+                    <span>Open source</span>
                     <ArrowUpRight aria-hidden="true" />
-                  </button>
+                  </a>
                 </motion.article>
               );
             })}

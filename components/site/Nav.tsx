@@ -170,7 +170,18 @@ export default function Nav() {
               if (result) router.push(result.href);
             }}
           />
-          <Link href="/search" className="site-search md:hidden" aria-label="Search the site"><span>⌕</span></Link>
+          <GooeySearch
+            className="site-gooey-search md:hidden"
+            items={navSearchEntries.map((item) => item.label)}
+            buttonLabel="Search"
+            placeholder="Find a page..."
+            maxResults={6}
+            debounceMs={120}
+            onSelect={(label) => {
+              const result = navSearchEntries.find((item) => item.label === label);
+              if (result) router.push(result.href);
+            }}
+          />
           <button type="button" className="site-menu-toggle xl:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} aria-controls="mobile-navigation">
             {mobileOpen ? <X size={21} /> : <Menu size={21} />}
           </button>

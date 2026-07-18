@@ -38,6 +38,7 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
 
   return <main className={`${styles.page} ${reporting ? styles.report : ""}`}>
     <section className={styles.intro}>
+      <div className={styles.pageBanner}><span>Paper Foundation India</span><strong>{reporting ? "Report a claim" : "Contact us"}</strong><small>Public desk / {reporting ? "02" : "01"}</small></div>
       <div className={styles.copy}>
         <p><span /> Public correspondence desk</p>
         <h1>{reporting ? <>Bring a claim.<br /><em>We&apos;ll trace it.</em></> : <>Let&apos;s put it<br /><em>on paper.</em></>}</h1>
@@ -74,7 +75,7 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
           </form>}
       </div>
     </section>
-    <section className={styles.after}><span>Need a different route?</span><Link href="/join">Join the Foundation <ExternalLink /></Link><Link href="/about">Understand our mission <ExternalLink /></Link></section>
+    <section className={styles.after}><span>Need a different route?</span><Link href="/join">Join the Foundation <ExternalLink /></Link><Link href={reporting ? "/contact" : "/report"}>{reporting ? "Contact us" : "Report a claim"} <ExternalLink /></Link></section>
   </main>;
 }
 

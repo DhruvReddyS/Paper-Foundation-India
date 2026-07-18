@@ -11,6 +11,11 @@ const editorialNotes = [
   "A mill-side visual explainer of what actually happens when fibre returns.",
   "A field dossier on what renewability asks from real landscapes.",
   "A forward-looking brief on design, collection and circular infrastructure.",
+  "A field atlas of the fibre routes that make India’s paper system unusually diverse.",
+  "A close look at the people and logistics that turn discarded sheets into mill-ready furnish.",
+  "A patient carbon account that keeps biology, energy, product life and timing in view.",
+  "A practical design brief for packaging that protects its contents without hiding its next route.",
+  "A mill-of-the-future dossier grounded in water, energy, fibre efficiency and inspectable data.",
 ];
 
 export default function FeaturedArticlesExperience() {

@@ -1,10 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Clock, Feather, Layers3, Search, Sprout } from "lucide-react";
+import { ArrowRight, Clock, Feather, Layers3, Search, Sparkles, Sprout } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { articleCatalog, articleCoverImage } from "@/content/articleCatalog";
 const categories = ["All", "Forestry", "Recovery", "Method", "Production", "Education", "Use"];
 const deskNotes = [
@@ -16,7 +17,10 @@ const deskNotes = [
 export default function KnowledgeExperience() {
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const featured = useMemo(() => articleCatalog.filter(article => article.featured), []);
   const filtered = useMemo(() => articleCatalog.filter(article =>
+    !article.featured &&
     (category === "All" || article.category === category) &&
     `${article.title} ${article.summary}`.toLowerCase().includes(query.toLowerCase())
   ), [category, query]);
@@ -30,16 +34,33 @@ export default function KnowledgeExperience() {
       <label><Search /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search articles" /><span>{filtered.length}</span></label>
     </section>
 
+    {!query && category === "All" && <section className="articles-featured-gateway">
+      <div className="articles-featured-gateway-copy">
+        <p><Sparkles /> The feature room</p>
+        <h2>Ten stories given<br /><em>more room to breathe.</em></h2>
+        <span>Long-form reporting, deeper evidence notes and richer visual essays live in a separate reading room.</span>
+        <Link href="/knowledge/featured">Enter the featured collection <ArrowRight /></Link>
+      </div>
+      <div className="articles-featured-gateway-stack" aria-label="Featured article preview">
+        {featured.slice(0, 3).map((article, index) => <Link key={article.slug} href={`/knowledge/${article.slug}`} style={{ "--feature-index": index } as CSSProperties}>
+          <Image src={articleCoverImage(article)} alt="" fill sizes="320px" />
+          <span>FEATURE {String(index + 1).padStart(2, "0")}</span>
+          <strong>{article.title}</strong>
+          <small>{article.time} read</small>
+        </Link>)}
+      </div>
+    </section>}
+
     <nav className="articles-category-tabs" aria-label="Article categories">
       {categories.map(item => <button key={item} onClick={() => setCategory(item)} className={category === item ? "is-active" : ""}>{item}</button>)}
-      <Link href="/knowledge/featured">Featured selection <ArrowRight /></Link>
+      <Link href="/knowledge/featured"><Sparkles /> {featured.length} featured stories <ArrowRight /></Link>
     </nav>
 
     <section className="articles-paper-grid" aria-live="polite">
       <AnimatePresence mode="popLayout">
         {filtered.flatMap((article, index) => {
-          const articleCard = <motion.article layout key={article.slug} initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: .96 }} transition={{ delay: Math.min(index * .035, .2) }} className={`article-paper-card article-paper-tone-${index % 4 + 1}`}>
-            <Link href={`/knowledge/${article.slug}`}>
+          const articleCard = <motion.article layout key={article.slug} initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: .96 }} transition={{ delay: Math.min(index * .035, .2) }} className={`article-paper-card article-paper-tone-${index % 4 + 1} ${selectedSlug === article.slug ? "is-selected" : ""}`}>
+            <Link href={`/knowledge/${article.slug}`} onPointerDown={() => setSelectedSlug(article.slug)} onFocus={() => setSelectedSlug(article.slug)} aria-label={`Read ${article.title}`}>
               <div className="article-paper-cover">
                 <Image src={articleCoverImage(article)} alt={`Editorial cover for ${article.title}`} fill sizes="(max-width: 680px) 94vw, (max-width: 1050px) 47vw, 31vw" />
                 <span>{String(article.id).padStart(2, "0")}</span>

@@ -3,49 +3,9 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BookOpenText, Search, X } from "lucide-react";
+import { glossaryAlphabet as alphabet, glossaryData, glossaryTermCount as termCount } from "@/content/glossary";
 import styles from "./Glossary.module.css";
-
-interface Term {
-  term: string;
-  definition: string;
-}
-
-const glossaryData: Record<string, Term[]> = {
-  A: [
-    { term: "Agro-residue Pulp", definition: "Pulp derived from agricultural waste such as bagasse, wheat straw, or rice husk, used as an alternative to wood-based pulp." },
-    { term: "Acid-free Paper", definition: "Paper made with a neutral or slightly alkaline pH, ensuring long-term durability and resistance to yellowing." },
-  ],
-  B: [
-    { term: "Bagasse", definition: "The fibrous residue left after sugarcane stalks are crushed to extract juice. Widely used in Indian paper mills as a sustainable pulp source." },
-    { term: "Bleaching", definition: "A process used to brighten pulp by removing or altering colour-forming material. The chemistry and environmental controls used matter." },
-    { term: "Biodegradable", definition: "Capable of being broken down by natural biological processes under suitable conditions. The time and conditions required should always be stated." },
-  ],
-  C: [
-    { term: "Carbon Sequestration", definition: "The capture and long-term storage of carbon dioxide in forests, soils, products, or geological formations." },
-    { term: "Cellulose", definition: "The primary structural component of plant cell walls and the main fibrous raw material used to make paper." },
-    { term: "Corrugated Board", definition: "A packaging material with a fluted inner sheet held between one or more flat linerboards." },
-  ],
-  D: [
-    { term: "Deinking", definition: "The industrial separation of printing inks, adhesives, and other contaminants from recovered paper during recycling." },
-  ],
-  F: [
-    { term: "FSC Certification", definition: "A certification system intended to support responsible forest management and traceable forest-based supply chains." },
-  ],
-  P: [
-    { term: "Pulp", definition: "A suspension of separated plant fibres produced mechanically, chemically, or through recovered-paper processing before a sheet is formed." },
-    { term: "Post-Consumer Waste", definition: "Material collected after a product has completed its intended use by a household or business." },
-  ],
-  R: [
-    { term: "Recycled Fibre", definition: "Fibre recovered from used paper products and prepared for another paper-making cycle. Fibre quality changes with repeated use." },
-  ],
-  S: [
-    { term: "Sustainable Forestry", definition: "Forest management that considers ecological health, community needs, and economic viability over the long term." },
-  ],
-};
-
-const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const availableLetters = Object.keys(glossaryData);
-const termCount = Object.values(glossaryData).flat().length;
 
 export default function GlossaryTermList() {
   const [query, setQuery] = useState("");
