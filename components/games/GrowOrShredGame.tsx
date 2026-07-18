@@ -3,20 +3,22 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ExternalLink, Leaf, X } from "lucide-react";
 import { useState } from "react";
-import { GameFrame, GameIntro, ResultPanel } from "./GameShared";
-import { quizQuestions } from "./gameData";
+import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameTimer } from "./GameShared";
+import { quizQuestions, type QuizQuestion } from "./gameData";
 
 type Phase = "intro" | "play" | "result";
 
 export default function GrowOrShredGame() {
   const [phase, setPhase] = useState<Phase>("intro");
+  const [questions, setQuestions] = useState<QuizQuestion[]>(() => shuffleItems(quizQuestions));
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState(0);
-  const question = quizQuestions[index];
+  const { seconds, resetTimer } = useGameTimer(phase === "play");
+  const question = questions[index];
 
   function answer(option: number) {
     if (selected !== null) return;
@@ -31,7 +33,7 @@ export default function GrowOrShredGame() {
   }
 
   function next() {
-    if (index === quizQuestions.length - 1) setPhase("result");
+    if (index === questions.length - 1) setPhase("result");
     else {
       setIndex((value) => value + 1);
       setSelected(null);
@@ -46,17 +48,20 @@ export default function GrowOrShredGame() {
     setBestStreak(0);
     setSelected(null);
     setCorrectAnswers(0);
+    setQuestions(shuffleItems(quizQuestions));
+    resetTimer();
   }
 
   const badge = correctAnswers >= 6 ? "Canopy Scholar" : correctAnswers >= 4 ? "Fibre Thinker" : "Curious Sapling";
 
   return (
-    <GameFrame immersive={phase === "play"} title="Grow or Shred" kicker="Game 01 · Paper IQ" progress={phase === "play" ? ((index + (selected === null ? 0 : 1)) / quizQuestions.length) * 100 : undefined}>
+    <GameFrame gameId="grow-or-shred" immersive={phase === "play"} title="Grow or Shred" kicker="Game 01 · Paper IQ" progress={phase === "play" ? ((index + (selected === null ? 0 : 1)) / questions.length) * 100 : undefined}>
       {phase === "intro" && (
         <GameIntro
+          gameId="grow-or-shred"
           eyebrow="The flagship Paper IQ game"
           title="Grow the evidence. Shred the assumption."
-          description="Six evidence-backed questions shape one living tree. Correct knowledge grows the canopy; wrong options physically break into fibres without punishing your curiosity."
+          description="A freshly shuffled set of evidence-backed questions shapes one living tree. Correct knowledge grows its canopy; weak assumptions return to fibre."
           rules={[
             "Choose one answer for each paper, recycling or forestry question.",
             "Read the evidence reveal—every answer explains why and links to a source.",
@@ -78,7 +83,7 @@ export default function GrowOrShredGame() {
 
           <AnimatePresence mode="wait">
             <motion.div key={index} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} className="question-panel">
-              <div className="question-number">Question {index + 1} of {quizQuestions.length}</div>
+              <div className="question-number">Question {index + 1} of {questions.length}</div>
               <h1>{question.question}</h1>
               <div className="answer-grid">
                 {question.answers.map((answerText, option) => {
@@ -107,7 +112,7 @@ export default function GrowOrShredGame() {
                     <p>{question.explanation}</p>
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <a href={question.source} target="_blank" rel="noreferrer">Source: {question.sourceLabel} <ExternalLink size={13} /></a>
-                      <button onClick={next} className="game-primary-button">{index === quizQuestions.length - 1 ? "See my tree" : "Next question"} →</button>
+                      <button onClick={next} className="game-primary-button">{index === questions.length - 1 ? "See my tree" : "Next question"} →</button>
                     </div>
                   </motion.div>
                 )}
@@ -118,8 +123,8 @@ export default function GrowOrShredGame() {
       )}
 
       {phase === "result" && (
-        <ResultPanel game="Grow or Shred" score={score} outOf={780} badge={badge} message={`You answered ${correctAnswers} of ${quizQuestions.length} correctly and built a best streak of ${bestStreak}.`} onReplay={reset}>
-          <div className="mx-auto my-8 max-w-sm"><TreeVisual correct={correctAnswers} wrong={quizQuestions.length - correctAnswers} streak={bestStreak} compact /></div>
+        <ResultPanel gameId="grow-or-shred" game="Grow or Shred" score={score} outOf={questions.reduce((total, _, questionIndex) => total + 100 + Math.min((questionIndex + 1) * 10, 40), 0)} badge={badge} message={`You answered ${correctAnswers} of ${questions.length} correctly and built a best streak of ${bestStreak}.`} durationSeconds={seconds} metrics={{ correctAnswers, bestStreak }} onReplay={reset}>
+          <div className="mx-auto my-8 max-w-sm"><TreeVisual correct={correctAnswers} wrong={questions.length - correctAnswers} streak={bestStreak} compact /></div>
         </ResultPanel>
       )}
     </GameFrame>

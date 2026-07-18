@@ -1,35 +1,348 @@
 "use client";
 
-import { ArrowLeft, Check, Clock3, Download, RotateCcw, Share2, Sparkles, Trophy } from "lucide-react";
-import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { Check, Clock3, RotateCcw, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import styles from "./PaperWordSearchGame.module.css";
+import {
+  formatTime,
+  GameFrame,
+  GameIntro,
+  ResultPanel,
+  shuffleItems,
+} from "./GameShared";
 
-type Placement={word:string;row:number;col:number;dr:number;dc:number};
-const SIZE=12,LIMIT=300;
-const placements:Placement[]=[
- {word:"PAPER",row:0,col:0,dr:0,dc:1},{word:"FIBRE",row:1,col:1,dr:1,dc:1},{word:"FOREST",row:0,col:11,dr:1,dc:0},{word:"MILL",row:3,col:5,dr:0,dc:1},{word:"PULP",row:4,col:0,dr:1,dc:0},{word:"CARTON",row:4,col:1,dr:1,dc:1},{word:"SHEET",row:8,col:6,dr:0,dc:1},{word:"TREE",row:5,col:9,dr:1,dc:0},{word:"WATER",row:10,col:7,dr:0,dc:1},{word:"RECYCLE",row:11,col:0,dr:0,dc:1},
+type Placement = {
+  word: string;
+  row: number;
+  col: number;
+  dr: number;
+  dc: number;
+};
+
+type Puzzle = {
+  letters: string[];
+  placements: Placement[];
+};
+
+const SIZE = 12;
+const LIMIT = 300;
+const WORD_COUNT = 10;
+const WORD_BANK = [
+  "PAPER",
+  "FIBRE",
+  "FOREST",
+  "MILL",
+  "PULP",
+  "CARTON",
+  "SHEET",
+  "TREE",
+  "WATER",
+  "RECYCLE",
+  "CELLULOSE",
+  "RECOVERY",
+  "PACKAGING",
+  "NEWSPRINT",
+  "KRAFT",
+  "BOARD",
+  "TISSUE",
+  "PRINT",
+  "FOLD",
+  "PRESS",
+  "DRYER",
+  "REEL",
+  "PAPERBOARD",
+  "PAPERMAKER",
+  "BAMBOO",
+  "BAGASSE",
+  "COATING",
+  "SCREEN",
+  "PULPER",
+  "FOLDING",
 ];
-const key=(r:number,c:number)=>`${r}-${c}`;
-const wordCells=(p:Placement)=>Array.from({length:p.word.length},(_,i)=>key(p.row+p.dr*i,p.col+p.dc*i));
+const DIRECTIONS = [
+  [0, 1],
+  [1, 0],
+  [1, 1],
+  [1, -1],
+  [0, -1],
+  [-1, 0],
+  [-1, -1],
+  [-1, 1],
+] as const;
+const FILLER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const cellKey = (row: number, col: number) => `${row}-${col}`;
+const placementCells = (placement: Placement) =>
+  Array.from({ length: placement.word.length }, (_, index) =>
+    cellKey(placement.row + placement.dr * index, placement.col + placement.dc * index)
+  );
 
-export default function PaperWordSearchGame(){
- const grid=useMemo(()=>{const filler="PAPERFIBRECYCLEFORESTMILLWATERTREESHEETCARTON";const letters=Array.from({length:SIZE*SIZE},(_,i)=>filler[(i*7+i%5)%filler.length]);placements.forEach(p=>p.word.split("").forEach((letter,i)=>{letters[(p.row+p.dr*i)*SIZE+p.col+p.dc*i]=letter}));return letters},[]);
- const[start,setStart]=useState<{row:number;col:number}|null>(null);const[found,setFound]=useState<string[]>([]);const[seconds,setSeconds]=useState(0);const[running,setRunning]=useState(false);const[message,setMessage]=useState("Tap the first letter, then the last.");const[best,setBest]=useState<number|null>(null);
- useEffect(()=>{const value=localStorage.getItem("paper-word-search-best");if(value)setBest(Number(value))},[]);
- useEffect(()=>{if(!running||found.length===placements.length)return;const timer=window.setInterval(()=>setSeconds(v=>{if(v>=LIMIT-1){setRunning(false);return LIMIT}return v+1}),1000);return()=>clearInterval(timer)},[running,found.length]);
- useEffect(()=>{if(found.length!==placements.length)return;setRunning(false);if(best===null||seconds<best){setBest(seconds);localStorage.setItem("paper-word-search-best",String(seconds))}},[found.length,seconds,best]);
- const selectedCells=new Set(found.flatMap(word=>wordCells(placements.find(p=>p.word===word)!)));
- function tap(row:number,col:number){if(seconds>=LIMIT||found.length===placements.length)return;if(!running)setRunning(true);if(!start){setStart({row,col});setMessage("Now tap the last letter.");return}const dr=Math.sign(row-start.row),dc=Math.sign(col-start.col),distance=Math.max(Math.abs(row-start.row),Math.abs(col-start.col));if(!((dr===0||dc===0||Math.abs(row-start.row)===Math.abs(col-start.col)))){setStart(null);setMessage("Words run straight or diagonally. Try again.");return}const cells=Array.from({length:distance+1},(_,i)=>key(start.row+dr*i,start.col+dc*i));const letters=cells.map(cell=>{const[r,c]=cell.split("-").map(Number);return grid[r*SIZE+c]}).join("");const reverse=letters.split("").reverse().join("");const match=placements.find(p=>(p.word===letters||p.word===reverse)&&!found.includes(p.word));if(match){setFound(v=>[...v,match.word]);setMessage(`${match.word} found — ${placements.length-found.length-1} to go.`)}else setMessage("Not one of the hidden words. Try another line.");setStart(null)}
- function reset(){setStart(null);setFound([]);setSeconds(0);setRunning(false);setMessage("Tap the first letter, then the last.")}
- const format=(v:number)=>`${String(Math.floor(v/60)).padStart(2,"0")}:${String(v%60).padStart(2,"0")}`;
- function buildResultCard(){const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1080;const ctx=canvas.getContext("2d");if(!ctx)return canvas;ctx.fillStyle="#f2ede4";ctx.fillRect(0,0,1080,1080);ctx.fillStyle="#173323";ctx.fillRect(54,54,972,972);ctx.strokeStyle="rgba(255,255,255,.2)";ctx.lineWidth=2;ctx.strokeRect(80,80,920,920);ctx.fillStyle="#d6a574";ctx.font="500 26px Arial";ctx.fillText("PAPER FOUNDATION INDIA · THE PLAYABLE EDITION",130,170);ctx.fillStyle="#faf7ef";ctx.font="700 78px Georgia";ctx.fillText("Fibre Word Search",130,285);ctx.font="700 205px Georgia";ctx.fillText(format(seconds),130,570);ctx.fillStyle="#d6a574";ctx.font="700 42px Georgia";ctx.fillText("ALL TEN WORDS FOUND",130,680);ctx.fillStyle="#faf7ef";ctx.font="400 31px Arial";ctx.fillText("Can you beat my Paper IQ time?",130,755);ctx.strokeStyle="rgba(255,255,255,.22)";ctx.beginPath();ctx.moveTo(130,875);ctx.lineTo(950,875);ctx.stroke();ctx.font="500 24px Arial";ctx.fillStyle="#d6a574";ctx.fillText("PLAY · LEARN · SHARE THE CONTEXT",130,925);ctx.fillStyle="#faf7ef";ctx.textAlign="right";ctx.fillText(window.location.host,950,925);return canvas}
- function downloadResult(){const link=document.createElement("a");link.download="fibre-word-search-result.png";link.href=buildResultCard().toDataURL("image/png");link.click()}
- async function shareResult(){const canvas=buildResultCard();const blob=await new Promise<Blob|null>(resolve=>canvas.toBlob(resolve,"image/png"));const text=`I found all ten words in ${format(seconds)} in Fibre Word Search by Paper Foundation India. Can you beat my time?`;const file=blob?new File([blob],"fibre-word-search-result.png",{type:"image/png"}):null;try{if(file&&navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({title:"Fibre Word Search result",text,url:window.location.href,files:[file]})}else if(navigator.share)await navigator.share({title:"Fibre Word Search result",text,url:window.location.href});else if(navigator.clipboard)await navigator.clipboard.writeText(`${text} ${window.location.href}`)}catch(error){if(!(error instanceof DOMException&&error.name==="AbortError")&&navigator.clipboard)await navigator.clipboard.writeText(`${text} ${window.location.href}`)}}
- return <div className={styles.page}>
-  <header className={styles.hero}><div><Link href="/games"><ArrowLeft/> Back to games</Link><p>Game 05 · Word hunt</p><h1>Fibre <em>Word Search.</em></h1><span>Ten paper words are hiding across, down and diagonally. Find every one before five minutes.</span><div className={styles.edition}><span>PLAYABLE EDITION</span><span>NO LOGIN</span><span>SHAREABLE RESULT</span></div></div><div className={styles.timer}><Clock3/><small>Elapsed time</small><strong>{format(seconds)}</strong><span>{best===null?"No personal best yet":`Best ${format(best)}`}</span></div></header>
-  <main className={styles.game}><section className={styles.boardWrap}><div className={styles.board} aria-label="Paper word search grid">{grid.map((letter,index)=>{const row=Math.floor(index/SIZE),col=index%SIZE,cell=key(row,col);return <button onClick={()=>tap(row,col)} className={`${selectedCells.has(cell)?styles.found:""} ${start&&start.row===row&&start.col===col?styles.start:""}`} aria-label={`Letter ${letter}, row ${row+1}, column ${col+1}`} key={cell}>{letter}</button>})}</div><footer><p>{message}</p><button onClick={reset}><RotateCcw/> Restart</button></footer></section><aside className={styles.words}><header><span>Word transcript</span><small>{found.length} / 10</small></header>{placements.map(p=><div className={found.includes(p.word)?styles.done:""} key={p.word}><Check/><span>{p.word}</span></div>)}</aside></main>
-  {seconds>=LIMIT&&found.length<10&&<div className={styles.result}><Clock3/><h2>Time&apos;s up.</h2><p>The words will stay in the same places. Reset and race your own search.</p><button onClick={reset}>Try again <RotateCcw/></button></div>}
-  {found.length===10&&<div className={styles.result}><Sparkles/><p>All ten found</p><h2>{format(seconds)}</h2><strong><Trophy/> {best===seconds?"New personal best":"Word search complete"}</strong><div className={styles.share}><button onClick={shareResult}><Share2/> Share result</button><button onClick={downloadResult}><Download/> Download card</button></div><button onClick={reset}>Race again <RotateCcw/></button></div>}
- </div>
+export default function PaperWordSearchGame() {
+  const [phase, setPhase] = useState<"intro" | "play" | "result" | "timeout">("intro");
+  const [puzzle, setPuzzle] = useState<Puzzle>(generatePuzzle);
+  const [start, setStart] = useState<{ row: number; col: number } | null>(null);
+  const [found, setFound] = useState<string[]>([]);
+  const [seconds, setSeconds] = useState(0);
+  const [message, setMessage] = useState("Select the first letter, then the last.");
+
+  useEffect(() => {
+    if (phase !== "play") return;
+    const timer = window.setInterval(() => {
+      setSeconds((value) => {
+        if (value >= LIMIT - 1) {
+          window.setTimeout(() => setPhase("timeout"), 0);
+          return LIMIT;
+        }
+        return value + 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [phase]);
+
+  const selectedCells = useMemo(
+    () =>
+      new Set(
+        found.flatMap((word) =>
+          placementCells(puzzle.placements.find((placement) => placement.word === word)!)
+        )
+      ),
+    [found, puzzle.placements]
+  );
+
+  function startGame() {
+    setPhase("play");
+    setSeconds(0);
+  }
+
+  function selectCell(row: number, col: number) {
+    if (phase !== "play") return;
+    if (!start) {
+      setStart({ row, col });
+      setMessage("Now select the final letter on the same line.");
+      return;
+    }
+
+    const rowDistance = row - start.row;
+    const colDistance = col - start.col;
+    const isStraight =
+      rowDistance === 0 ||
+      colDistance === 0 ||
+      Math.abs(rowDistance) === Math.abs(colDistance);
+    if (!isStraight) {
+      setStart(null);
+      setMessage("Words only run straight or diagonally. Start a new line.");
+      return;
+    }
+
+    const dr = Math.sign(rowDistance);
+    const dc = Math.sign(colDistance);
+    const distance = Math.max(Math.abs(rowDistance), Math.abs(colDistance));
+    const letters = Array.from({ length: distance + 1 }, (_, index) => {
+      const cellRow = start.row + dr * index;
+      const cellCol = start.col + dc * index;
+      return puzzle.letters[cellRow * SIZE + cellCol];
+    }).join("");
+    const reversed = letters.split("").reverse().join("");
+    const match = puzzle.placements.find(
+      (placement) =>
+        (placement.word === letters || placement.word === reversed) &&
+        !found.includes(placement.word)
+    );
+
+    setStart(null);
+    if (!match) {
+      setMessage("That line is not on this transcript. Look again.");
+      return;
+    }
+
+    const nextFound = [...found, match.word];
+    setFound(nextFound);
+    setMessage(
+      nextFound.length === WORD_COUNT
+        ? "Transcript complete."
+        : `${match.word} found — ${WORD_COUNT - nextFound.length} remaining.`
+    );
+    if (nextFound.length === WORD_COUNT) setPhase("result");
+  }
+
+  function newRound(nextPhase: "intro" | "play" = "intro") {
+    setPuzzle(generatePuzzle());
+    setStart(null);
+    setFound([]);
+    setSeconds(0);
+    setMessage("Select the first letter, then the last.");
+    setPhase(nextPhase);
+  }
+
+  const score = Math.max(200, 1000 - seconds * 2);
+  const badge =
+    seconds <= 90 ? "Fibre-Eyed Reader" : seconds <= 180 ? "Transcript Hunter" : "Patient Papermaker";
+
+  return (
+    <GameFrame
+      gameId="paper-word-search"
+      immersive={phase === "play"}
+      title="Fibre Word Search"
+      kicker="Game 05 · A fresh grid every round"
+      progress={phase === "play" ? (found.length / WORD_COUNT) * 100 : undefined}
+    >
+      {phase === "intro" && (
+        <GameIntro
+          gameId="paper-word-search"
+          eyebrow="A five-minute typographic hunt"
+          title="Read between every line."
+          description="The press generates a new grid and ten new paper words for every round. Search in eight directions and finish the transcript before the clock does."
+          rules={[
+            "Select the first letter, then the final letter of a hidden word.",
+            "Words can run across, down, diagonally and backwards.",
+            "Find all ten before five minutes; faster transcripts earn more points.",
+          ]}
+          onStart={startGame}
+        />
+      )}
+
+      {phase === "play" && (
+        <section className="word-stage">
+          <header className="word-stage-header">
+            <div>
+              <p className="game-kicker">Live compositor&apos;s proof</p>
+              <h1>Find the words<br />inside the sheet.</h1>
+            </div>
+            <div className="word-clock">
+              <Clock3 />
+              <small>Elapsed</small>
+              <strong>{formatTime(seconds)}</strong>
+            </div>
+          </header>
+
+          <div className="word-workbench">
+            <div className="word-board-wrap">
+              <div className="word-registration"><span /><span /><span /><span /></div>
+              <div className="word-board" aria-label="Paper word-search grid">
+                {puzzle.letters.map((letter, index) => {
+                  const row = Math.floor(index / SIZE);
+                  const col = index % SIZE;
+                  const key = cellKey(row, col);
+                  const isStart = start?.row === row && start.col === col;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => selectCell(row, col)}
+                      className={`${selectedCells.has(key) ? "is-found" : ""} ${
+                        isStart ? "is-start" : ""
+                      }`}
+                      aria-label={`Letter ${letter}, row ${row + 1}, column ${col + 1}`}
+                    >
+                      {letter}
+                    </button>
+                  );
+                })}
+              </div>
+              <footer>
+                <p>{message}</p>
+                <button onClick={() => newRound("play")}>
+                  <RotateCcw size={15} /> New grid
+                </button>
+              </footer>
+            </div>
+
+            <aside className="word-transcript">
+              <header>
+                <span>Word transcript</span>
+                <strong>{found.length} / {WORD_COUNT}</strong>
+              </header>
+              {puzzle.placements.map((placement, index) => (
+                <div className={found.includes(placement.word) ? "is-found" : ""} key={placement.word}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{placement.word}</strong>
+                  <Check />
+                </div>
+              ))}
+            </aside>
+          </div>
+        </section>
+      )}
+
+      <AnimatePresence>
+        {phase === "timeout" && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="word-timeout"
+          >
+            <Clock3 />
+            <p className="game-kicker">The press stopped at 05:00</p>
+            <h1>{found.length} of {WORD_COUNT} words found.</h1>
+            <p>A fresh transcript is waiting. Keep the vocabulary; lose the old layout.</p>
+            <button className="game-primary-button" onClick={() => newRound("play")}>
+              Generate another grid
+            </button>
+          </motion.section>
+        )}
+      </AnimatePresence>
+
+      {phase === "result" && (
+        <ResultPanel
+          gameId="paper-word-search"
+          game="Fibre Word Search"
+          score={score}
+          outOf={1000}
+          badge={badge}
+          message={`You found all ten paper words in ${formatTime(seconds)} on a one-of-one generated grid.`}
+          durationSeconds={seconds}
+          metrics={{ wordsFound: found.length }}
+          onReplay={() => newRound("intro")}
+        >
+          <div className="word-result-proof">
+            <Sparkles />
+            <span>Transcript complete</span>
+            <strong>{formatTime(seconds)}</strong>
+          </div>
+        </ResultPanel>
+      )}
+    </GameFrame>
+  );
+}
+
+export function generatePuzzle(): Puzzle {
+  for (let puzzleAttempt = 0; puzzleAttempt < 30; puzzleAttempt += 1) {
+    const words = shuffleItems(WORD_BANK)
+      .slice(0, WORD_COUNT)
+      .sort((a, b) => b.length - a.length);
+    const grid = Array<string | null>(SIZE * SIZE).fill(null);
+    const placements: Placement[] = [];
+
+    for (const word of words) {
+      let placed = false;
+      for (let attempt = 0; attempt < 280 && !placed; attempt += 1) {
+        const [dr, dc] = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+        const row = Math.floor(Math.random() * SIZE);
+        const col = Math.floor(Math.random() * SIZE);
+        const endRow = row + dr * (word.length - 1);
+        const endCol = col + dc * (word.length - 1);
+        if (endRow < 0 || endRow >= SIZE || endCol < 0 || endCol >= SIZE) continue;
+
+        const compatible = word.split("").every((letter, index) => {
+          const cell = grid[(row + dr * index) * SIZE + col + dc * index];
+          return cell === null || cell === letter;
+        });
+        if (!compatible) continue;
+
+        word.split("").forEach((letter, index) => {
+          grid[(row + dr * index) * SIZE + col + dc * index] = letter;
+        });
+        placements.push({ word, row, col, dr, dc });
+        placed = true;
+      }
+      if (!placed) break;
+    }
+
+    if (placements.length === WORD_COUNT) {
+      return {
+        placements: shuffleItems(placements),
+        letters: grid.map((letter) => letter ?? FILLER[Math.floor(Math.random() * FILLER.length)]),
+      };
+    }
+  }
+
+  throw new Error("Could not generate a complete word-search puzzle.");
 }

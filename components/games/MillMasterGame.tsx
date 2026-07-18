@@ -3,13 +3,17 @@
 import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import { ArrowDown, ArrowLeft, ArrowUp, Check, CheckCircle2, Droplets, Factory, Filter, GripVertical, PackageCheck, Play, Recycle, RotateCcw, Scissors, Sparkles, Waves, Wind, X } from "lucide-react";
 import { useEffect, useMemo, useState, type ComponentType, type PointerEvent } from "react";
-import { GameFrame, GameIntro, ResultPanel } from "./GameShared";
+import { GameFrame, GameIntro, ResultPanel, shuffleItems } from "./GameShared";
 import { millSteps } from "./gameData";
 
 type Step = (typeof millSteps)[number];
 type StepInfo = { hint: string; icon: ComponentType<{ size?: number; strokeWidth?: number }> };
 
-const startingOrder: Step[] = ["Dry sheet", "Sort fibre", "Finish reel", "Make pulp", "Press water", "Clean pulp", "Form sheet", "Refine fibres"];
+const makeStartingOrder = () => {
+  let order = shuffleItems(millSteps) as Step[];
+  while (order.every((step, index) => step === millSteps[index])) order = shuffleItems(millSteps) as Step[];
+  return order;
+};
 
 const stepInfo: Record<Step, StepInfo> = {
   "Sort fibre": { hint: "Separate usable recovered-paper grades", icon: Recycle },
@@ -24,7 +28,7 @@ const stepInfo: Record<Step, StepInfo> = {
 
 export default function MillMasterGame() {
   const [phase, setPhase] = useState<"intro" | "play" | "result">("intro");
-  const [steps, setSteps] = useState<Step[]>([...startingOrder]);
+  const [steps, setSteps] = useState<Step[]>(makeStartingOrder);
   const [attempts, setAttempts] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [checked, setChecked] = useState(false);
@@ -67,7 +71,7 @@ export default function MillMasterGame() {
 
   function reset() {
     setPhase("intro");
-    setSteps([...startingOrder]);
+    setSteps(makeStartingOrder());
     setAttempts(0);
     setSeconds(0);
     setChecked(false);
@@ -78,14 +82,14 @@ export default function MillMasterGame() {
   const badge = finalScore >= 720 ? "Mill Line Master" : finalScore >= 560 ? "Process Engineer" : "Fibre Apprentice";
 
   return (
-    <GameFrame immersive={phase === "play"} title="Paper Mill Shuffle" kicker="Game 03 · Build the Process" progress={phase === "play" ? correctCount / millSteps.length * 100 : undefined}>
+    <GameFrame gameId="mill-master" immersive={phase === "play"} title="Paper Mill Shuffle" kicker="Game 03 · Build the Process" progress={phase === "play" ? correctCount / millSteps.length * 100 : undefined}>
       {phase === "intro" && (
         <GameIntro
+          gameId="mill-master"
           eyebrow="A drag-and-drop process game"
           title="Can you build a working paper mill?"
           description="Eight process cards are out of order. Drag them into the sequence that turns recovered paper into a finished reel. Simple to play; surprisingly easy to get wrong."
           rules={["Drag the cards into the order you think is correct.", "Use the arrow controls when you prefer tapping or a keyboard.", "Check the line. Correct stages lock visually; rearrange the rest and try again."]}
-          accent="copper"
           onStart={startGame}
         />
       )}
@@ -130,7 +134,7 @@ export default function MillMasterGame() {
 
             <div className="mill-order-actions">
               <button className="game-secondary-button" onClick={reset}><ArrowLeft size={16} /> Exit game</button>
-              <button className="mill-shuffle-button" onClick={() => reorder([...startingOrder])}><RotateCcw size={16} /> Reset cards</button>
+              <button className="mill-shuffle-button" onClick={() => reorder(makeStartingOrder())}><RotateCcw size={16} /> Shuffle cards</button>
               <button className="game-primary-button" onClick={checkLine}><Play size={17} /> Check the mill line</button>
             </div>
           </motion.section>
@@ -138,7 +142,7 @@ export default function MillMasterGame() {
       </AnimatePresence>
 
       {phase === "result" && (
-        <ResultPanel game="Paper Mill Shuffle" score={finalScore} outOf={800} badge={badge} message={`You rebuilt the complete papermaking line in ${attempts} ${attempts === 1 ? "check" : "checks"} and ${seconds} seconds.`} onReplay={reset}>
+        <ResultPanel gameId="mill-master" game="Paper Mill Shuffle" score={finalScore} outOf={800} badge={badge} message={`You rebuilt the complete papermaking line in ${attempts} ${attempts === 1 ? "check" : "checks"} and ${seconds} seconds.`} durationSeconds={seconds} metrics={{ attempts }} onReplay={reset}>
           <div className="mill-result-line">
             {millSteps.map((step, index) => <div key={step}><span>{index + 1}</span><strong>{step}</strong>{index < millSteps.length - 1 && <i />}</div>)}
           </div>

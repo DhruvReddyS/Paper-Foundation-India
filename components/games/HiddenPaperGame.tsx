@@ -4,23 +4,27 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Eye, ExternalLink, Lightbulb, ScanSearch, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { GameFrame, GameIntro, ResultPanel } from "./GameShared";
-import { hiddenProducts } from "./gameData";
+import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameTimer } from "./GameShared";
+import { hiddenProducts, type HiddenProduct } from "./gameData";
 
 export default function HiddenPaperGame() {
   const [phase, setPhase] = useState<"intro" | "play" | "result">("intro");
+  const [products, setProducts] = useState<HiddenProduct[]>(() => shuffleItems(hiddenProducts));
   const [index, setIndex] = useState(0);
   const [clues, setClues] = useState(1);
   const [wrong, setWrong] = useState(0);
   const [solved, setSolved] = useState(false);
   const [score, setScore] = useState(0);
   const [clueHistory, setClueHistory] = useState<number[]>([]);
-  const product = hiddenProducts[index];
+  const { seconds, resetTimer } = useGameTimer(phase === "play");
+  const product = products[index];
   const availablePoints = Math.max(20, 120 - (clues - 1) * 20 - wrong * 15);
 
   function guess(option: string) {
     if (solved) return;
-    if (option === product.name) {
+    const normalizedOption = option.toLocaleLowerCase();
+    const normalizedAnswer = product.name.toLocaleLowerCase();
+    if (normalizedOption === normalizedAnswer || normalizedAnswer.includes(normalizedOption)) {
       setSolved(true);
       setScore((value) => value + availablePoints);
       setClueHistory((value) => [...value, clues]);
@@ -31,17 +35,17 @@ export default function HiddenPaperGame() {
   }
 
   function next() {
-    if (index === hiddenProducts.length - 1) setPhase("result");
+    if (index === products.length - 1) setPhase("result");
     else { setIndex((value) => value + 1); setClues(1); setWrong(0); setSolved(false); }
   }
 
-  function reset() { setPhase("intro"); setIndex(0); setClues(1); setWrong(0); setSolved(false); setScore(0); setClueHistory([]); }
+  function reset() { setPhase("intro"); setIndex(0); setClues(1); setWrong(0); setSolved(false); setScore(0); setClueHistory([]); setProducts(shuffleItems(hiddenProducts)); resetTimer(); }
   const averageClues = clueHistory.length ? clueHistory.reduce((a, b) => a + b, 0) / clueHistory.length : 0;
   const badge = averageClues <= 1.8 ? "Fibre Visionary" : averageClues <= 2.8 ? "Material Detective" : "Curious Observer";
 
   return (
-    <GameFrame immersive={phase === "play"} title="Hidden Paper" kicker="Game 04 · The clue hunt" progress={phase === "play" ? ((index + (solved ? 1 : 0)) / hiddenProducts.length) * 100 : undefined}>
-      {phase === "intro" && <GameIntro eyebrow="Unexpected paper, hiding in plain sight" title="How soon can you see the paper?" description="Identify five products using the fewest clues possible. Begin with language, then unlock material behaviour and a clearer visual—but every clue costs points." rules={["Read the first cryptic clue and make a guess or request another clue.", "A wrong guess automatically reveals more information and lowers the available score.", "After solving, peel back the object to learn exactly why a paper component works there."]} accent="sage" onStart={() => setPhase("play")} />}
+    <GameFrame gameId="hidden-paper" immersive={phase === "play"} title="Hidden Paper" kicker="Game 04 · The clue hunt" progress={phase === "play" ? ((index + (solved ? 1 : 0)) / products.length) * 100 : undefined}>
+      {phase === "intro" && <GameIntro gameId="hidden-paper" eyebrow="Unexpected paper, hiding in plain sight" title="How soon can you see the paper?" description="Identify five products using the fewest clues possible. Begin with language, then unlock material behaviour and a clearer visual—but every clue costs points." rules={["Read the first cryptic clue and make a guess or request another clue.", "A wrong guess automatically reveals more information and lowers the available score.", "After solving, peel back the object to learn exactly why a paper component works there."]} onStart={() => setPhase("play")} />}
 
       {phase === "play" && (
         <section className="hidden-stage">
@@ -55,7 +59,7 @@ export default function HiddenPaperGame() {
           </div>
 
           <div className="clue-console">
-            <div className="flex items-center justify-between gap-4"><p className="game-kicker">Mystery {index + 1} / {hiddenProducts.length}</p><span className="clue-score"><Sparkles size={14} /> {score} total</span></div>
+            <div className="flex items-center justify-between gap-4"><p className="game-kicker">Mystery {index + 1} / {products.length}</p><span className="clue-score"><Sparkles size={14} /> {score} total</span></div>
             <h1>{solved ? product.name : "What am I?"}</h1>
             <div className="clue-stack">
               {product.clues.slice(0, clues).map((clue, clueIndex) => <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} key={clue}><span>{String(clueIndex + 1).padStart(2, "0")}</span><p>{clue}</p></motion.div>)}
@@ -73,14 +77,14 @@ export default function HiddenPaperGame() {
                 <h2>Why paper?</h2><p>{product.whyPaper}</p>
                 <blockquote>{product.reveal}</blockquote>
                 <small>{product.credit}</small>
-                <div className="flex flex-wrap items-center justify-between gap-4"><a href={product.source} target="_blank" rel="noreferrer">Read source <ExternalLink size={13} /></a><button className="game-primary-button" onClick={next}>{index === hiddenProducts.length - 1 ? "See detective report" : "Next mystery"} →</button></div>
+                <div className="flex flex-wrap items-center justify-between gap-4"><a href={product.source} target="_blank" rel="noreferrer">Read source <ExternalLink size={13} /></a><button className="game-primary-button" onClick={next}>{index === products.length - 1 ? "See detective report" : "Next mystery"} →</button></div>
               </motion.div>
             )}
           </div>
         </section>
       )}
 
-      {phase === "result" && <ResultPanel game="Hidden Paper" score={score} outOf={600} badge={badge} message={`You uncovered five hidden paper products using an average of ${averageClues.toFixed(1)} clues each.`} onReplay={reset}><div className="clue-result-grid">{clueHistory.map((count, itemIndex) => <div key={hiddenProducts[itemIndex].name}><span>{itemIndex + 1}</span><strong>{hiddenProducts[itemIndex].name}</strong><small>{count} clue{count === 1 ? "" : "s"}</small></div>)}</div></ResultPanel>}
+      {phase === "result" && <ResultPanel gameId="hidden-paper" game="Hidden Paper" score={score} outOf={products.length * 120} badge={badge} message={`You uncovered ${products.length} hidden paper products using an average of ${averageClues.toFixed(1)} clues each.`} durationSeconds={seconds} metrics={{ averageClues: Number(averageClues.toFixed(1)) }} onReplay={reset}><div className="clue-result-grid">{clueHistory.map((count, itemIndex) => <div key={products[itemIndex].name}><span>{itemIndex + 1}</span><strong>{products[itemIndex].name}</strong><small>{count} clue{count === 1 ? "" : "s"}</small></div>)}</div></ResultPanel>}
     </GameFrame>
   );
 }
