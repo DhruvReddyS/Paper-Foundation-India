@@ -5,7 +5,7 @@ import styles from "./Footer.module.css";
 
 const columns=[
  {label:"Understand",links:[["Knowledge Hub","/knowledge"],["Myths vs Facts","/myths"],["Glossary","/glossary"],["Resources","/resources"]]},
- {label:"Experience",links:[["Paper Journey","/journey"],["The Playable Edition","/games"],["Paper Everywhere","/everyday-paper"],["Circularity","/circularity"]]},
+ {label:"Experience",links:[["Paper Journey","/journey"],["Games Lab","/games"],["Paper Everywhere","/everyday-paper"],["Circularity","/circularity"]]},
  {label:"India & Foundation",links:[["India Fibre Map","/india-map"],["India by Numbers","/india-snapshot"],["About the Foundation","/about"],["Join the Initiative","/join"]]},
 ] as const;
 

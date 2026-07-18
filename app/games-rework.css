@@ -1914,3 +1914,251 @@
   .game-rework.game-page-immersive .game-result-card-preview h1 { font-size: 5.4rem; }
   .game-rework.game-page-immersive .game-result-card-preview h2 { font-size: 2.3rem; }
 }
+
+/* Clean instruction desk: nothing overlaps, and the full briefing reads in one view. */
+.game-rework .game-intro {
+  height: calc(100svh - 76px);
+  min-height: 610px;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 42px minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: stretch;
+  padding: 1rem 0 1.2rem;
+}
+.game-rework .game-intro-heading {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--game-ink) 16%, transparent);
+  color: var(--game-muted);
+  font: 600 .5rem/1 var(--font-dm-mono);
+  text-transform: uppercase;
+  letter-spacing: .11em;
+}
+.game-rework .game-intro-heading > span { color: var(--game-accent); }
+.game-rework .game-intro-heading > i { width: 38px; height: 1px; background: color-mix(in srgb, var(--game-ink) 22%, transparent); }
+.game-rework .game-intro-layout {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, .58fr);
+  gap: clamp(2rem, 5vw, 6rem);
+  align-items: center;
+}
+.game-rework .game-intro-copy { max-width: 760px; }
+.game-rework .game-intro-copy h1 {
+  margin: .6rem 0 1rem;
+  font-size: clamp(3.5rem, 6vw, 6.7rem);
+  line-height: .86;
+}
+.game-rework .game-intro-copy > p:not(.game-kicker) { margin-bottom: 1.35rem; line-height: 1.55; }
+.game-rework .game-intro-visual {
+  position: relative;
+  min-height: 285px;
+  height: min(39svh, 390px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--game-ink) 20%, transparent);
+  color: var(--game-ink);
+  background:
+    radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--game-accent) 15%, transparent), transparent 45%),
+    color-mix(in srgb, var(--game-paper) 84%, white);
+}
+.game-rework .game-intro-visual::before,
+.game-rework .game-intro-visual::after {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  content: "";
+}
+.game-rework .game-intro-visual::before { left: 12px; top: 12px; border-left: 1px solid var(--game-accent); border-top: 1px solid var(--game-accent); }
+.game-rework .game-intro-visual::after { right: 12px; bottom: 12px; border-right: 1px solid var(--game-accent); border-bottom: 1px solid var(--game-accent); }
+.game-rework .game-intro-visual > span,
+.game-rework .game-intro-visual > small {
+  position: absolute;
+  z-index: 2;
+  color: var(--game-accent);
+  font: 600 .52rem/1 var(--font-dm-mono);
+  letter-spacing: .12em;
+}
+.game-rework .game-intro-visual > span { left: 1.2rem; top: 1.2rem; }
+.game-rework .game-intro-visual > small { right: 1.2rem; bottom: 1.2rem; text-transform: uppercase; }
+.game-rework .game-intro-visual .game-mark { width: min(58%, 255px); height: min(76%, 290px); }
+.game-rework .game-rules-card {
+  width: 100%;
+  align-self: auto;
+  padding: .9rem 1.1rem;
+  border-top-width: 3px;
+  box-shadow: none;
+  transform: none;
+}
+.game-rework .game-rules-card > header {
+  justify-content: space-between;
+  padding-bottom: .65rem;
+}
+.game-rework .game-rules-card > header > span {
+  color: var(--game-muted);
+  font: 600 .5rem/1 var(--font-dm-mono);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.game-rework .game-rules-card ol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  padding: 0;
+}
+.game-rework .game-rules-card li {
+  min-height: 72px;
+  grid-template-columns: 32px 1fr;
+  border-bottom: 0;
+  border-right: 1px solid color-mix(in srgb, var(--game-ink) 12%, transparent);
+  padding: .55rem 1rem .3rem 0;
+  font-size: .65rem;
+  line-height: 1.4;
+}
+.game-rework .game-rules-card li + li { padding-left: 1rem; }
+.game-rework .game-rules-card li:last-child { border-right: 0; }
+
+.game-rework .game-session-live svg { width: 16px; color: var(--game-accent); }
+.game-rework .game-session-live span { display: flex; align-items: center; gap: .45rem; }
+.game-rework .game-session-live strong { color: var(--game-ink); font-size: .75rem; }
+
+.game-rework .knowledge-tree canvas {
+  width: 100%;
+  height: min(69svh, 610px);
+  display: block;
+}
+.game-rework .knowledge-tree-compact canvas { height: min(28svh, 240px); }
+.game-rework .game-result-mark .knowledge-tree {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+.game-rework .game-result-mark .knowledge-tree canvas { height: 100%; }
+.game-rework .game-result-mark .tree-legend { display: none; }
+.game-rework .game-result-mark:has(.knowledge-tree) { width: min(43%, 420px); height: 43%; opacity: .4; }
+
+/* Mill Shuffle: one calm control column and one ordered production sheet. */
+.game-rework .mill-order-game {
+  height: calc(100svh - 80px);
+  min-height: 0;
+  overflow: hidden;
+  padding: 1rem 0;
+}
+.game-rework .mill-game-layout {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(260px, .42fr) minmax(580px, 1fr);
+  gap: 1rem;
+}
+.game-rework .mill-control-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid color-mix(in srgb, var(--game-ink) 18%, transparent);
+  padding: clamp(1.25rem, 2.5vw, 2.4rem);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 31px, color-mix(in srgb, var(--game-ink) 5%, transparent) 32px),
+    color-mix(in srgb, var(--game-paper) 88%, white);
+}
+.game-rework .mill-control-panel h1 {
+  margin: .55rem 0 .8rem;
+  font: 570 clamp(3rem, 4.8vw, 5.5rem)/.84 var(--font-fraunces);
+  letter-spacing: -.055em;
+}
+.game-rework .mill-control-panel > p:not(.game-kicker) { color: var(--game-muted); font-size: .74rem; line-height: 1.55; }
+.game-rework .mill-control-panel .mill-order-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 1.2rem 0 0;
+  border: 1px solid color-mix(in srgb, var(--game-ink) 17%, transparent);
+}
+.game-rework .mill-control-panel .mill-order-status span {
+  min-height: 76px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid color-mix(in srgb, var(--game-ink) 17%, transparent);
+  padding: .7rem;
+}
+.game-rework .mill-control-panel .mill-order-status span:last-child { border: 0; }
+.game-rework .mill-control-panel .mill-order-status strong { font: 600 1.8rem/1 var(--font-fraunces); }
+.game-rework .mill-control-panel .mill-order-status small { margin-top: .25rem; color: var(--game-muted); font: 600 .45rem/1 var(--font-dm-mono); text-transform: uppercase; }
+.game-rework .mill-control-panel .mill-order-feedback {
+  margin: 1rem 0 0;
+  padding: .8rem;
+  border-left: 3px solid var(--game-accent);
+  font-size: .64rem;
+}
+.game-rework .mill-control-panel .mill-order-feedback span { display: flex; align-items: center; gap: .4rem; font-weight: 700; }
+.game-rework .mill-control-panel .mill-order-feedback p { margin-top: .35rem; color: var(--game-muted); line-height: 1.45; }
+.game-rework .mill-control-panel .mill-order-actions {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .45rem;
+}
+.game-rework .mill-control-panel .mill-order-actions button { min-height: 43px; display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border: 1px solid color-mix(in srgb, var(--game-ink) 22%, transparent); font-size: .58rem; font-weight: 700; }
+.game-rework .mill-control-panel .mill-exit-button { grid-column: 1 / -1; border: 0 !important; min-height: 30px !important; color: var(--game-muted); }
+.game-rework .mill-sequence-sheet {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 52px minmax(0, 1fr) 36px;
+  border: 1px solid color-mix(in srgb, var(--game-ink) 20%, transparent);
+  padding: 0 1rem;
+  background: #f8f3e5;
+}
+.game-rework .mill-sequence-sheet > header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  border-bottom: 1px solid #cbc0ab;
+  color: var(--game-muted);
+  font: 600 .46rem/1 var(--font-dm-mono);
+  text-transform: uppercase;
+  letter-spacing: .09em;
+}
+.game-rework .mill-sequence-sheet > header strong { color: var(--game-accent); }
+.game-rework .mill-sequence-sheet > header span:last-child { text-align: right; }
+.game-rework .mill-sequence-sheet .mill-order-list {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  gap: .35rem;
+  padding: .55rem 0;
+}
+.game-rework .mill-sequence-sheet .mill-order-card {
+  min-height: 0;
+  height: 100%;
+  grid-template-columns: 52px 38px minmax(0, 1fr) 30px 66px;
+  border: 1px solid #d0c5b2;
+  box-shadow: none;
+}
+.game-rework .mill-sequence-sheet .mill-order-grip,
+.game-rework .mill-sequence-sheet .mill-order-icon,
+.game-rework .mill-sequence-sheet .mill-order-verdict,
+.game-rework .mill-sequence-sheet .mill-order-move { min-height: 0; height: 100%; }
+.game-rework .mill-sequence-sheet .mill-order-copy strong { font-size: .72rem; }
+.game-rework .mill-sequence-sheet .mill-order-copy span { font-size: .52rem; }
+.game-rework .mill-sequence-sheet .mill-order-move { display: grid; grid-template-columns: 1fr 1fr; }
+.game-rework .mill-sequence-sheet .mill-order-move button { width: 100%; height: 100%; }
+.game-rework .mill-sequence-sheet > footer { display: flex; align-items: center; gap: .45rem; border-top: 1px solid #cbc0ab; color: var(--game-muted); font: 500 .48rem/1 var(--font-dm-mono); }
+.game-rework .mill-sequence-sheet > footer svg { width: 13px; color: var(--game-accent); }
+
+@media (max-width: 800px) {
+  .game-rework .game-intro { height: auto; min-height: 0; grid-template-rows: auto; padding: 1rem 0 2rem; }
+  .game-rework .game-intro-layout { grid-template-columns: 1fr; }
+  .game-rework .game-intro-visual { min-height: 260px; height: 42svh; }
+  .game-rework .game-rules-card ol { grid-template-columns: 1fr; }
+  .game-rework .game-rules-card li,
+  .game-rework .game-rules-card li + li { min-height: 62px; border-right: 0; border-bottom: 1px solid color-mix(in srgb, var(--game-ink) 12%, transparent); padding: .5rem 0; }
+  .game-rework .mill-order-game { height: calc(100svh - 64px); overflow: auto; }
+  .game-rework .mill-game-layout { height: auto; grid-template-columns: 1fr; }
+  .game-rework .mill-control-panel { min-height: 360px; }
+  .game-rework .mill-sequence-sheet { min-height: 690px; }
+}

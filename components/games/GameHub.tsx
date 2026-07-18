@@ -5,9 +5,6 @@ import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-moti
 import {
   ArrowDown,
   ArrowRight,
-  Clock3,
-  Download,
-  Fingerprint,
 } from "lucide-react";
 import { useEffect, useState, type PointerEvent } from "react";
 import { gameCatalog, type GameDefinition } from "./gameCatalog";
@@ -55,10 +52,6 @@ export default function GameHub() {
             animate={{ opacity: 1, y: 0 }}
             className="games-new-hero-copy"
           >
-            <div className="games-new-edition">
-              <span>Paper Foundation India</span>
-              <b>The Playable Edition / 01</b>
-            </div>
             <h1>
               Paper makes more sense
               <em>when your hands are in it.</em>
@@ -76,11 +69,6 @@ export default function GameHub() {
                 Open the game deck <ArrowDown />
               </a>
             </div>
-            <div className="games-new-proof">
-              <span><Clock3 /> 3–7 minutes</span>
-              <span><Fingerprint /> No account</span>
-              <span><Download /> Branded result PNG</span>
-            </div>
           </motion.div>
 
           <div className="games-new-hero-art" aria-hidden="true">
@@ -91,9 +79,9 @@ export default function GameHub() {
                 rotateX: reducedMotion ? 0 : cursorY,
               }}
             >
-              <span>PFI / PLAY</span>
-              <strong>THE<br />PLAYABLE<br />EDITION</strong>
-              <small>Five field games<br />Issue 01 · India</small>
+              <span>FIELD TESTS</span>
+              <strong>THE<br />GAME<br />LAB</strong>
+              <small>Five ways to test<br />your paper sense</small>
               <i />
             </motion.div>
             {gameCatalog.map((game, index) => (

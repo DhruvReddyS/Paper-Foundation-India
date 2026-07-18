@@ -183,6 +183,7 @@ export default function PaperWordSearchGame() {
       immersive={phase !== "intro"}
       title="Fibre Word Search"
       kicker="Game 05 · A fresh grid every round"
+      elapsedSeconds={phase === "intro" ? undefined : seconds}
       progress={phase === "play" ? (found.length / WORD_COUNT) * 100 : undefined}
     >
       {phase === "intro" && (

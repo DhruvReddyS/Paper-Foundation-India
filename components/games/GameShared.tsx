@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowLeft,
+  Clock3,
   Copy,
   Download,
   ExternalLink,
@@ -23,6 +24,7 @@ export function GameFrame({
   title,
   kicker,
   progress,
+  elapsedSeconds,
   immersive = false,
   children,
 }: {
@@ -30,6 +32,7 @@ export function GameFrame({
   title: string;
   kicker: string;
   progress?: number;
+  elapsedSeconds?: number;
   immersive?: boolean;
   children: React.ReactNode;
 }) {
@@ -61,11 +64,7 @@ export function GameFrame({
             <p>{title}</p>
           </div>
           <div className="game-session-live">
-            <i />
-            <span>
-              Paper Foundation India
-              <b>Playable edition</b>
-            </span>
+            {typeof elapsedSeconds === "number" ? <><Clock3 /><span>Time<strong>{formatTime(elapsedSeconds)}</strong></span></> : <span>{definition.skill}</span>}
           </div>
         </header>
         {typeof progress === "number" && (
@@ -112,24 +111,33 @@ export function GameIntro({
       animate={{ opacity: 1, y: 0 }}
       className={`game-intro game-intro-${definition.theme}`}
     >
-      <div className="game-intro-copy">
-        <p className="game-kicker">{eyebrow}</p>
-        <h1>{title}</h1>
-        <p>{description}</p>
-        <button className="game-primary-button" onClick={onStart}>
-          Begin the game <Play size={16} fill="currentColor" />
-        </button>
-      </div>
-      <div className="game-intro-object" aria-hidden="true">
-        <GameMark gameId={gameId} animate={!reducedMotion} />
+      <header className="game-intro-heading">
+        <span>{definition.verb}</span>
+        <i />
+        <small>{definition.duration} · {definition.difficulty}</small>
+      </header>
+      <div className="game-intro-layout">
+        <div className="game-intro-copy">
+          <p className="game-kicker">{eyebrow}</p>
+          <h1>{title}</h1>
+          <p>{description}</p>
+          <button className="game-primary-button" onClick={onStart}>
+            Begin the game <Play size={16} fill="currentColor" />
+          </button>
+        </div>
+        <div className="game-intro-visual" aria-hidden="true">
+          <span>{definition.number}</span>
+          <GameMark gameId={gameId} animate={!reducedMotion} />
+          <small>{definition.shortTitle}</small>
+        </div>
       </div>
       <aside className="game-rules-card">
         <header>
-          <span>{definition.number}</span>
           <div>
-            <small>Field instructions</small>
-            <strong>{definition.skill}</strong>
+            <small>How to play</small>
+            <strong>Three clear steps</strong>
           </div>
+          <span>{definition.skill}</span>
         </header>
         <ol>
           {rules.map((rule, index) => (
@@ -139,11 +147,6 @@ export function GameIntro({
             </li>
           ))}
         </ol>
-        <footer>
-          <span>No login</span>
-          <span>Keyboard ready</span>
-          <span>Shareable result</span>
-        </footer>
       </aside>
     </motion.section>
   );
@@ -159,6 +162,7 @@ export function ResultPanel({
   durationSeconds,
   metrics = {},
   children,
+  scoreArtwork,
   onReplay,
 }: {
   gameId: GameId;
@@ -170,6 +174,7 @@ export function ResultPanel({
   durationSeconds: number;
   metrics?: Record<string, MetricValue>;
   children?: React.ReactNode;
+  scoreArtwork?: React.ReactNode;
   onReplay: () => void;
 }) {
   const definition = getGameDefinition(gameId);
@@ -235,6 +240,7 @@ export function ResultPanel({
         badge,
         message,
         durationSeconds,
+        metrics,
       });
       const blob = await canvasToBlob(canvas);
       const file = new File([blob], `${gameId}-paper-iq.png`, { type: "image/png" });
@@ -265,6 +271,7 @@ export function ResultPanel({
       badge,
       message,
       durationSeconds,
+      metrics,
     });
     const link = document.createElement("a");
     link.download = `${gameId}-paper-iq.png`;
@@ -286,11 +293,11 @@ export function ResultPanel({
     >
       <div className="game-result-card-preview">
         <header>
-          <span>PFI / PLAY {definition.number}</span>
-          <small>PAPER FOUNDATION INDIA</small>
+          <span>GAME RESULT · {definition.number}</span>
+          <small>PAPERFOUNDATION.IN</small>
         </header>
         <div className="game-result-mark" aria-hidden="true">
-          <GameMark gameId={gameId} animate={false} />
+          {scoreArtwork ?? <GameMark gameId={gameId} animate={false} />}
         </div>
         <p className="game-kicker">Your Paper IQ result</p>
         <h1>
@@ -412,6 +419,7 @@ type CanvasOptions = {
   badge: string;
   message: string;
   durationSeconds: number;
+  metrics: Record<string, MetricValue>;
 };
 
 const scoreThemes: Record<GameId, { background: string; panel: string; accent: string; ink: string }> = {
@@ -438,12 +446,12 @@ async function buildScoreCanvas(options: CanvasOptions) {
   ctx.lineWidth = 2;
   ctx.strokeRect(76, 76, 928, 928);
   drawPaperTexture(ctx, theme.ink);
-  drawGameCanvasMark(ctx, options.gameId, theme.accent);
+  drawGameCanvasMark(ctx, options.gameId, theme.accent, options.metrics);
 
   ctx.fillStyle = theme.accent;
   ctx.font = "600 25px Arial";
   ctx.letterSpacing = "3px";
-  ctx.fillText("PAPER FOUNDATION INDIA  /  THE PLAYABLE EDITION", 118, 148);
+  ctx.fillText("PAPER FOUNDATION INDIA  /  GAME RESULT", 118, 148);
   ctx.letterSpacing = "0px";
   ctx.fillStyle = theme.ink;
   ctx.font = "600 72px Georgia";
@@ -476,14 +484,27 @@ async function buildScoreCanvas(options: CanvasOptions) {
   return canvas;
 }
 
-function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accent: string) {
+function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accent: string, metrics: Record<string, MetricValue>) {
   ctx.save();
   ctx.translate(820, 320);
   ctx.strokeStyle = `${accent}66`;
   ctx.fillStyle = `${accent}33`;
   ctx.lineWidth = 9;
   if (gameId === "grow-or-shred") {
-    ctx.beginPath(); ctx.moveTo(80, 230); ctx.lineTo(80, 45); ctx.moveTo(80, 110); ctx.quadraticCurveTo(10, 80, 18, 15); ctx.moveTo(80, 145); ctx.quadraticCurveTo(150, 105, 143, 35); ctx.stroke();
+    const growth = Math.max(1, Number(metrics.correctAnswers) || 1);
+    ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(82, 230); ctx.bezierCurveTo(74, 177, 91, 112, 82, 38); ctx.stroke();
+    const limbs = [[80,178,25,124],[84,162,141,106],[81,130,41,72],[85,113,128,54],[82,88,64,32],[84,72,106,18]];
+    limbs.slice(0, growth).forEach(([x1,y1,x2,y2], index) => {
+      ctx.lineWidth = Math.max(3, 8 - index * .7);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.quadraticCurveTo((x1+x2)/2 + (index % 2 ? 8 : -8),(y1+y2)/2,x2,y2); ctx.stroke();
+      ctx.fillStyle = accent;
+      for (let leafIndex = 0; leafIndex < 5; leafIndex += 1) {
+        ctx.beginPath();
+        ctx.ellipse(x2 + (leafIndex - 2) * 7, y2 + Math.abs(leafIndex - 2) * 3, 5, 11, (leafIndex - 2) * .35, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
   } else if (gameId === "truth-press") {
     ctx.rotate(-0.12); ctx.strokeRect(0, 30, 190, 120); ctx.font = "700 31px Arial"; ctx.fillStyle = accent; ctx.fillText("VERIFIED", 17, 102);
   } else if (gameId === "mill-master") {

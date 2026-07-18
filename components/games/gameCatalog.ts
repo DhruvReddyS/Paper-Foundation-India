@@ -49,7 +49,7 @@ export const gameCatalog: GameDefinition[] = [
     subtitle: "A claim-verification desk",
     href: "/discover/truth-press",
     description:
-      "Stamp each claim Myth, Fact or Missing Context, then repair the wording before it leaves the press.",
+      "Stamp each claim Myth or Fact, then inspect the evidence before the next sheet enters the press.",
     hook: "Put every claim under pressure.",
     verb: "Investigate",
     duration: "5–7 min",

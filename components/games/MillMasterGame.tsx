@@ -82,7 +82,7 @@ export default function MillMasterGame() {
   const badge = finalScore >= 720 ? "Mill Line Master" : finalScore >= 560 ? "Process Engineer" : "Fibre Apprentice";
 
   return (
-    <GameFrame gameId="mill-master" immersive={phase !== "intro"} title="Paper Mill Shuffle" kicker="Game 03 · Build the Process" progress={phase === "play" ? correctCount / millSteps.length * 100 : undefined}>
+    <GameFrame gameId="mill-master" immersive={phase !== "intro"} title="Paper Mill Shuffle" kicker="Game 03 · Build the Process" elapsedSeconds={phase === "intro" ? undefined : seconds} progress={phase === "play" ? correctCount / millSteps.length * 100 : undefined}>
       {phase === "intro" && (
         <GameIntro
           gameId="mill-master"
@@ -97,45 +97,45 @@ export default function MillMasterGame() {
       <AnimatePresence mode="wait">
         {phase === "play" && (
           <motion.section key="mill-order" initial={{ opacity: 0, scale: .96, rotateX: 4 }} animate={{ opacity: 1, scale: 1, rotateX: 0 }} exit={{ opacity: 0, scale: 1.04, filter: "blur(10px)" }} className="mill-order-game">
-            <header className="mill-order-header">
-              <div>
+            <div className="mill-game-layout">
+              <aside className="mill-control-panel">
                 <p className="game-kicker">The line is stopped</p>
-                <h1>Put the mill<br />back in order.</h1>
-                <p>Start with recovered paper. End with a finished reel. The stages in between need your engineering brain.</p>
+                <h1>Reconnect<br />the mill.</h1>
+                <p>Move eight stages into one continuous line—from recovered fibre to a finished reel.</p>
+                <div className="mill-order-status">
+                  <span><strong>{String(correctCount).padStart(2, "0")}</strong><small>correct</small></span>
+                  <span><strong>{String(attempts).padStart(2, "0")}</strong><small>checks</small></span>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {checked && correctCount < millSteps.length && (
+                    <motion.div key={correctCount} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mill-order-feedback">
+                      <span><X size={18} /> Line blocked</span>
+                      <p><strong>{correctCount} stages</strong> are placed correctly. Keep the green stages and move the others.</p>
+                    </motion.div>
+                  )}
+                  {checked && correctCount === millSteps.length && (
+                    <motion.div initial={{ opacity: 0, scale: .94 }} animate={{ opacity: 1, scale: 1 }} className="mill-order-feedback is-success"><span><CheckCircle2 /> Mill running</span><p>The complete fibre-to-reel line is connected.</p></motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="mill-order-actions">
+                  <button className="mill-shuffle-button" onClick={() => reorder(makeStartingOrder())}><RotateCcw size={16} /> Reshuffle</button>
+                  <button className="game-primary-button" onClick={checkLine}><Play size={17} /> Check line</button>
+                  <button className="mill-exit-button" onClick={reset}><ArrowLeft size={15} /> Exit</button>
+                </div>
+              </aside>
+
+              <div className="mill-sequence-sheet">
+                <header><span>Recovered fibre</span><strong>Drag the process into order</strong><span>Finished reel</span></header>
+                <Reorder.Group axis="y" values={steps} onReorder={reorder} className="mill-order-list" aria-label="Paper mill process order">
+                  {steps.map((step, index) => {
+                    const isCorrect = millSteps[index] === step;
+                    return <MillOrderCard key={step} step={step} index={index} checked={checked} isCorrect={isCorrect} onMove={moveStep} />;
+                  })}
+                </Reorder.Group>
+                <footer><GripVertical /> Drag a row, or use its arrow buttons. Correct positions turn green after checking.</footer>
               </div>
-              <div className="mill-order-status">
-                <span><strong>{String(correctCount).padStart(2, "0")}</strong> / 08 placed</span>
-                <span><strong>{String(Math.floor(seconds / 60)).padStart(2, "0")}:{String(seconds % 60).padStart(2, "0")}</strong> time</span>
-                <span><strong>{String(attempts).padStart(2, "0")}</strong> checks</span>
-              </div>
-            </header>
-
-            <div className="mill-order-workbench">
-              <div className="mill-order-rail" aria-hidden="true"><i /><i /><i /></div>
-              <Reorder.Group axis="y" values={steps} onReorder={reorder} className="mill-order-list" aria-label="Paper mill process order">
-                {steps.map((step, index) => {
-                  const isCorrect = millSteps[index] === step;
-                  return <MillOrderCard key={step} step={step} index={index} checked={checked} isCorrect={isCorrect} onMove={moveStep} />;
-                })}
-              </Reorder.Group>
-            </div>
-
-            <AnimatePresence mode="wait">
-              {checked && correctCount < millSteps.length && (
-                <motion.div key={correctCount} initial={{ opacity: 0, y: 12, scale: .96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8 }} className="mill-order-feedback">
-                  <span><X size={18} /> Line blocked</span>
-                  <p><strong>{correctCount} stages</strong> are in the right position. Green cards are correct; move the marked cards and inspect again.</p>
-                </motion.div>
-              )}
-              {checked && correctCount === millSteps.length && (
-                <motion.div initial={{ opacity: 0, scale: .9 }} animate={{ opacity: 1, scale: 1 }} className="mill-order-feedback is-success"><span><CheckCircle2 /> Mill running</span><p>Every stage is connected. Your finished reel is on its way.</p></motion.div>
-              )}
-            </AnimatePresence>
-
-            <div className="mill-order-actions">
-              <button className="game-secondary-button" onClick={reset}><ArrowLeft size={16} /> Exit game</button>
-              <button className="mill-shuffle-button" onClick={() => reorder(makeStartingOrder())}><RotateCcw size={16} /> Shuffle cards</button>
-              <button className="game-primary-button" onClick={checkLine}><Play size={17} /> Check the mill line</button>
             </div>
           </motion.section>
         )}

@@ -31,7 +31,7 @@ export default function PlayableEdition(){
  };
  return <section id="playable-edition" className={styles.section} aria-labelledby="playable-edition-title">
   <div className={styles.heading} data-reveal><div><p className={styles.kicker}>The playable edition</p><h2 id="playable-edition-title">Test your <em>paper instincts.</em></h2></div><div className={styles.introduction}><p>Five short, replayable games built for curious people of every age. Swipe the edition, choose a cover and learn by doing.</p><Link href="/games">View the games hub <ArrowRight/></Link></div></div>
-  <div className={styles.carouselHead} data-reveal><span>Issue 01 · Five playable covers</span><div><button onClick={()=>move(-1)} aria-label="Previous games"><ArrowLeft/></button><button onClick={()=>move(1)} aria-label="Next games"><ArrowRight/></button></div></div>
+  <div className={styles.carouselHead} data-reveal><span>Five games · Choose a challenge</span><div><button onClick={()=>move(-1)} aria-label="Previous games"><ArrowLeft/></button><button onClick={()=>move(1)} aria-label="Next games"><ArrowRight/></button></div></div>
   <div
    ref={rail}
    className={`${styles.gameGrid} ${dragging?styles.dragging:""}`}

@@ -4,14 +4,14 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 const routeNames: Record<string, string> = {
-  "/": "Opening the field edition",
+  "/": "Opening the home page",
   "/journey": "Binding the paper journey",
   "/knowledge": "Preparing the reading desk",
   "/knowledge/featured": "Opening the feature folio",
   "/myths": "Retrieving the evidence files",
   "/glossary": "Indexing the paper lexicon",
   "/resources": "Gathering source material",
-  "/games": "Loading the playable edition",
+  "/games": "Loading the games lab",
   "/join": "Preparing the membership folio",
   "/contact": "Opening the correspondence desk",
   "/report": "Preparing the evidence desk",

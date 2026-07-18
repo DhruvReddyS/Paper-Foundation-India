@@ -3,7 +3,7 @@ export default function RouteLoading() {
     <div className="route-loading-screen" role="status" aria-live="polite">
       <div className="route-loading-sheet">
         <header>
-          <span>PFI / FIELD EDITION</span>
+          <span>PREPARING THE PAGE</span>
           <small>Preparing the next page</small>
         </header>
         <div className="route-loading-signature" aria-hidden="true">

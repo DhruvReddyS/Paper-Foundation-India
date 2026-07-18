@@ -188,7 +188,7 @@ export default function InteractiveBook({
                             <div className="flex-1 flex flex-col justify-center items-center text-center opacity-80">
                                 <h2 className="text-2xl font-serif text-neutral-800 mb-2 tracking-wide">{bookTitle}</h2>
                                 <div className="w-8 h-[1px] bg-neutral-300 mb-3" />
-                                <p className="text-xs text-neutral-500 uppercase tracking-widest">Interactive Edition</p>
+                                <p className="text-xs text-neutral-500 uppercase tracking-widest">Interactive volume</p>
                             </div>
                         )}
                     </div>

@@ -6,11 +6,13 @@ import { useState } from "react";
 import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameTimer } from "./GameShared";
 import { truthClaims, type TruthClaim } from "./gameData";
 
-type Verdict = "myth" | "fact" | "context";
+type Verdict = "myth" | "fact";
+type BinaryClaim = Omit<TruthClaim, "verdict"> & { verdict: Verdict };
+const binaryClaims = truthClaims.map((claim): BinaryClaim => ({ ...claim, verdict: claim.verdict === "fact" ? "fact" : "myth" }));
 
 export default function TruthPressGame() {
   const [phase, setPhase] = useState<"intro" | "play" | "result">("intro");
-  const [claims, setClaims] = useState<TruthClaim[]>(() => shuffleItems(truthClaims));
+  const [claims, setClaims] = useState<BinaryClaim[]>(() => shuffleItems(binaryClaims));
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<Verdict | null>(null);
   const [score, setScore] = useState(0);
@@ -32,12 +34,12 @@ export default function TruthPressGame() {
     else { setIndex((value) => value + 1); setSelected(null); }
   }
 
-  function reset() { setPhase("intro"); setIndex(0); setSelected(null); setScore(0); setCorrect(0); setClaims(shuffleItems(truthClaims)); resetTimer(); }
-  const badge = correct === claims.length ? "Chief Fact Checker" : correct >= 3 ? "Context Keeper" : "Evidence Apprentice";
+  function reset() { setPhase("intro"); setIndex(0); setSelected(null); setScore(0); setCorrect(0); setClaims(shuffleItems(binaryClaims)); resetTimer(); }
+  const badge = correct === claims.length ? "Chief Fact Checker" : correct >= 3 ? "Claim Reader" : "Evidence Apprentice";
 
   return (
-    <GameFrame gameId="truth-press" immersive={phase !== "intro"} title="The Truth Press" kicker="Game 02 · Claim investigation" progress={phase === "play" ? ((index + (selected ? 1 : 0)) / claims.length) * 100 : undefined}>
-      {phase === "intro" && <GameIntro gameId="truth-press" eyebrow="Myth, fact, or missing context?" title="Do not repeat the claim. Put it through the press." description="A claim can be false, true, or technically true while hiding the part that matters. Stamp your verdict, inspect the evidence and repair weak wording." rules={["Read the printed claim and choose Myth, Fact or Missing Context.", "Compare your verdict with the evidence and original source.", "When a claim is incomplete, read the repaired sentence that should be shared instead."]} onStart={() => setPhase("play")} />}
+    <GameFrame gameId="truth-press" immersive={phase !== "intro"} title="The Truth Press" kicker="Game 02 · Claim investigation" elapsedSeconds={phase === "intro" ? undefined : seconds} progress={phase === "play" ? ((index + (selected ? 1 : 0)) / claims.length) * 100 : undefined}>
+      {phase === "intro" && <GameIntro gameId="truth-press" eyebrow="Myth or fact?" title="Do not repeat the claim. Put it through the press." description="Read each statement, stamp it Myth or Fact, then inspect the evidence before the next sheet enters the press." rules={["Read the printed claim without guessing from the headline alone.", "Choose only Myth or Fact.", "Compare your verdict with the explanation and inspect the named source."]} onStart={() => setPhase("play")} />}
 
       {phase === "play" && (
         <section className="truth-stage">
@@ -47,12 +49,12 @@ export default function TruthPressGame() {
               <p className="game-kicker">Claim {index + 1} / {claims.length}</p>
               <blockquote>“{claim.claim}”</blockquote>
               <div className="stamp-options" role="group" aria-label="Choose a verdict">
-                {(["myth", "fact", "context"] as Verdict[]).map((verdict) => <button key={verdict} onClick={() => stamp(verdict)} disabled={Boolean(selected)} className={`${selected === verdict ? "stamp-selected" : ""} ${selected && claim.verdict === verdict ? "stamp-correct" : ""}`}><Stamp size={19} />{verdict === "context" ? "Missing context" : verdict}</button>)}
+                {(["myth", "fact"] as Verdict[]).map((verdict) => <button key={verdict} onClick={() => stamp(verdict)} disabled={Boolean(selected)} className={`${selected === verdict ? "stamp-selected" : ""} ${selected && claim.verdict === verdict ? "stamp-correct" : ""}`}><Stamp size={19} />{verdict}</button>)}
               </div>
               <AnimatePresence>
                 {selected && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="truth-evidence">
-                    <div className="truth-verdict-line"><span className={`verdict-${claim.verdict}`}>{claim.verdict === "context" ? "NEEDS CONTEXT" : claim.verdict.toUpperCase()}</span><strong>{selected === claim.verdict ? "+200 · Strong verdict" : "Correction printed"}</strong></div>
+                    <div className="truth-verdict-line"><span className={`verdict-${claim.verdict}`}>{claim.verdict.toUpperCase()}</span><strong>{selected === claim.verdict ? "+200 · Strong verdict" : "Correction printed"}</strong></div>
                     <p>{claim.explanation}</p>
                     {claim.repair && <div className="repair-strip"><small>Repair the claim</small>{claim.repair}</div>}
                     <div className="evidence-ticket"><span>Evidence note</span><p>{claim.evidence}</p><a href={claim.source} target="_blank" rel="noreferrer">Inspect source <ExternalLink size={13} /></a></div>
