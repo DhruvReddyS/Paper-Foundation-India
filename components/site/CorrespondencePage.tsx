@@ -36,7 +36,7 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
     }
   }
 
-  return <main className={`${styles.page} ${reporting ? styles.report : ""}`}>
+  return <main className={`${styles.page} ${reporting ? styles.report : styles.contact}`}>
     <section className={styles.intro}>
       <div className={styles.pageBanner}><span>Paper Foundation India</span><strong>{reporting ? "Report a claim" : "Contact us"}</strong><small>Public desk / {reporting ? "02" : "01"}</small></div>
       <div className={styles.copy}>
@@ -48,7 +48,7 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
           <p><FileSearch /> {reporting ? "Every report is checked for context and source quality." : "Every note is routed to the most relevant Foundation desk."}</p>
         </div>
         <div className={styles.switch}><Link className={!reporting ? styles.active : ""} href="/contact"><Mail /> Contact us</Link><Link className={reporting ? styles.active : ""} href="/report"><Flag /> Report a claim</Link></div>
-        <PaperMessenger reporting={reporting} />
+        {reporting ? <EvidenceDesk /> : <LetterpressDesk />}
       </div>
       <div className={styles.sheet}>
         {status === "sent" ? <div className={styles.success}><Check /><p>Correspondence filed</p><h2>{reporting ? "The claim is now in the review queue." : "Your note has reached the Foundation."}</h2><span>Thank you. The desk will use the email you supplied if more context is needed.</span><button onClick={() => setStatus("idle")}>Write another note</button></div> :
@@ -75,11 +75,31 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
   </main>;
 }
 
-function PaperMessenger({ reporting }: { reporting: boolean }) {
-  return <div className={styles.messenger} aria-hidden="true">
-    <div className={styles.orbit}><i /><i /><i /></div>
-    <div className={styles.character}><span className={styles.head} /><span className={styles.body} /><span className={styles.arm} /><span className={styles.hand} /><span className={styles.legs} /></div>
-    <div className={styles.letter}><small>{reporting ? "CLAIM / SOURCE / CONTEXT" : "HELLO / IDEA / QUESTION"}</small><strong>{reporting ? "FOR REVIEW" : "PUBLIC POST"}</strong><i /><i /><b>PFI</b></div>
-    <span className={styles.flyOne} /><span className={styles.flyTwo} />
+function LetterpressDesk() {
+  return <div className={styles.contactArtifact} aria-hidden="true">
+    <div className={styles.contactBook}>
+      <span>PUBLIC CORRESPONDENCE / 01</span>
+      <strong>Write the first line.</strong>
+      <p>IDEA · QUESTION · PARTNERSHIP</p>
+      <i /><i /><i />
+    </div>
+    <div className={styles.contactTabs}><span>A–F</span><span>G–P</span><span>Q–Z</span></div>
+    <div className={styles.contactEnvelope}><b>PFI</b><span>TO THE PUBLIC DESK</span><i /></div>
+    <div className={styles.contactClip} />
+  </div>;
+}
+
+function EvidenceDesk() {
+  return <div className={styles.reportArtifact} aria-hidden="true">
+    <div className={styles.reportBoard}>
+      <span>EVIDENCE FILE / OPEN</span>
+      <strong>“A claim without its source is only a loose sheet.”</strong>
+      <p>CLAIM → ORIGIN → BOUNDARY → CONTEXT</p>
+      <i className={styles.reportPinA} /><i className={styles.reportPinB} /><i className={styles.reportThread} />
+    </div>
+    <div className={styles.reportSlip}><span>01</span><b>CAPTURE</b><small>Exact wording</small></div>
+    <div className={styles.reportSlip}><span>02</span><b>TRACE</b><small>Original source</small></div>
+    <div className={styles.reportSlip}><span>03</span><b>CONTEXT</b><small>What surrounds it</small></div>
+    <div className={styles.reportMagnifier} />
   </div>;
 }

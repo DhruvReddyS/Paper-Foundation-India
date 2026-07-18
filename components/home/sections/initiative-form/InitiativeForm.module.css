@@ -408,3 +408,150 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Membership folio: a public register, not another illustration. */
+.hero {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 8% 24%, rgba(139, 157, 119, .35), transparent 24rem),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 6px),
+    #173020;
+}
+
+.joinCopy h1 { font-size: clamp(4rem, 6.9vw, 7.3rem); }
+.joinCopy aside { border-radius: 0; transform: none; border-left: 5px solid #d6a574; }
+
+.membershipFolio {
+  width: 480px;
+  height: 300px;
+  position: relative;
+  margin-top: 1.3rem;
+  pointer-events: none;
+}
+
+.memberRoll {
+  width: 300px;
+  min-height: 195px;
+  position: absolute;
+  left: 12px;
+  top: 28px;
+  display: flex;
+  flex-direction: column;
+  padding: 1.3rem;
+  color: #294132;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(49, 94, 64, .08) 28px),
+    #eee2cd;
+  box-shadow: 14px 17px 0 rgba(0,0,0,.15);
+  transform: rotate(-2deg);
+}
+
+.memberRoll::before {
+  width: 300px;
+  height: 17px;
+  position: absolute;
+  left: 0;
+  top: -16px;
+  background: #d9c6a5;
+  clip-path: polygon(0 65%, 4% 38%, 8% 62%, 12% 35%, 16% 64%, 20% 40%, 24% 61%, 28% 36%, 32% 63%, 36% 39%, 40% 65%, 44% 37%, 48% 62%, 52% 38%, 56% 66%, 60% 39%, 64% 63%, 68% 36%, 72% 64%, 76% 40%, 80% 62%, 84% 37%, 88% 64%, 92% 39%, 96% 62%, 100% 36%, 100% 100%, 0 100%);
+  content: "";
+}
+
+.memberRoll > span,
+.memberCard > span {
+  font: 600 .43rem/1 var(--font-mono);
+  letter-spacing: .11em;
+}
+
+.memberRoll > strong {
+  margin: auto 0 1rem;
+  font: 540 2rem/.96 var(--font-serif);
+}
+
+.memberRoll > i {
+  width: 82%;
+  height: 1px;
+  margin-top: .38rem;
+  background: rgba(49, 94, 64, .28);
+}
+
+.memberRoll > i:nth-of-type(2) { width: 64%; }
+.memberRoll > i:nth-of-type(3) { width: 75%; }
+
+.memberCard {
+  width: 165px;
+  height: 82px;
+  position: absolute;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  padding: .8rem;
+  color: #24372b;
+  background: #d5c39d;
+  box-shadow: 8px 9px 0 rgba(0,0,0,.12);
+}
+
+.memberCard:nth-of-type(2) { top: 8px; transform: rotate(3deg); }
+.memberCard:nth-of-type(3) { top: 102px; right: 20px; background: #aebfa5; transform: rotate(-2deg); }
+.memberCard:nth-of-type(4) { top: 196px; right: 3px; color: #f7eee2; background: #956443; transform: rotate(2deg); }
+.memberCard b { margin: auto 0; font: 550 1.2rem/1 var(--font-serif); }
+.memberCard i { width: 54px; height: 1px; background: currentColor; }
+
+.memberRibbon {
+  position: absolute;
+  left: -18px;
+  bottom: 5px;
+  padding: .55rem 1rem;
+  color: #173020;
+  background: #d6a574;
+  font: 600 .4rem/1 var(--font-mono);
+  letter-spacing: .12em;
+  transform: rotate(3deg);
+}
+
+.paper {
+  border: 1px solid #c9beae;
+  border-top: 6px solid #d6a574;
+  box-shadow: 18px 22px 0 rgba(214, 165, 116, .12);
+}
+
+.paper label {
+  position: relative;
+  padding: .35rem .55rem .1rem;
+  border: 1px solid transparent;
+  transition: border-color .25s, background .25s, transform .25s;
+}
+
+.paper label:focus-within {
+  border-color: rgba(49, 94, 64, .35);
+  background: rgba(49, 94, 64, .035);
+  transform: translateY(-2px);
+}
+
+.paper footer button {
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s, box-shadow .25s;
+}
+
+.paper footer button:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 5px 5px 0 #d6a574;
+}
+
+@media (max-height: 850px) and (min-width: 901px) {
+  .hero { padding-top: 4.8rem; padding-bottom: 2rem; }
+  .joinCopy > p { margin-top: 1.2rem; }
+  .joinCopy h1 { font-size: clamp(3.7rem, 5.8vw, 6rem); }
+  .joinCopy aside { margin-top: 1.1rem; }
+  .membershipFolio { height: 200px; margin-top: 0; transform: scale(.68); transform-origin: left top; }
+}
+
+@media (max-width: 900px) {
+  .membershipFolio { margin-inline: auto; }
+}
+
+@media (max-width: 620px) {
+  .membershipFolio { width: 450px; max-width: 100%; transform: scale(.76); transform-origin: left top; margin-bottom: -65px; }
+  .paper label { padding-inline: .25rem; }
+}

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { DM_Mono, DM_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 import "./games-rework.css";
+import "./transitions.css";
+import "./editorial-polish.css";
 
 const fraunces = Fraunces({
   subsets: ["latin"],

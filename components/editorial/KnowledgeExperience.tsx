@@ -5,7 +5,6 @@ import { ArrowRight, Clock, Feather, Layers3, Search, Sparkles, Sprout } from "l
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import type { CSSProperties } from "react";
 import { articleCatalog, articleCoverImage } from "@/content/articleCatalog";
 const categories = ["All", "Forestry", "Recovery", "Method", "Production", "Education", "Use"];
 const deskNotes = [
@@ -33,23 +32,6 @@ export default function KnowledgeExperience() {
       </div>
       <label><Search /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search articles" /><span>{filtered.length}</span></label>
     </section>
-
-    {!query && category === "All" && <section className="articles-featured-gateway">
-      <div className="articles-featured-gateway-copy">
-        <p><Sparkles /> The feature room</p>
-        <h2>Ten stories given<br /><em>more room to breathe.</em></h2>
-        <span>Long-form reporting, deeper evidence notes and richer visual essays live in a separate reading room.</span>
-        <Link href="/knowledge/featured">Enter the featured collection <ArrowRight /></Link>
-      </div>
-      <div className="articles-featured-gateway-stack" aria-label="Featured article preview">
-        {featured.slice(0, 3).map((article, index) => <Link key={article.slug} href={`/knowledge/${article.slug}`} style={{ "--feature-index": index } as CSSProperties}>
-          <Image src={articleCoverImage(article)} alt="" fill sizes="320px" />
-          <span>FEATURE {String(index + 1).padStart(2, "0")}</span>
-          <strong>{article.title}</strong>
-          <small>{article.time} read</small>
-        </Link>)}
-      </div>
-    </section>}
 
     <nav className="articles-category-tabs" aria-label="Article categories">
       {categories.map(item => <button key={item} onClick={() => setCategory(item)} className={category === item ? "is-active" : ""}>{item}</button>)}

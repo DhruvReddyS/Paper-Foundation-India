@@ -67,6 +67,7 @@ export default function InitiativeForm() {
             <ShieldCheck />
             <div><small>Main objective</small><strong>Love paper. Encourage its responsible use.</strong></div>
           </aside>
+          <MembershipFolio />
         </div>
         <div className={styles.paper}>
           <header>
@@ -155,5 +156,21 @@ export default function InitiativeForm() {
         </Link>
       </section>
     </main>
+  );
+}
+
+function MembershipFolio() {
+  return (
+    <div className={styles.membershipFolio} aria-hidden="true">
+      <div className={styles.memberRoll}>
+        <span>FOUNDATION REGISTER / OPEN</span>
+        <strong>People who put evidence behind the work.</strong>
+        <i /><i /><i />
+      </div>
+      <div className={styles.memberCard}><span>MEMBER / 01</span><b>Education</b><i /></div>
+      <div className={styles.memberCard}><span>MEMBER / 02</span><b>Industry</b><i /></div>
+      <div className={styles.memberCard}><span>MEMBER / 03</span><b>Public life</b><i /></div>
+      <div className={styles.memberRibbon}>PAPER FOUNDATION INDIA · OPEN REGISTER</div>
+    </div>
   );
 }
