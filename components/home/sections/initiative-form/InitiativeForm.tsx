@@ -49,37 +49,25 @@ export default function InitiativeForm() {
           <strong>Join us</strong>
           <small>Membership desk / 03</small>
         </div>
-        <Link href="/">
-          <ArrowLeft /> Back to home
-        </Link>
-        <p>Membership correspondence</p>
-        <h1>
-          Put your name
-          <br />
-          <em>behind the work.</em>
-        </h1>
-        <span>
-          Complete the digital version of the Foundation&apos;s official
-          application. There is no financial commitment or membership fee.
-        </span>
-      </section>
-      <section className={styles.application}>
-        <aside>
-          <div>
+        <div className={styles.joinCopy}>
+          <Link href="/">
+            <ArrowLeft /> Back to home
+          </Link>
+          <p>Membership correspondence</p>
+          <h1>
+            Put your name
+            <br />
+            <em>behind the work.</em>
+          </h1>
+          <span>
+            Complete the digital version of the Foundation&apos;s official
+            application. There is no financial commitment or membership fee.
+          </span>
+          <aside>
             <ShieldCheck />
-            <small>Main objective</small>
-            <h2>Love paper. Encourage its responsible use.</h2>
-            <p>
-              Support myth-busting, fight greenwashing, build awareness of new
-              paper applications and promote Indian-made paper and paper
-              products.
-            </p>
-          </div>
-          <blockquote>
-            “I value the objectives of the Foundation and want to support the
-            movement without any financial commitment or membership fee.”
-          </blockquote>
-        </aside>
+            <div><small>Main objective</small><strong>Love paper. Encourage its responsible use.</strong></div>
+          </aside>
+        </div>
         <div className={styles.paper}>
           <header>
             <div>

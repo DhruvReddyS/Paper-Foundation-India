@@ -7,21 +7,22 @@
   min-height: calc(100svh - 72px);
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 0.88fr;
+  grid-template-columns: 0.82fr 1.18fr;
   align-items: center;
-  gap: 4rem;
-  padding: clamp(5rem, 8vw, 8rem) max(24px, calc((100% - 1220px) / 2));
+  gap: clamp(2rem, 5vw, 5rem);
+  padding: clamp(5.5rem, 7vw, 7rem) max(24px, calc((100% - 1260px) / 2)) 4rem;
   background:
     radial-gradient(
       circle at 12% 18%,
       rgba(139, 157, 119, 0.32),
       transparent 30rem
     ),
-    linear-gradient(105deg, #f7f2e9 0 58%, #203b2a 58%);
+    linear-gradient(105deg, #f7f2e9 0 47%, #203b2a 47%);
 }
 .copy {
   position: relative;
   z-index: 2;
+  align-self: center;
 }
 .copy > p {
   display: flex;
@@ -102,6 +103,18 @@
   position: relative;
   display: grid;
   place-items: center;
+}
+.copy .messenger {
+  width: 470px;
+  min-height: 360px;
+  position: absolute;
+  z-index: -1;
+  right: -60px;
+  bottom: -250px;
+  opacity: 0.3;
+  pointer-events: none;
+  transform: scale(0.72);
+  transform-origin: center;
 }
 .orbit {
   width: min(510px, 43vw);
@@ -327,6 +340,10 @@
   box-shadow:
     18px 24px 0 rgba(255, 255, 255, 0.07),
     0 35px 75px rgba(0, 0, 0, 0.22);
+}
+.intro > .sheet {
+  width: 100%;
+  align-self: center;
 }
 .sheet:before {
   content: "";
@@ -560,8 +577,12 @@
     padding-bottom: 3rem;
     background: linear-gradient(165deg, #f7f2e9 0 62%, #203b2a 62%);
   }
-  .messenger {
-    min-height: 480px;
+  .copy {
+    padding-bottom: 2rem;
+  }
+  .copy .messenger {
+    right: -80px;
+    bottom: -240px;
   }
   .orbit {
     width: 460px;
@@ -583,8 +604,8 @@
   .copy h1 {
     font-size: clamp(3.7rem, 16vw, 5rem);
   }
-  .messenger {
-    min-height: 390px;
+  .copy .messenger {
+    display: none;
   }
   .character {
     left: 1%;

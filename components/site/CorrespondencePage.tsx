@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ExternalLink, FileSearch, Flag, Mail, Paperclip, Send, ShieldCheck } from "lucide-react";
+import { Check, ExternalLink, FileSearch, Flag, Mail, Send, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import styles from "./CorrespondencePage.module.css";
@@ -48,12 +48,8 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
           <p><FileSearch /> {reporting ? "Every report is checked for context and source quality." : "Every note is routed to the most relevant Foundation desk."}</p>
         </div>
         <div className={styles.switch}><Link className={!reporting ? styles.active : ""} href="/contact"><Mail /> Contact us</Link><Link className={reporting ? styles.active : ""} href="/report"><Flag /> Report a claim</Link></div>
+        <PaperMessenger reporting={reporting} />
       </div>
-      <PaperMessenger reporting={reporting} />
-    </section>
-
-    <section className={styles.desk}>
-      <aside><small>DESK NOTE · {reporting ? "02" : "01"}</small><strong>{reporting ? "Evidence first. Reach second." : "A clear note gets a clearer reply."}</strong><p>{reporting ? "Please link to the original material when possible. Screenshots help when posts may disappear." : "Choose the closest subject and include the outcome you are hoping for."}</p><Paperclip /></aside>
       <div className={styles.sheet}>
         {status === "sent" ? <div className={styles.success}><Check /><p>Correspondence filed</p><h2>{reporting ? "The claim is now in the review queue." : "Your note has reached the Foundation."}</h2><span>Thank you. The desk will use the email you supplied if more context is needed.</span><button onClick={() => setStatus("idle")}>Write another note</button></div> :
           <form onSubmit={submit}>
