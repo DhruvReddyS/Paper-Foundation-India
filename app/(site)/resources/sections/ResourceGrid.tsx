@@ -13,8 +13,8 @@ const types = ["All", "Report", "Guide", "Standard", "Data portal", "Toolkit", "
 const sources = ["All sources", "Government", "Intergovernmental", "Standards body"];
 const iconFor = (type: string) => type === "Data portal" ? BarChart3 : type === "Toolkit" ? GraduationCap : type === "Standard" ? FileText : type === "Report" || type === "Research" ? BookOpen : Library;
 
-export default function ResourceGrid() {
-  const [query, setQuery] = useState("");
+export default function ResourceGrid({ initialSearch = "" }: { initialSearch?: string }) {
+  const [query, setQuery] = useState(initialSearch);
   const [type, setType] = useState("All");
   const [source, setSource] = useState("All sources");
 

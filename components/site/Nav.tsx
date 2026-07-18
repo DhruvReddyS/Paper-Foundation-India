@@ -30,6 +30,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { GooeySearch } from "@/components/ui/gooey-search";
+import { searchSite } from "@/content/searchIndex";
 
 type NavItem = { href: string; label: string; description: string; icon: LucideIcon };
 type NavGroup = { label: string; slug: string; eyebrow: string; introduction: string; items: NavItem[] };
@@ -85,13 +86,6 @@ const navGroups: NavGroup[] = [
       { href: "/report", label: "Report a Claim", description: "Send misinformation for review", icon: Flag },
     ],
   },
-];
-
-const navSearchEntries = [
-  { label: "Home", href: "/" },
-  { label: "Myths vs Facts", href: "/myths" },
-  { label: "Paper Journey", href: "/journey" },
-  ...navGroups.flatMap((group) => group.items.map((item) => ({ label: item.label, href: item.href }))),
 ];
 
 function routeMatches(pathname: string, href: string) {
@@ -159,28 +153,24 @@ export default function Nav() {
             <Link href="/contact" className="site-nav-contact"><Mail /> Contact</Link>
           </div>
           <GooeySearch
+            key={`desktop-search-${pathname}`}
             className="site-gooey-search hidden md:inline-flex"
-            items={navSearchEntries.map((item) => item.label)}
+            onSearch={(query) => searchSite(query, 7)}
             buttonLabel="Search"
-            placeholder="Find a page..."
-            maxResults={5}
-            debounceMs={180}
-            onSelect={(label) => {
-              const result = navSearchEntries.find((item) => item.label === label);
-              if (result) router.push(result.href);
-            }}
+            placeholder="Search everything..."
+            maxResults={7}
+            debounceMs={90}
+            onSelect={(result) => { if (result.href) router.push(result.href); }}
           />
           <GooeySearch
+            key={`mobile-search-${pathname}`}
             className="site-gooey-search md:hidden"
-            items={navSearchEntries.map((item) => item.label)}
+            onSearch={(query) => searchSite(query, 7)}
             buttonLabel="Search"
-            placeholder="Find a page..."
-            maxResults={6}
-            debounceMs={120}
-            onSelect={(label) => {
-              const result = navSearchEntries.find((item) => item.label === label);
-              if (result) router.push(result.href);
-            }}
+            placeholder="Search everything..."
+            maxResults={7}
+            debounceMs={70}
+            onSelect={(result) => { if (result.href) router.push(result.href); }}
           />
           <button type="button" className="site-menu-toggle xl:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} aria-controls="mobile-navigation">
             {mobileOpen ? <X size={21} /> : <Menu size={21} />}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo, useId } from "react";
+import { useState, useRef, useEffect, useMemo, useId, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -46,10 +46,10 @@ const getResultVariants = (index: number, unsupported: boolean) => ({
 });
 
 const getResultTransition = (index: number) => ({
-  duration: 0.75,
-  delay: index * 0.12,
+  duration: 0.42,
+  delay: index * 0.055,
   type: "spring" as const,
-  bounce: 0.35,
+  bounce: 0.22,
   filter: { ease: "easeInOut" },
 });
 
@@ -138,17 +138,25 @@ function InfoSvgIcon({ index }: { index: number }) {
 
 // ── Public types ─────────────────────────────────────────────────────────────
 
+export type GooeySearchResult = {
+  id: string;
+  label: string;
+  href?: string;
+  type?: string;
+  description?: string;
+};
+
 export interface GooeySearchProps {
-  /** Strings to search locally. Ignored when `onSearch` is provided. */
-  items?: string[];
+  /** Search result records. Ignored when `onSearch` is provided. */
+  items?: GooeySearchResult[];
   /** Async/sync custom search function for external data sources. */
-  onSearch?: (query: string) => Promise<string[]> | string[];
+  onSearch?: (query: string) => Promise<GooeySearchResult[]> | GooeySearchResult[];
   /** Input placeholder text. */
   placeholder?: string;
   /** Label shown on the collapsed button. */
   buttonLabel?: string;
   /** Called when the user clicks a result item. */
-  onSelect?: (item: string) => void;
+  onSelect?: (item: GooeySearchResult) => void;
   /** Extra class names for the outermost wrapper. */
   className?: string;
   /** Input debounce delay in ms. Defaults to 500. */
@@ -173,9 +181,10 @@ export function GooeySearch({
   const filterId = `gooey-search-${uid}`;
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState<1 | 2>(1);
   const [searchText, setSearchText] = useState("");
-  const [results, setResults] = useState<string[]>([]);
+  const [results, setResults] = useState<GooeySearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const isUnsupported = useMemo(() => detectUnsupportedBrowser(), []);
@@ -187,27 +196,56 @@ export function GooeySearch({
     if (step === 2) inputRef.current?.focus();
   }, [step]);
 
+  const closeSearch = useCallback(() => {
+    setStep(1);
+    setSearchText("");
+    setResults([]);
+    setIsLoading(false);
+    inputRef.current?.blur();
+  }, []);
+
+  useEffect(() => {
+    if (step === 1) return;
+    const closeOutside = (event: PointerEvent) => {
+      if (!wrapperRef.current?.contains(event.target as Node)) closeSearch();
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeSearch();
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOutside);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [closeSearch, step]);
+
   useEffect(() => {
     let cancelled = false;
 
     // All state writes live inside the async closure so none run synchronously
     // in the effect body (keeps React from cascading renders).
     const run = async () => {
-      if (!debouncedQuery) {
+      if (step === 1 || !debouncedQuery) {
         setResults([]);
         setIsLoading(false);
+        return;
+      }
+      if (searchText.trim() !== debouncedQuery.trim()) {
+        setResults([]);
+        setIsLoading(Boolean(searchText.trim()));
         return;
       }
 
       setIsLoading(true);
       try {
-        let data: string[];
+        let data: GooeySearchResult[];
         if (onSearch) {
           data = await onSearch(debouncedQuery);
         } else {
           await new Promise<void>((r) => setTimeout(r, 300));
           data = items.filter((item) =>
-            item.toLowerCase().includes(debouncedQuery.trim().toLowerCase())
+            `${item.label} ${item.description ?? ""}`.toLowerCase().includes(debouncedQuery.trim().toLowerCase())
           );
         }
         if (!cancelled) setResults(data.slice(0, maxResults));
@@ -218,13 +256,18 @@ export function GooeySearch({
 
     run();
     return () => { cancelled = true; };
-  }, [debouncedQuery, items, onSearch, maxResults]);
+  }, [debouncedQuery, items, onSearch, maxResults, searchText, step]);
 
   const btnPadding = isUnsupported ? "5px 10px" : "10px 20px";
   const resultPadding = isUnsupported ? "7.5px 10px" : "12.5px 20px";
+  const selectResult = (item: GooeySearchResult) => {
+    closeSearch();
+    onSelect?.(item);
+  };
 
   return (
     <motion.div
+      ref={wrapperRef}
       className={cn("relative inline-flex items-center justify-end", className)}
       initial={false}
       animate={{ width: step === 1 ? 100 : 238 }}
@@ -273,18 +316,23 @@ export function GooeySearch({
             key="results-wrapper"
             role="listbox"
             aria-label="Search results"
-            style={{ position: "absolute", zIndex: -1, left: 0, top: 0, width: 184 }}
+            style={{ position: "absolute", zIndex: -1, left: 0, top: 0, width: 238 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ delay: isUnsupported ? 0.5 : 1.25, duration: 0.5 }}
           >
             <AnimatePresence mode="popLayout">
               {results.map((item, index) => (
                 <motion.div
-                  key={item}
+                  key={item.id}
                   role="option"
                   tabIndex={0}
-                  onClick={() => onSelect?.(item)}
-                  onKeyDown={(e) => e.key === "Enter" && onSelect?.(item)}
+                  onClick={() => selectResult(item)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      selectResult(item);
+                    }
+                  }}
                   whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
                   variants={getResultVariants(index, isUnsupported)}
                   initial="initial"
@@ -303,15 +351,16 @@ export function GooeySearch({
                     cursor: "pointer",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
                     <InfoSvgIcon index={index} />
                     <motion.span
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: index * 0.12 + 0.3 }}
-                      style={{ position: "relative", top: -0.35 }}
+                      style={{ position: "relative", top: -0.35, minWidth: 0, flex: 1 }}
                     >
-                      {item}
+                      <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.label}</span>
+                      {item.type && <small style={{ display: "block", marginTop: 1, fontSize: 9, letterSpacing: ".12em", opacity: .62, textTransform: "uppercase" }}>{item.type}</small>}
                     </motion.span>
                   </div>
                 </motion.div>
@@ -327,9 +376,16 @@ export function GooeySearch({
           animate={step === 1 ? "step1" : "step2"}
           transition={{ duration: 0.75, type: "spring", bounce: 0.15 }}
           onClick={() => step === 1 && setStep(2)}
+          onKeyDown={(event) => {
+            if (step === 1 && (event.key === "Enter" || event.key === " ")) {
+              event.preventDefault();
+              setStep(2);
+            }
+          }}
           whileHover={{ scale: step === 2 ? 1 : 1.05 }}
           whileTap={{ scale: 0.95 }}
           role={step === 1 ? "button" : undefined}
+          tabIndex={step === 1 ? 0 : -1}
           aria-label={step === 1 ? "Open search" : undefined}
           style={{
             position: "absolute",
@@ -368,7 +424,17 @@ export function GooeySearch({
               className="gooey-search-input"
               placeholder={placeholder}
               aria-label="Search input"
-              onChange={(e) => setSearchText(e.target.value)}
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                setResults([]);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && results[0]) {
+                  event.preventDefault();
+                  selectResult(results[0]);
+                }
+              }}
               style={{
                 width: "100%",
                 backgroundColor: "transparent",

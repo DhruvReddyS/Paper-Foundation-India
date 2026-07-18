@@ -75,7 +75,7 @@ export default function FeaturedArticlesExperience() {
       <section className="feature-vault-ledger">
         <header>
           <div><p>THE EDITORIAL LEDGER</p><h2>Seven more<br />field dossiers.</h2></div>
-          <p>Each selection pairs a distinct visual cover with its scope, reading time and editorial reason for being here.</p>
+          <p>Together, these dossiers follow fibre through landscapes, mills, products, collection networks and its next useful life.</p>
         </header>
         <div>
           {ledger.map((article, index) => (

@@ -18,7 +18,7 @@ const items = [
 export default function EverydayGrid() {
   return (
     <section className={styles.section}>
-      <header><div><p>Everyday atlas / nine object files</p><h2>Open the object.<br />Read the material job.</h2></div><p>Each reveal stays inside its own card, so the archive never jumps or pushes an entire row.</p></header>
+      <header><div><p>Everyday atlas / nine object files</p><h2>Open the object.<br />Read the material job.</h2></div><p>Look past the surface: fibre, strength, barriers and recovery routes change with the job each object performs.</p></header>
       <div className={styles.grid}>{items.map((item, index) => <EverydayCard key={item.title} item={item} index={index} />)}</div>
     </section>
   );

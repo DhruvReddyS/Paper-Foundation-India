@@ -52,7 +52,7 @@ export default function KnowledgeExperience() {
             </i>
           ))}
         </div>
-        <p>Long-form essays selected for method, context and visual storytelling.</p>
+        <p>Long-form essays selected for method, context and evidence.</p>
       </Link>
     )}
 

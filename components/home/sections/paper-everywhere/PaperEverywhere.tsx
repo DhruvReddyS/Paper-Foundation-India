@@ -53,7 +53,7 @@ export default function PaperEverywhere() {
       <div className={styles.copy}>
         <p>Paper Everywhere · seven field notes</p>
         <h2 id="everywhere-title">The material hiding <em>in plain sight.</em></h2>
-        <span>Keep scrolling. Each ordinary scene reveals another job paper performs without asking for attention.</span>
+        <span>Ordinary scenes carry specialised grades, fibres and functions that are easy to overlook.</span>
         <div className={styles.counter}><strong>{moments[active].no}</strong><span>{moments[active].label}</span></div>
         <Link href="/everyday-paper">Open the complete paper atlas <ArrowRight /></Link>
       </div>

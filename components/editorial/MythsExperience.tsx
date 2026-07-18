@@ -17,10 +17,10 @@ const categories = [
 const categoryFor = (index: number) => categories.find(([, end]) => index < end)?.[0] ?? "Paper systems";
 const categorySlug = (category: string) => category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-export default function MythsExperience() {
+export default function MythsExperience({ initialSearch = "" }: { initialSearch?: string }) {
   const reduced = useReducedMotion();
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialSearch);
   const [activeCategory, setActiveCategory] = useState(categories[0][0] as string);
   const library = useMemo(() => handbookCards.map((card, index) => ({ ...card, category: categoryFor(index), number: index + 1 })), []);
   const grouped = useMemo(() => categories.map(([name], index) => ({
@@ -66,7 +66,7 @@ export default function MythsExperience() {
     </section>
 
     <section id="myth-library" className="myth-library-premium myth-evidence-wall">
-      <header><div><p className="premium-kicker">Browse by evidence category</p><h2>Choose a subject.<br />Open one dossier.</h2></div><p>No collapsing shelves and no broken grid. Pick a category, then open any card in a focused evidence reader without disturbing the wall behind it.</p></header>
+      <header><div><p className="premium-kicker">Browse by evidence category</p><h2>Choose a subject.<br />Open one dossier.</h2></div><p>Compare each claim with the evidence-based reality, its boundary and the context that applies in India.</p></header>
       <label className="myth-search-desk"><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search all sixty claims..." /><span>{String(filteredLibrary.length).padStart(2, "0")} cases</span></label>
 
       <div className="myth-library-layout">
@@ -78,7 +78,7 @@ export default function MythsExperience() {
         <div className="myth-library-cases">
           <div className="myth-wall-heading">
             <div><span>{query ? "SEARCH RESULTS" : activeGroup.slug.replaceAll("-", " / ").toUpperCase()}</span><h3>{query ? `${filteredLibrary.length} matching dossiers` : activeGroup.name}</h3></div>
-            <p>Press the seal. The card changes face without moving the row.</p>
+            <p>Break a seal to read the evidence-based reality and its Indian context.</p>
           </div>
 
           <motion.div layout className="myth-evidence-grid">

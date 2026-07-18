@@ -6,6 +6,7 @@ export const metadata = {
     "A comprehensive A–Z glossary of paper industry and sustainability terminology.",
 };
 
-export default function GlossaryPage() {
-  return <GlossaryTermList />;
+export default async function GlossaryPage({ searchParams }: { searchParams: Promise<{ search?: string }> }) {
+  const { search = "" } = await searchParams;
+  return <GlossaryTermList key={search} initialSearch={search} />;
 }

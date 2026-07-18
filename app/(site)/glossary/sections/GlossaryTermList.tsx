@@ -7,8 +7,8 @@ import { glossaryAlphabet as alphabet, glossaryData, glossaryTermCount as termCo
 import styles from "./Glossary.module.css";
 const availableLetters = Object.keys(glossaryData);
 
-export default function GlossaryTermList() {
-  const [query, setQuery] = useState("");
+export default function GlossaryTermList({ initialSearch = "" }: { initialSearch?: string }) {
+  const [query, setQuery] = useState(initialSearch);
   const [letter, setLetter] = useState("ALL");
 
   const groups = useMemo(() => {

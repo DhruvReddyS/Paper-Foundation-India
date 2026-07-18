@@ -27,7 +27,7 @@ export default function MythsFairly() {
     <div className={styles.newsTicker} aria-hidden="true"><span>CASE FILES</span><p>Move past the headline · reveal the missing context · evidence before assumption</p><i>EDITION 02</i></div>
     <header className={styles.heading} data-reveal>
       <div><p><Scale /> Myth vs fact</p><h2 id="fair-title">Turn the whole page. <em><span>Read</span> both sides.</em></h2></div>
-      <p>No hidden half-sentences. Each claim now opens as a complete two-page evidence spread.</p>
+      <p>A claim becomes useful only when its source, boundary and missing context travel with it.</p>
     </header>
 
     <div className={`${styles.reader} ${tested ? styles.tested : ""}`} data-reveal="right" onPointerMove={tilt} onPointerLeave={(event) => { event.currentTarget.style.setProperty("--reader-x", "0deg"); event.currentTarget.style.setProperty("--reader-y", "0deg"); }}>

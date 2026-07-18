@@ -29,21 +29,16 @@ export default function PageTransition({ children }: { children: React.ReactNode
   const reduced = useReducedMotion();
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={pathname}
-        className="paper-page-transition"
-        initial={reduced ? false : { opacity: 0, y: 18, filter: "blur(4px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={reduced ? undefined : { opacity: 0, y: -12, filter: "blur(3px)" }}
-        transition={{ duration: reduced ? 0 : 0.48, ease: [0.22, 1, 0.36, 1] }}
-      >
+    <div className="paper-page-transition">
+      <AnimatePresence mode="popLayout" initial={false}>
         {!reduced && (
           <motion.div
+            key={pathname}
             className="route-paper-transition"
             aria-hidden="true"
             initial={{ y: "0%" }}
             animate={{ y: "-105%" }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.86, delay: 0.22, ease: [0.76, 0, 0.24, 1] }}
           >
             <div className="route-paper-grain" />
@@ -68,8 +63,8 @@ export default function PageTransition({ children }: { children: React.ReactNode
             <div className="route-paper-edge" />
           </motion.div>
         )}
-        {children}
-      </motion.div>
-    </AnimatePresence>
+      </AnimatePresence>
+      {children}
+    </div>
   );
 }

@@ -6,6 +6,7 @@ export const metadata = {
     "Access curated research papers, reports, toolkits, and infographics about India's paper industry and sustainability.",
 };
 
-export default function ResourcesPage() {
-  return <ResourceGrid />;
+export default async function ResourcesPage({ searchParams }: { searchParams: Promise<{ search?: string }> }) {
+  const { search = "" } = await searchParams;
+  return <ResourceGrid key={search} initialSearch={search} />;
 }
