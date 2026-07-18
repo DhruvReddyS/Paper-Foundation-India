@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useMemo, useId, useCallback } from "react"
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+const EMPTY_RESULTS: GooeySearchResult[] = [];
+
 // ── Utilities ────────────────────────────────────────────────────────────────
 
 function detectUnsupportedBrowser(): boolean {
@@ -41,7 +43,7 @@ const iconMotionVariants = {
 
 const getResultVariants = (index: number, unsupported: boolean) => ({
   initial: { y: 0, scale: 0.3, filter: unsupported ? "none" : "blur(10px)" },
-  animate: { y: (index + 1) * 50, scale: 1, filter: "blur(0px)" },
+  animate: { y: (index + 1) * 54, scale: 1, filter: "blur(0px)" },
   exit: { y: unsupported ? 0 : -4, scale: 0.8 },
 });
 
@@ -119,7 +121,7 @@ function InfoSvgIcon({ index }: { index: number }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ delay: index * 0.12 + 0.3 }}
+      transition={{ delay: index * 0.04 + 0.1 }}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 15 15"
       fill="none"
@@ -168,7 +170,7 @@ export interface GooeySearchProps {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function GooeySearch({
-  items = [],
+  items = EMPTY_RESULTS,
   onSearch,
   placeholder = "Type to search...",
   buttonLabel = "Search",
@@ -226,7 +228,8 @@ export function GooeySearch({
     // All state writes live inside the async closure so none run synchronously
     // in the effect body (keeps React from cascading renders).
     const run = async () => {
-      if (step === 1 || !debouncedQuery) {
+      if (step === 1) return;
+      if (!debouncedQuery) {
         setResults([]);
         setIsLoading(false);
         return;
@@ -316,7 +319,7 @@ export function GooeySearch({
             key="results-wrapper"
             role="listbox"
             aria-label="Search results"
-            style={{ position: "absolute", zIndex: -1, left: 0, top: 0, width: 238 }}
+            style={{ position: "absolute", zIndex: -1, left: -62, top: 0, width: 300 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ delay: isUnsupported ? 0.5 : 1.25, duration: 0.5 }}
           >
@@ -356,7 +359,7 @@ export function GooeySearch({
                     <motion.span
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.12 + 0.3 }}
+                      transition={{ delay: index * 0.04 + 0.1 }}
                       style={{ position: "relative", top: -0.35, minWidth: 0, flex: 1 }}
                     >
                       <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.label}</span>

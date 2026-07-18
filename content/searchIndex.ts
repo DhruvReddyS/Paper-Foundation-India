@@ -122,6 +122,15 @@ function scoreEntry(entry: SiteSearchEntry, query: string) {
   if (label.includes(needle)) score += 45;
   if (description.includes(needle)) score += 24;
   if (keywords.includes(needle)) score += 16;
+  score += {
+    Page: 18,
+    Featured: 12,
+    Article: 10,
+    Glossary: 10,
+    Resource: 8,
+    Game: 8,
+    "Myth & fact": 0,
+  }[entry.type];
   for (const word of words) {
     if (label.split(" ").includes(word)) score += 18;
     else if (label.includes(word)) score += 10;
@@ -132,10 +141,22 @@ function scoreEntry(entry: SiteSearchEntry, query: string) {
 }
 
 export function searchSite(query: string, limit = 7) {
-  return siteSearchIndex
+  const ranked = siteSearchIndex
     .map((entry, position) => ({ entry, position, score: scoreEntry(entry, query) }))
     .filter((result) => result.score > 0)
-    .sort((a, b) => b.score - a.score || a.position - b.position)
-    .slice(0, limit)
-    .map(({ entry }) => entry);
+    .sort((a, b) => b.score - a.score || a.position - b.position);
+
+  const singleWord = normalise(query).split(/\s+/).length === 1;
+  if (!singleWord) return ranked.slice(0, limit).map(({ entry }) => entry);
+
+  const typeCounts = new Map<SearchEntryType, number>();
+  const varied: SiteSearchEntry[] = [];
+  for (const { entry } of ranked) {
+    const count = typeCounts.get(entry.type) ?? 0;
+    if (count >= 2) continue;
+    varied.push(entry);
+    typeCounts.set(entry.type, count + 1);
+    if (varied.length === limit) break;
+  }
+  return varied;
 }

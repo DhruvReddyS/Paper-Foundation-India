@@ -155,20 +155,20 @@ export default function Nav() {
           <GooeySearch
             key={`desktop-search-${pathname}`}
             className="site-gooey-search hidden md:inline-flex"
-            onSearch={(query) => searchSite(query, 7)}
+            onSearch={(query) => searchSite(query, 6)}
             buttonLabel="Search"
             placeholder="Search everything..."
-            maxResults={7}
+            maxResults={6}
             debounceMs={90}
             onSelect={(result) => { if (result.href) router.push(result.href); }}
           />
           <GooeySearch
             key={`mobile-search-${pathname}`}
             className="site-gooey-search md:hidden"
-            onSearch={(query) => searchSite(query, 7)}
+            onSearch={(query) => searchSite(query, 6)}
             buttonLabel="Search"
             placeholder="Search everything..."
-            maxResults={7}
+            maxResults={6}
             debounceMs={70}
             onSelect={(result) => { if (result.href) router.push(result.href); }}
           />
