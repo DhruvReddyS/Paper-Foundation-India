@@ -1,2 +1,2 @@
-import React from 'react';
-export default function AdminGlossary() { return <div>Glossary Manager</div>; }
+import AdminRecords from "@/components/admin/AdminRecords";
+export default function Page() { return <AdminRecords mode="glossary" />; }

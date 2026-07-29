@@ -35,7 +35,7 @@ export const journeySpreads: JourneySpread[] = [
     title: "A sheet begins before the paper machine",
     body: [
       "Paper is made from cellulose fibre, water, energy and carefully chosen process inputs. Its route can begin with responsibly sourced fresh fibre, recovered paper, or a blend selected for the product.",
-      "No single recipe describes every sheet. This book follows the main decisions that turn separated fibre into paper—and help useful fibre return.",
+      "No single recipe describes every sheet. This book follows the main decisions that turn separated fibre into paper, and help useful fibre return.",
     ],
     stat: "LOOK CLOSER",
     statLabel: "Every grade begins with a purpose and a fibre plan",
@@ -194,7 +194,7 @@ export const journeySpreads: JourneySpread[] = [
       "Papermakers blend fibre types and add process or functional ingredients according to the required strength, printability, absorbency, colour and durability.",
     ],
     stat: "BALANCE",
-    statLabel: "Performance comes from a controlled furnish—not one fibre alone",
+    statLabel: "Performance comes from a controlled furnish, not one fibre alone",
     image: "/images/journey/spreads-v2/spread6.jpg",
     images: [
       {
@@ -217,7 +217,7 @@ export const journeySpreads: JourneySpread[] = [
     title: "A dilute flow becomes a continuous web",
     body: [
       "The prepared furnish is distributed evenly onto a moving forming fabric. Water drains away as fibres settle, overlap and begin to create a continuous wet web.",
-      "Flow, drainage and machine conditions shape formation—the evenness that influences how the finished paper looks and performs.",
+      "Flow, drainage and machine conditions shape formation, the evenness that influences how the finished paper looks and performs.",
     ],
     stat: "FORM",
     statLabel: "Distribute · drain · interlock",
@@ -359,7 +359,7 @@ export const journeySpreads: JourneySpread[] = [
     title: "The next sheet begins with connected choices",
     body: [
       "Collected paper is graded and prepared to enter another papermaking cycle when its fibre and condition suit the next product. Yield is never absolute: contaminants are removed and fibres gradually shorten through repeated processing.",
-      "Circular paper systems therefore connect effective recovery with responsible fresh-fibre inputs. The loop is not a claim on a label—it is the result of sourcing, design, use, collection and mill decisions working together.",
+      "Circular paper systems therefore connect effective recovery with responsible fresh-fibre inputs. The loop is not a claim on a label, it is the result of sourcing, design, use, collection and mill decisions working together.",
     ],
     stat: "CONTINUE",
     statLabel: "Source responsibly · design intelligently · recover effectively",

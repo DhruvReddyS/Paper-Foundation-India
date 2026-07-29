@@ -22,7 +22,7 @@ const sampleCorrections: CorrectionEntry[] = [
     date: '2024-12-15',
     articleTitle: 'The Water Footprint of Paper Production',
     originalText: 'Paper production uses 10,000 litres per tonne.',
-    correctedText: 'Paper production uses approximately 10–20 cubic metres per tonne, varying by mill.',
+    correctedText: 'Paper production uses approximately 10-20 cubic metres per tonne, varying by mill.',
     reason: 'Updated with more accurate range from IPPTA 2024 data.',
   },
   {

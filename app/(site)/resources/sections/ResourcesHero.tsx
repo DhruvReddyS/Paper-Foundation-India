@@ -34,7 +34,7 @@ export default function ResourcesHero() {
           transition={{ delay: 0.2 }}
           className="text-lg md:text-xl text-paper-warm/80 max-w-2xl mx-auto leading-relaxed"
         >
-          Curated research papers, reports, toolkits, and infographics — everything
+          Curated research papers, reports, toolkits, and infographics, everything
           you need to understand India&apos;s paper ecosystem.
         </motion.p>
       </div>

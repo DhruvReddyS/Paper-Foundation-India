@@ -1,3 +1,5 @@
+"use client";
+
 import IndiaLedger from "@/components/home/sections/india-ledger/IndiaLedger";
 import CommunityDesk from "@/components/home/sections/community-desk/CommunityDesk";
 import HomeReveal from "@/components/home/HomeReveal";
@@ -7,19 +9,30 @@ import LivingCover from "@/components/home/sections/living-cover/LivingCover";
 import MythsFairly from "@/components/home/sections/myths-fairly/MythsFairly";
 import PaperEverywhere from "@/components/home/sections/paper-everywhere/PaperEverywhere";
 import PlayableEdition from "@/components/home/sections/playable-edition/PlayableEdition";
+import { usePublicSettings } from "@/components/site/usePublicSettings";
+
+const modules = {
+  "living-cover": LivingCover,
+  myths: MythsFairly,
+  knowledge: KnowledgeHub,
+  everywhere: PaperEverywhere,
+  journey: JourneyPreview,
+  games: PlayableEdition,
+  india: IndiaLedger,
+  community: CommunityDesk,
+};
+const defaults = Object.keys(modules).map(id => ({ id, enabled: true }));
 
 export default function HomePage() {
+  const settings = usePublicSettings();
+  const sections = Array.isArray(settings["public.home.sections"]) ? settings["public.home.sections"] as { id: keyof typeof modules; enabled: boolean }[] : defaults as { id: keyof typeof modules; enabled: boolean }[];
   return (
     <div className="home-shell">
       <HomeReveal />
-      <LivingCover />
-      <MythsFairly />
-      <KnowledgeHub />
-      <PaperEverywhere />
-      <JourneyPreview />
-      <PlayableEdition />
-      <IndiaLedger />
-      <CommunityDesk />
+      {sections.filter(section => section.enabled && modules[section.id]).map(section => {
+        const Section = modules[section.id];
+        return <Section key={section.id} />;
+      })}
     </div>
   );
 }

@@ -11,9 +11,9 @@ interface PaperTextureProps {
 export function PaperTexture({ opacity = 0.04, type = 'grain', className = '' }: PaperTextureProps) {
   const baseFrequency = type === 'smooth' ? '0.01' : type === 'kraft' ? '0.08' : '0.04';
   const numOctaves = type === 'smooth' ? 2 : type === 'kraft' ? 5 : 3;
-  
+
   return (
-    <div 
+    <div
       className={`pointer-events-none absolute inset-0 z-0 overflow-hidden mix-blend-multiply ${className}`}
       style={{ opacity }}
     >

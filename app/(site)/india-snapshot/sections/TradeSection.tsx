@@ -27,7 +27,7 @@ export default function TradeSection() {
           className="mb-8"
         >
           <h2 className="text-2xl font-bold text-forest mb-2">
-            Trade — Exports &amp; Imports
+            Trade, Exports &amp; Imports
           </h2>
           <p className="text-forest/60 text-sm">
             India is a net importer of waste paper and select finished grades

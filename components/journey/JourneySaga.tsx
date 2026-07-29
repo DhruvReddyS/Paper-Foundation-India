@@ -36,7 +36,7 @@ export default function JourneySaga() {
           <h1 id="journey-title">See how a sheet <em>really</em> takes form.</h1>
           <p className={styles.lede}>
             Open the book and follow fibre through sourcing, preparation, formation,
-            use and recovery. Every chapter names the decision—not just the machinery.
+            use and recovery. Every chapter names the decision, not just the machinery.
           </p>
           <div className={styles.activeChapter} style={{ "--chapter-accent": active.accent } as CSSProperties}>
             <span>{String(active.id).padStart(2, "0")} / {String(journeySpreads.length).padStart(2, "0")}</span>

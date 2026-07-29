@@ -18,7 +18,7 @@ export default function GlossaryHero() {
           animate={{ opacity: 1, y: 0 }}
           className="inline-block mb-4 px-4 py-1.5 rounded-full bg-sage/20 text-sage text-sm font-medium tracking-wide uppercase"
         >
-          A–Z Reference
+          A-Z Reference
         </motion.span>
 
         <motion.h1

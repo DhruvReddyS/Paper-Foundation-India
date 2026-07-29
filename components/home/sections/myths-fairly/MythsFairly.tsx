@@ -6,7 +6,7 @@ import { useState, type PointerEvent } from "react";
 import styles from "./MythsFairly.module.css";
 
 const claims = [
-  { short: "Forests", myth: "Using paper always means losing forests.", fact: "The outcome depends on fibre origin, forest management, land use and demand—not the material name alone.", verdict: "Context required", file: "FORESTRY / 01", source: "Ask where the fibre came from and how that landscape is managed." },
+  { short: "Forests", myth: "Using paper always means losing forests.", fact: "The outcome depends on fibre origin, forest management, land use and demand, not the material name alone.", verdict: "Context required", file: "FORESTRY / 01", source: "Ask where the fibre came from and how that landscape is managed." },
   { short: "Recycling", myth: "Recycled fibre can circulate forever.", fact: "Fibres shorten and some are lost in every cycle. Responsible fresh fibre keeps the recovery loop useful.", verdict: "Myth", file: "FIBRE / 02", source: "Recovery needs both good collection and fibres strong enough for the next product." },
   { short: "Packaging", myth: "Every paper pack belongs in every recycling bin.", fact: "Construction, coatings, contamination and local collection rules decide whether recovery is practical.", verdict: "Context required", file: "RECOVERY / 03", source: "Check the pack design and the rules where the pack is actually discarded." },
 ] as const;

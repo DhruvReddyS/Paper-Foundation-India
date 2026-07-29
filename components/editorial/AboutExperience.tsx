@@ -38,7 +38,7 @@ const advisors = [
 ] as const;
 
 const faqs = [
-  ["Is Paper Foundation India part of the paper industry?", "Paper Foundation India is a registered public foundation. Its public work is built around evidence, transparent sourcing, named methods and visible corrections—not unqualified promotion."],
+  ["Is Paper Foundation India part of the paper industry?", "Paper Foundation India is a registered public foundation. Its public work is built around evidence, transparent sourcing, named methods and visible corrections, not unqualified promotion."],
   ["Does the foundation say paper has no environmental impact?", "No. Every material system has impacts and trade-offs. Our role is to replace blanket claims with the context needed to understand fibre source, production, use, recovery and local conditions."],
   ["How do you choose the claims you investigate?", "We begin with questions people repeatedly encounter in public discussion, advertising, classrooms and purchasing decisions, then map the evidence and the limits of what it can prove."],
   ["Can readers challenge or correct an article?", "Yes. Readers can contact the foundation with a precise claim, source or correction. Material changes should be made visible instead of silently erasing the earlier record."],
@@ -78,10 +78,28 @@ export default function AboutExperience() {
           <b className="about-identity-shadow" />
         </motion.div>
       </div>
-      <div className="about-hero-foot"><span><b>2025</b> registered in Telangana</span><span><b>08</b> office and executive members</span><span><b>04</b> supplied advisors</span></div>
+      <div className="about-hero-foot"><span><b>2025</b> registered in Telangana</span><span><b>08</b> office and executive members</span><span><b>04</b> foundation advisors</span></div>
     </section>
 
-    <section className="about-mission-statement">
+    <nav className="about-section-nav" aria-label="About page sections">
+      <span>Explore the foundation</span>
+      <a href="#mission">Mission</a>
+      <a href="#team">People</a>
+      <a href="#method">Method</a>
+      <a href="#questions">Questions</a>
+      <Link href="/join">Join us <ArrowRight /></Link>
+    </nav>
+
+    <section className="about-public-docket">
+      <header><p className="premium-kicker">How to use the foundation</p><h2>More than a statement.<br />A set of public desks.</h2></header>
+      <div>
+        <Link href="/knowledge"><span>01 / READ</span><BookOpenCheck /><h3>Knowledge desk</h3><p>Long-form explainers with sources, boundaries and reading notes.</p><b>Open the library <ArrowRight /></b></Link>
+        <Link href="/report"><span>02 / CHECK</span><FileSearch /><h3>Claim review</h3><p>Send the exact wording and original source of a paper-related claim.</p><b>Report a claim <ArrowRight /></b></Link>
+        <Link href="/join"><span>03 / JOIN</span><Users /><h3>Membership desk</h3><p>Apply online or return a completed, digitally signed membership PDF.</p><b>Choose an application path <ArrowRight /></b></Link>
+      </div>
+    </section>
+
+    <section id="mission" className="about-mission-statement">
       <p className="premium-kicker">The documented objective</p>
       <h2>Encourage responsible paper use, <em>bust myths</em>, challenge greenwashing and make new paper applications visible.</h2>
       <div><p>The foundation also supports Indian-made paper and paper products in the spirit of Atmanirbhar Bharat. The public-facing platform translates that objective into evidence, interactive learning and practical material literacy.</p><aside><HeartHandshake /><strong>Love paper. Use paper without hesitation, and use it with responsibility.</strong></aside></div>
@@ -105,7 +123,7 @@ export default function AboutExperience() {
 
     <section className="about-transparency"><div><p className="premium-kicker">Trust is a visible process</p><h2>Registered.<br />Reachable.<br />Correctable.</h2><p>Paper Foundation is registered in Hyderabad, Telangana. Readers should be able to inspect claims, understand our method and contact the organization directly.</p><div className="about-contact-lines"><span><MapPin /> Domalguda, Hyderabad, Telangana</span><a href="mailto:paperfoundationindia@gmail.com"><Mail /> paperfoundationindia@gmail.com</a></div></div><div className="transparency-stack"><motion.article whileHover={{ rotate: -2, y: -8 }}><BookOpenCheck /><span>Sources</span><strong>Linked where the claim appears.</strong><Check /></motion.article><motion.article whileHover={{ rotate: 1, y: -8 }}><FileSearch /><span>Methods</span><strong>Boundaries and assumptions named.</strong><Check /></motion.article><motion.article whileHover={{ rotate: -1, y: -8 }}><RefreshCw /><span>Corrections</span><strong>Updated without erasing history.</strong><Check /></motion.article></div></section>
 
-    <section className="about-faq" aria-labelledby="about-faq-title">
+    <section id="questions" className="about-faq" aria-labelledby="about-faq-title">
       <header><p className="premium-kicker">Questions worth asking</p><h2 id="about-faq-title">Before you take<br />our word for it.</h2><p>Our answers should be as open to inspection as the questions we ask of everyone else.</p></header>
       <div className="about-faq-list">{faqs.map(([question, answer], index) => {
         const open = faqOpen === index;

@@ -29,7 +29,7 @@ export function FibreParticles({
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
-    
+
     const initParticles = () => {
       particles = [];
       for (let i = 0; i < numParticles; i++) {
@@ -91,10 +91,10 @@ export function FibreParticles({
   }, [colour, density, paused]);
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      className="absolute inset-0 w-full h-full pointer-events-none z-0" 
-      aria-hidden="true" 
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      aria-hidden="true"
     />
   );
 }

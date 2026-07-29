@@ -1,2 +1,2 @@
-import React from 'react';
-export default function AdminInquiries() { return <div>Inquiries Inbox</div>; }
+import AdminRecords from "@/components/admin/AdminRecords";
+export default function Page() { return <AdminRecords mode="inquiries" />; }

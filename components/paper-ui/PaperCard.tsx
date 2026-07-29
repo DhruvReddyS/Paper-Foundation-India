@@ -27,12 +27,12 @@ export function PaperCard({
   };
 
   return (
-    <div 
+    <div
       className={`relative rounded-xl overflow-hidden shadow-sm border border-border/50 ${bgColors[variant]} ${hoverClasses[hover]} ${className}`}
     >
       {variant === 'kraft' && <PaperTexture type="kraft" opacity={0.06} />}
       {variant === 'standard' && <PaperTexture type="smooth" opacity={0.03} />}
-      
+
       <div className="relative z-10 p-6 h-full">
         {children}
       </div>

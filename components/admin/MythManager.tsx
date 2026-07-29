@@ -1,37 +1,17 @@
 "use client";
 
-import { FilePlus2, RefreshCw, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { ChevronDown, ChevronUp, Edit3, FilePlus2, RefreshCw, Search, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import MythEditor from "./MythEditor";
 
-type MythItem = { _id?: string; claim: string; correction: string; explanation: string; category: string; verdict: "myth" | "fact" | "context"; tags?: string[]; sources?: { label: string; url: string }[]; status?: string };
-
+type MythItem = { _id?: string; claim: string; correction: string; explanation: string; category: string; verdict: "myth" | "fact" | "context"; tags?: string[]; sources?: { label: string; url: string }[]; status?: string; order?: number; coverImage?: string; revisionNote?: string };
 export default function MythManager() {
-  const [items, setItems] = useState<MythItem[]>([]);
-  const [creating, setCreating] = useState(false);
-  const [notice, setNotice] = useState("");
-  const load = useCallback(async () => { const response = await fetch("/api/myths"); const data = await response.json(); setItems(data.items ?? []); }, []);
+  const [items, setItems] = useState<MythItem[]>([]), [editing, setEditing] = useState<MythItem | "new" | null>(null), [notice, setNotice] = useState(""), [query, setQuery] = useState("");
+  const load = useCallback(async () => { const response = await fetch("/api/myths?status=all"); const data = await response.json(); setItems(data.items ?? []); }, []);
   useEffect(() => { void load(); }, [load]);
-
-  async function save(data: Record<string, unknown>) {
-    const rawSources = Array.isArray(data.sources) ? data.sources.map(String) : String(data.sources ?? "").split("\n");
-    const sources = rawSources.filter(Boolean).map((url) => ({ label: url.replace(/^https?:\/\//, "").split("/")[0], url }));
-    const payload = { claim: data.myth, verdict: "context", correction: data.fact, explanation: data.explanation, category: data.category, tags: data.tags, sources, status: data.status, featured: false };
-    const response = await fetch("/api/myths", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-    const result = await response.json();
-    setNotice(response.ok ? "Myth case saved." : result.error ?? "Myth case could not be saved.");
-    if (response.ok) { setCreating(false); await load(); }
-  }
-
-  async function remove(item: MythItem) {
-    if (!item._id || !window.confirm("Delete this myth case?")) return;
-    const response = await fetch(`/api/myths?id=${item._id}`, { method: "DELETE" });
-    if (response.ok) await load();
-  }
-
-  return <div className="space-y-6">
-    <header className="flex flex-wrap items-end justify-between gap-4 border-b border-stone-200 pb-5"><div><p className="text-xs font-semibold uppercase tracking-[.18em] text-[#956443]">Evidence CMS</p><h1 className="mt-2 font-serif text-4xl">Myths vs facts</h1><p className="mt-2 text-sm text-stone-500">Review claims, evidence, context and publication status.</p></div><div className="flex gap-2"><button onClick={() => void load()} className="flex items-center gap-2 border border-stone-300 px-4 py-2 text-sm"><RefreshCw size={15} /> Refresh</button><button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-[#1a3c2a] px-4 py-2 text-sm font-semibold text-white"><FilePlus2 size={16} /> Add claim</button></div></header>
-    {notice && <p className="border-l-2 border-[#c4956a] bg-[#f2ede7] px-4 py-3 text-sm">{notice}</p>}
-    {creating ? <section className="border border-stone-200 bg-white p-6"><div className="mb-5 flex justify-between"><h2 className="font-serif text-2xl">New evidence case</h2><button onClick={() => setCreating(false)} className="text-sm text-stone-500">Close</button></div><MythEditor onSave={save} /></section> : <div className="grid gap-3">{items.length ? items.map(item => <article key={item._id ?? item.claim} className="grid grid-cols-[1fr_auto] gap-4 border border-stone-200 bg-white p-5"><div><span className="text-xs uppercase tracking-wider text-[#956443]">{item.category} · {item.verdict}</span><h2 className="mt-2 font-serif text-xl">{item.claim}</h2><p className="mt-2 text-sm text-stone-500">{item.correction}</p></div><button disabled={!item._id} onClick={() => void remove(item)} className="self-start border border-stone-200 p-2 text-red-700 disabled:opacity-30"><Trash2 size={15} /></button></article>) : <div className="border border-dashed border-stone-300 bg-stone-50 p-10 text-center"><p className="font-serif text-2xl">The case desk is ready.</p><p className="mt-2 text-sm text-stone-500">Add verified myths and facts after the content review.</p></div>}</div>}
-  </div>;
+  const filtered = useMemo(() => items.filter(item => `${item.claim} ${item.correction} ${item.category}`.toLowerCase().includes(query.toLowerCase())), [items, query]);
+  async function save(data: Record<string, unknown>) { const current = editing && editing !== "new" ? editing : null; const raw = Array.isArray(data.sources) ? data.sources.map(String) : []; const sources = raw.filter(Boolean).map(url => ({ label: url.replace(/^https?:\/\//, "").split("/")[0], url })); const payload = { ...(current?._id ? { id: current._id } : {}), claim: data.myth, verdict: current?.verdict ?? "context", correction: data.fact, explanation: data.explanation, category: data.category, tags: data.tags, sources, status: data.status, featured: false, order: current?.order ?? items.length, coverImage: data.coverImage, revisionNote: data.revisionNote }; const response = await fetch("/api/myths", { method: current?._id ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); const result = await response.json(); setNotice(response.ok ? "Myth or fact saved." : result.error); if (response.ok) { setEditing(null); await load(); } }
+  async function remove(item: MythItem) { if (!item._id || !confirm("Delete this record?")) return; await fetch(`/api/myths?id=${item._id}`, { method: "DELETE" }); await load(); }
+  async function move(index: number, direction: number) { const target=index+direction;if(target<0||target>=items.length)return;const next=[...items];[next[index],next[target]]=[next[target],next[index]];setItems(next);await Promise.all([next[index],next[target]].filter(item=>item._id).map(item=>fetch("/api/myths",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:item._id,order:next.indexOf(item)})}))); }
+  return <div><header className="admin-workspace-heading"><div><p>Research publishing</p><h1>Myths and facts</h1></div><div><button className="admin-action" onClick={() => void load()}><RefreshCw /> Refresh</button><button className="admin-action primary" onClick={() => setEditing("new")}><FilePlus2 /> New record</button></div></header>{notice&&<div className="admin-notice">{notice}</div>}{editing?<section className="admin-editor-panel"><header><div><p>EDITOR</p><h2>{editing==="new"?"New myth or fact":editing.claim}</h2></div><button onClick={()=>setEditing(null)}>Close</button></header><MythEditor initialData={editing==="new"?undefined:{myth:editing.claim,fact:editing.correction,explanation:editing.explanation,category:editing.category,tags:editing.tags??[],sources:(editing.sources??[]).map(source=>source.url),status:editing.status??"draft",coverImage:editing.coverImage,revisionNote:editing.revisionNote}} onSave={save}/></section>:<><div className="admin-toolbar"><label><Search/><input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Search claims, corrections or category"/></label><span>{filtered.length} records</span></div><div className="admin-data-list">{filtered.map(item=>{const index=items.indexOf(item);return <article className="admin-data-row" key={item._id??item.claim}><div><strong>{item.claim}</strong><small>{item.correction}</small></div><span>{item.category}</span><em>{item.status??"review"}</em><div className="admin-row-actions"><button disabled={!item._id} onClick={()=>void move(index,-1)}><ChevronUp/></button><button disabled={!item._id} onClick={()=>void move(index,1)}><ChevronDown/></button><button onClick={()=>setEditing(item)} title="Inspect or edit"><Edit3/></button><button disabled={!item._id} onClick={()=>void remove(item)}><Trash2/></button></div></article>})}</div></>}</div>;
 }

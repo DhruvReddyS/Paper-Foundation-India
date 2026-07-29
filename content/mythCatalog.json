@@ -2,7 +2,7 @@
   {
     "id": "myth-01",
     "myth": "Making paper always destroys natural or ancient forests.",
-    "reality": "Paper can be made from recycled fibre, farm-grown wood, managed forests, non-wood fibres and wood-processing residues. Fibre origin—not the word “paper” alone—determines the forestry impact.",
+    "reality": "Paper can be made from recycled fibre, farm-grown wood, managed forests, non-wood fibres and wood-processing residues. Fibre origin, not the word “paper” alone, determines the forestry impact.",
     "explanation": "Harvesting is not automatically deforestation. Deforestation is the long-term conversion of forest land to another use. Nevertheless, poorly governed fibre sourcing can damage natural forests, so traceability, legality and credible certification remain essential.",
     "indiaContext": "Indian mills use different fibre mixes, including recovered paper, farm forestry wood, bamboo, bagasse and imported pulp. The mix varies by mill and paper grade.",
     "evidence": "FAO Forest Products Statistics; FAO Sustainable Forest Industries; FSC and PEFC standards.",
@@ -180,7 +180,7 @@
     "myth": "Bagasse paper uses no resources because bagasse is a waste.",
     "reality": "Bagasse is a sugar-industry residue that can become pulp, energy, board or other products, but collection, pulping, chemicals, water and energy still have impacts.",
     "explanation": "Using a residue can improve resource efficiency, yet competing uses and processing burdens must be considered. “Residue-based” does not mean “zero impact.”",
-    "indiaContext": "Bagasse has particular relevance in sugar-producing regions of India and can complement—not universally replace—other fibres.",
+    "indiaContext": "Bagasse has particular relevance in sugar-producing regions of India and can complement, not universally replace, other fibres.",
     "evidence": "FAO non-wood fibre publications; mill-specific environmental data.",
     "caution": "Review local rules and supplier-specific data before applying this statement universally.",
     "reviewed": "July 2026",
@@ -365,7 +365,7 @@
   {
     "id": "myth-34",
     "myth": "All paper food packaging is compostable.",
-    "reality": "Compostability depends on the complete package—including coatings, inks and adhesives—and on whether a certified composting facility accepts it.",
+    "reality": "Compostability depends on the complete package, including coatings, inks and adhesives, and on whether a certified composting facility accepts it.",
     "explanation": "Industrial compostability and home compostability are different claims. A fibre package may be recyclable, compostable under controlled conditions, or neither.",
     "indiaContext": "Because industrial composting access is limited in many Indian cities, labels should not imply an end-of-life route that users cannot access.",
     "evidence": "ISO/EN/ASTM compostability standards; facility acceptance rules.",
@@ -529,7 +529,7 @@
   },
   {
     "id": "myth-49",
-    "myth": "Every paper mill generates 60–80% of its own electricity.",
+    "myth": "Every paper mill generates 60-80% of its own electricity.",
     "reality": "Some integrated mills are highly energy self-sufficient; other mills purchase most of their electricity and fuel.",
     "explanation": "A universal percentage is misleading because mill type, product, recovery boiler, combined heat and power system and local grid all matter.",
     "indiaContext": "Use plant-specific figures only when they are independently reported and clearly define electricity versus total energy.",
@@ -575,7 +575,7 @@
     "id": "myth-53",
     "myth": "Paper has no educational advantage over screens.",
     "reality": "Research often finds that print can support comprehension, navigation or recall in some reading contexts, while digital tools provide search, accessibility and multimedia benefits.",
-    "explanation": "Outcomes depend on age, text type, device, distractions, reading strategy and learner needs. Evidence supports thoughtful medium choice—not a universal ban on screens.",
+    "explanation": "Outcomes depend on age, text type, device, distractions, reading strategy and learner needs. Evidence supports thoughtful medium choice, not a universal ban on screens.",
     "indiaContext": "For Indian education, consider device access, electricity, language, disability support and cost alongside learning outcomes.",
     "evidence": "Peer-reviewed reading-comprehension meta-analyses; UNESCO education resources.",
     "caution": "Review local rules and supplier-specific data before applying this statement universally.",
@@ -629,7 +629,7 @@
   {
     "id": "myth-58",
     "myth": "One eco-label proves every aspect of a paper product is sustainable.",
-    "reality": "Labels cover defined criteria—such as fibre sourcing, recycled content, emissions or compostability—not every possible impact.",
+    "reality": "Labels cover defined criteria, such as fibre sourcing, recycled content, emissions or compostability, not every possible impact.",
     "explanation": "Consumers should understand what a label certifies, who verifies it and whether the certificate applies to the specific product.",
     "indiaContext": "Build a Paper Foundation India label guide explaining FSC, PEFC, recycled-content and compostability claims separately.",
     "evidence": "FSC/PEFC official label rules; ISO 14020 series environmental labels.",

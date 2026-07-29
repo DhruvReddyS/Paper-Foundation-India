@@ -26,7 +26,7 @@ export default function CircularityText() {
 
             <p>
               Unlike fossil-fuel-derived materials, paper starts from a renewable
-              resource — trees grown on managed plantations, agricultural residues
+              resource, trees grown on managed plantations, agricultural residues
               like wheat straw and bagasse, and previously recycled fibre. India&apos;s
               paper industry sources 75% of its raw material from recycled fibre,
               making it one of the most circular industries in the country.
@@ -34,7 +34,7 @@ export default function CircularityText() {
 
             <p>
               At end-of-life, paper biodegrades naturally. But before that, it can
-              be collected and recycled up to 7 times — each cycle reducing the
+              be collected and recycled up to 7 times, each cycle reducing the
               need for virgin material, saving energy, and lowering carbon emissions.
             </p>
 
@@ -52,7 +52,7 @@ export default function CircularityText() {
                   <p className="text-xs text-forest/60">Global paper recovery rate</p>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-forest">2–6 mo</div>
+                  <div className="text-2xl font-bold text-forest">2-6 mo</div>
                   <p className="text-xs text-forest/60">Biodegradation time</p>
                 </div>
               </div>

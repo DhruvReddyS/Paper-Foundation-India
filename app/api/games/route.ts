@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import { GameResult } from "@/lib/models/Game";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { requireAdmin } from "@/lib/api-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,7 @@ const resultSchema = z
   });
 
 export async function GET() {
+  const denied = await requireAdmin(); if (denied) return denied;
   if (!process.env.MONGODB_URI) {
     return NextResponse.json({
       games: gameCatalog,

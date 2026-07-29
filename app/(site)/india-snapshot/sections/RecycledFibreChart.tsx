@@ -31,7 +31,7 @@ export default function RecycledFibreChart() {
             Recycled Fibre Usage
           </h2>
           <p className="text-forest/60 text-sm">
-            Percentage of recycled fibre in India&apos;s paper production (2015–2024)
+            Percentage of recycled fibre in India&apos;s paper production (2015-2024)
           </p>
         </motion.div>
 
@@ -69,7 +69,7 @@ export default function RecycledFibreChart() {
           className="mt-6 bg-forest/5 rounded-lg px-4 py-3 text-center"
         >
           <p className="text-sm text-forest/70">
-            🌱 India uses <strong>75%</strong> recycled fibre — among the highest globally,
+            🌱 India uses <strong>75%</strong> recycled fibre, among the highest globally,
             ahead of most developed nations.
           </p>
         </motion.div>

@@ -31,6 +31,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { GooeySearch } from "@/components/ui/gooey-search";
 import { searchSite } from "@/content/searchIndex";
+import { usePublicSettings } from "@/components/site/usePublicSettings";
 
 type NavItem = { href: string; label: string; description: string; icon: LucideIcon };
 type NavGroup = { label: string; slug: string; eyebrow: string; introduction: string; items: NavItem[] };
@@ -95,6 +96,7 @@ function routeMatches(pathname: string, href: string) {
 }
 
 export default function Nav() {
+  const publicSettings = usePublicSettings();
   const pathname = usePathname();
   const router = useRouter();
   const desktopMenuRef = useRef<HTMLUListElement>(null);
@@ -133,10 +135,10 @@ export default function Nav() {
 
   return (
     <header className={`site-header ${scrolled ? "is-scrolled" : ""} sticky top-0 z-50`}>
-      <nav className="container-wide flex h-[72px] items-center justify-between" aria-label="Primary navigation">
+      <nav className="site-nav-shell" aria-label="Primary navigation">
         <Link href="/" className="site-brand" aria-label="Paper Foundation India home">
-          <Image src="/images/brand/paper-foundation-nav-logo.png" alt="" width={40} height={49} priority />
-          <span><strong>Paper Foundation</strong><small>India</small></span>
+          <span className="site-brand-mark"><Image src="/images/brand/paper-foundation-nav-logo.png" alt="" width={40} height={49} priority /></span>
+          <span><strong>{String(publicSettings["public.brand.name"] || "Paper Foundation")}</strong><small>{String(publicSettings["public.brand.country"] || "India")}</small></span>
         </Link>
 
         <ul ref={desktopMenuRef} className="site-desktop-nav hidden items-center xl:flex">
@@ -149,19 +151,21 @@ export default function Nav() {
 
         <div className="site-nav-actions">
           <div className="site-nav-quick hidden xl:flex">
-            <Link href="/join" className="site-nav-join"><HeartHandshake /> Join us</Link>
-            <Link href="/contact" className="site-nav-contact"><Mail /> Contact</Link>
+            <Link href="/join" className="site-nav-join"><HeartHandshake /> {String(publicSettings["public.navigation.join"] || "Join us")}</Link>
+            <Link href="/contact" className="site-nav-contact"><Mail /> {String(publicSettings["public.navigation.contact"] || "Contact")}</Link>
           </div>
-          <GooeySearch
-            key={`desktop-search-${pathname}`}
-            className="site-gooey-search hidden md:inline-flex"
-            onSearch={(query) => searchSite(query, 6)}
-            buttonLabel="Search"
-            placeholder="Search everything..."
-            maxResults={6}
-            debounceMs={90}
-            onSelect={(result) => { if (result.href) router.push(result.href); }}
-          />
+          <div className="site-desktop-gooey-slot hidden md:flex">
+            <GooeySearch
+              key={`desktop-search-${pathname}`}
+              className="site-gooey-search site-gooey-search-desktop"
+              onSearch={(query) => searchSite(query, 6)}
+              buttonLabel="Search"
+              placeholder="Search articles, facts, games..."
+              maxResults={6}
+              debounceMs={70}
+              onSelect={(result) => { if (result.href) router.push(result.href); }}
+            />
+          </div>
           <GooeySearch
             key={`mobile-search-${pathname}`}
             className="site-gooey-search md:hidden"

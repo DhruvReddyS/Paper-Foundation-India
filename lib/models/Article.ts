@@ -13,8 +13,11 @@ const ArticleSchema = new Schema({
   tags: [{ type: String }],
   status: { type: String, enum: ["draft", "review", "published", "archived"], default: "draft", index: true },
   featured: { type: Boolean, default: false, index: true },
+  order: { type: Number, default: 0, index: true },
+  media: [{ url: String, publicId: String, type: String, alt: String }],
   publishedAt: Date,
   revisionNote: String,
+  lastEditedBy: String,
 }, { timestamps: true });
 
 export const Article = mongoose.models.Article || mongoose.model("Article", ArticleSchema);

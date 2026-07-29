@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpRight, BarChart3, BookOpen, FileText,
@@ -14,18 +14,25 @@ const sources = ["All sources", "Government", "Intergovernmental", "Standards bo
 const iconFor = (type: string) => type === "Data portal" ? BarChart3 : type === "Toolkit" ? GraduationCap : type === "Standard" ? FileText : type === "Report" || type === "Research" ? BookOpen : Library;
 
 export default function ResourceGrid({ initialSearch = "" }: { initialSearch?: string }) {
+  const [resourceItems, setResourceItems] = useState([...resources]);
   const [query, setQuery] = useState(initialSearch);
   const [type, setType] = useState("All");
   const [source, setSource] = useState("All sources");
 
+  useEffect(() => {
+    fetch("/api/resources?status=published").then(response => response.json()).then(data => {
+      if (data.source === "cms" && Array.isArray(data.items)) setResourceItems(data.items);
+    }).catch(() => undefined);
+  }, []);
+
   const filtered = useMemo(() => {
     const normalised = query.trim().toLowerCase();
-    return resources.filter((resource) =>
+    return resourceItems.filter((resource) =>
       (type === "All" || resource.type === type) &&
       (source === "All sources" || resource.source === source) &&
       (!normalised || `${resource.title} ${resource.description} ${resource.publisher}`.toLowerCase().includes(normalised))
     );
-  }, [query, source, type]);
+  }, [query, resourceItems, source, type]);
 
   const reset = () => { setQuery(""); setType("All"); setSource("All sources"); };
 
@@ -34,8 +41,8 @@ export default function ResourceGrid({ initialSearch = "" }: { initialSearch?: s
       <section id="resource-archive" className={styles.archive}>
         <motion.div className={styles.compactIntro} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
           <div><p className={styles.eyebrow}>Public evidence desk / open access</p><h1>Resources</h1></div>
-          <p>Reports, methods and teaching tools—each labelled with publisher, format and date before you open it.</p>
-          <aside><Library /><span>READING ROOM</span><strong>{resources.length}</strong><small>official sources on this shelf</small></aside>
+          <p>Reports, methods and teaching tools, each labelled with publisher, format and date before you open it.</p>
+          <aside><Library /><span>READING ROOM</span><strong>{resourceItems.length}</strong><small>official sources on this shelf</small></aside>
         </motion.div>
         <header className={styles.archiveHeader}>
           <div>
@@ -64,7 +71,7 @@ export default function ResourceGrid({ initialSearch = "" }: { initialSearch?: s
         <nav className={styles.typeTabs} aria-label="Filter resources by format">
           {types.map((item) => (
             <button type="button" key={item} className={type === item ? styles.activeType : ""} onClick={() => setType(item)} aria-pressed={type === item}>
-              {item}<small>{item === "All" ? resources.length : resources.filter((resource) => resource.type === item).length}</small>
+              {item}<small>{item === "All" ? resourceItems.length : resourceItems.filter((resource) => resource.type === item).length}</small>
             </button>
           ))}
         </nav>

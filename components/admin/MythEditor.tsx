@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface MythEditorProps {
   initialData?: {
@@ -11,6 +12,8 @@ interface MythEditorProps {
     tags: string[];
     sources: string[];
     status: string;
+    coverImage?: string;
+    revisionNote?: string;
   };
   onSave?: (data: Record<string, unknown>) => void;
   className?: string;
@@ -27,7 +30,14 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
     tags: initialData?.tags?.join(', ') || '',
     sources: initialData?.sources?.join('\n') || '',
     status: initialData?.status || 'draft',
+    coverImage: initialData?.coverImage || '',
+    revisionNote: initialData?.revisionNote || '',
   });
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => window.localStorage.setItem('pfi:myth-draft', JSON.stringify(form)), 500);
+    return () => window.clearTimeout(timer);
+  }, [form]);
 
   const handleSubmit = () => {
     onSave?.({
@@ -36,12 +46,25 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
       sources: form.sources.split('\n').map((s) => s.trim()).filter(Boolean),
     });
   };
+  const sourceCount = form.sources.split('\n').map(source => source.trim()).filter(Boolean).length;
+  const checks = [
+    { label: 'Specific public claim', ready: form.myth.trim().length >= 20 },
+    { label: 'Clear correction', ready: form.fact.trim().length >= 30 },
+    { label: 'Contextual explanation', ready: form.explanation.trim().length >= 120 },
+    { label: 'Two or more sources', ready: sourceCount >= 2 },
+    { label: 'Revision note', ready: Boolean(form.revisionNote.trim()) },
+  ];
+  const readyCount = checks.filter(item => item.ready).length;
 
   const inputClass =
     'w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a3c2a]/30';
 
   return (
     <div className={`space-y-5 ${className}`}>
+      <section className="admin-editor-readiness">
+        <div><span>{readyCount === checks.length ? <CheckCircle2 /> : <AlertCircle />}</span><div><small>EVIDENCE READINESS</small><strong>{readyCount} of {checks.length} checks complete</strong><p>Publish only when the correction and its boundaries are easy to understand.</p></div></div>
+        <ul>{checks.map(item => <li className={item.ready ? 'is-ready' : ''} key={item.label}>{item.ready ? <CheckCircle2 /> : <i />}{item.label}</li>)}</ul>
+      </section>
       <div>
         <label className="block text-sm font-medium text-stone-700 mb-1">Myth Statement</label>
         <textarea
@@ -54,6 +77,11 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
       </div>
 
       <div>
+        <label className="block text-sm font-medium text-stone-700 mb-1">Cover asset URL</label>
+        <input type="url" value={form.coverImage} onChange={(e) => setForm({ ...form, coverImage: e.target.value })} placeholder="Paste a URL copied from Media" className={inputClass} />
+      </div>
+
+      <div>
         <label className="block text-sm font-medium text-stone-700 mb-1">Fact / Truth</label>
         <textarea
           value={form.fact}
@@ -62,6 +90,11 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
           placeholder="The actual fact..."
           className={inputClass}
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-stone-700 mb-1">Revision note</label>
+        <input value={form.revisionNote} onChange={(e) => setForm({ ...form, revisionNote: e.target.value })} placeholder="What changed and why?" className={inputClass} />
       </div>
 
       <div>
@@ -132,7 +165,7 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
           type="button"
           className="rounded-lg border border-stone-300 px-5 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
         >
-          Cancel
+          Saved locally
         </button>
         <button
           type="button"

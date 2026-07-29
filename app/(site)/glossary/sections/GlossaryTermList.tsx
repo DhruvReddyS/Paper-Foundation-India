@@ -1,19 +1,35 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BookOpenText, Search, X } from "lucide-react";
 import { glossaryAlphabet as alphabet, glossaryData, glossaryTermCount as termCount } from "@/content/glossary";
 import styles from "./Glossary.module.css";
-const availableLetters = Object.keys(glossaryData);
+type Term = { term: string; definition: string };
 
 export default function GlossaryTermList({ initialSearch = "" }: { initialSearch?: string }) {
+  const [dictionary, setDictionary] = useState<Record<string, Term[]>>(glossaryData);
   const [query, setQuery] = useState(initialSearch);
   const [letter, setLetter] = useState("ALL");
+  const availableLetters = Object.keys(dictionary);
+  const totalTerms = Object.values(dictionary).reduce((total, terms) => total + terms.length, 0);
+
+  useEffect(() => {
+    fetch("/api/glossary?status=published").then(response => response.json()).then(data => {
+      if (data.source !== "cms" || !Array.isArray(data.items)) return;
+      const next: Record<string, Term[]> = {};
+      for (const item of data.items) {
+        const group = String(item.letter || item.term?.charAt(0) || "").toUpperCase();
+        if (!group) continue;
+        (next[group] ||= []).push({ term: String(item.term), definition: String(item.definition) });
+      }
+      setDictionary(next);
+    }).catch(() => undefined);
+  }, []);
 
   const groups = useMemo(() => {
     const normalised = query.trim().toLowerCase();
-    return Object.entries(glossaryData)
+    return Object.entries(dictionary)
       .filter(([group]) => letter === "ALL" || group === letter)
       .map(([group, terms]) => ({
         letter: group,
@@ -22,7 +38,7 @@ export default function GlossaryTermList({ initialSearch = "" }: { initialSearch
         ),
       }))
       .filter((group) => group.terms.length);
-  }, [letter, query]);
+  }, [dictionary, letter, query]);
 
   const visibleCount = groups.reduce((total, group) => total + group.terms.length, 0);
 
@@ -36,7 +52,7 @@ export default function GlossaryTermList({ initialSearch = "" }: { initialSearch
         </motion.div>
         <header className={styles.indexHeader}>
           <div>
-            <p className={styles.eyebrow}>A—Z field index</p>
+            <p className={styles.eyebrow}>A, Z field index</p>
             <h2>Find the word behind the claim.</h2>
           </div>
           <label className={styles.search}>
@@ -52,7 +68,7 @@ export default function GlossaryTermList({ initialSearch = "" }: { initialSearch
                 <X aria-hidden="true" />
               </button>
             )}
-            <small>{visibleCount} of {termCount} entries</small>
+            <small>{visibleCount} of {totalTerms || termCount} entries</small>
           </label>
         </header>
 
@@ -115,7 +131,7 @@ export default function GlossaryTermList({ initialSearch = "" }: { initialSearch
           {!groups.length && (
             <div className={styles.empty}>
               <BookOpenText aria-hidden="true" />
-              <h3>No entry on this sheet—yet.</h3>
+              <h3>No entry on this sheet, yet.</h3>
               <p>Try a shorter phrase or return to the complete index.</p>
               <button type="button" onClick={() => { setQuery(""); setLetter("ALL"); }}>Reset the index</button>
             </div>

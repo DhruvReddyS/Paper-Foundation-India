@@ -10,7 +10,7 @@ const nodeDetails = [
   {
     title: "Sustainable Sourcing",
     icon: "🌱",
-    description: "Raw materials for paper come from renewable sources — plantation timber, agri-residues, and recycled fibre.",
+    description: "Raw materials for paper come from renewable sources, plantation timber, agri-residues, and recycled fibre.",
     stats: "75% recycled fibre + 25% plantation/agri-based virgin fibre",
     impact: "No natural forests are used for papermaking in India.",
   },
@@ -31,7 +31,7 @@ const nodeDetails = [
   {
     title: "Use & Reuse",
     icon: "📝",
-    description: "Paper serves essential roles — education, packaging, hygiene, communication — and can be reused before recycling.",
+    description: "Paper serves essential roles, education, packaging, hygiene, communication, and can be reused before recycling.",
     stats: "Average Indian uses ~16 kg of paper per year",
     impact: "Paper replaces single-use plastics in packaging.",
   },
@@ -45,7 +45,7 @@ const nodeDetails = [
   {
     title: "Recycling",
     icon: "♻️",
-    description: "Collected paper is sorted, pulped, de-inked, and processed into new paper — closing the loop.",
+    description: "Collected paper is sorted, pulped, de-inked, and processed into new paper, closing the loop.",
     stats: "A fibre can be recycled up to 7 times",
     impact: "Recycling saves 70% energy vs virgin production.",
   },

@@ -28,7 +28,7 @@ export default function ProductionChart() {
             Paper &amp; Paperboard Production
           </h2>
           <p className="text-forest/60 text-sm">
-            Annual production in thousand tonnes (2018–2024)
+            Annual production in thousand tonnes (2018-2024)
           </p>
         </motion.div>
 

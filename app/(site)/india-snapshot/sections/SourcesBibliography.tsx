@@ -5,32 +5,32 @@ import { motion } from "framer-motion";
 const sources = [
   {
     id: 1,
-    title: "Indian Paper Manufacturers Association (IPMA) — Annual Report 2024",
+    title: "Indian Paper Manufacturers Association (IPMA), Annual Report 2024",
     url: "https://www.ipma.co.in",
   },
   {
     id: 2,
-    title: "Central Pulp and Paper Research Institute (CPPRI) — Industry Statistics",
+    title: "Central Pulp and Paper Research Institute (CPPRI), Industry Statistics",
     url: "https://www.cppri.org.in",
   },
   {
     id: 3,
-    title: "Ministry of Commerce & Industry — Trade Data Portal",
+    title: "Ministry of Commerce & Industry, Trade Data Portal",
     url: "https://tradestat.commerce.gov.in",
   },
   {
     id: 4,
-    title: "FAO — Forestry Statistics (FAOSTAT)",
+    title: "FAO, Forestry Statistics (FAOSTAT)",
     url: "https://www.fao.org/faostat",
   },
   {
     id: 5,
-    title: "RISI / Fastmarkets — Global Pulp & Paper Market Intelligence",
+    title: "RISI / Fastmarkets, Global Pulp & Paper Market Intelligence",
     url: "https://www.fastmarkets.com",
   },
   {
     id: 6,
-    title: "Bureau of International Recycling (BIR) — Recovered Paper Statistics",
+    title: "Bureau of International Recycling (BIR), Recovered Paper Statistics",
     url: "https://www.bir.org",
   },
 ];

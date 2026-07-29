@@ -3,19 +3,20 @@
 import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import { ArrowDown, ArrowLeft, ArrowUp, Check, CheckCircle2, Droplets, Factory, Filter, GripVertical, PackageCheck, Play, Recycle, RotateCcw, Scissors, Sparkles, Waves, Wind, X } from "lucide-react";
 import { useEffect, useMemo, useState, type ComponentType, type PointerEvent } from "react";
-import { GameFrame, GameIntro, ResultPanel, shuffleItems } from "./GameShared";
+import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameConfiguration } from "./GameShared";
+import { playGameSound } from "./gameAudio";
 import { millSteps } from "./gameData";
 
-type Step = (typeof millSteps)[number];
+type Step = string;
 type StepInfo = { hint: string; icon: ComponentType<{ size?: number; strokeWidth?: number }> };
 
-const makeStartingOrder = () => {
-  let order = shuffleItems(millSteps) as Step[];
-  while (order.every((step, index) => step === millSteps[index])) order = shuffleItems(millSteps) as Step[];
+const makeStartingOrder = (source: readonly Step[]) => {
+  let order = shuffleItems([...source]);
+  while (source.length > 1 && order.every((step, index) => step === source[index])) order = shuffleItems([...source]);
   return order;
 };
 
-const stepInfo: Record<Step, StepInfo> = {
+const stepInfo: Record<string, StepInfo> = {
   "Sort fibre": { hint: "Separate usable recovered-paper grades", icon: Recycle },
   "Make pulp": { hint: "Water loosens the old sheet into fibres", icon: Droplets },
   "Clean pulp": { hint: "Screens remove unwanted material", icon: Filter },
@@ -27,8 +28,19 @@ const stepInfo: Record<Step, StepInfo> = {
 };
 
 export default function MillMasterGame() {
+  const configuration = useGameConfiguration("mill-master");
+  const configuredSteps = useMemo(() => {
+    const value = configuration?.content?.steps;
+    if (!Array.isArray(value)) return null;
+    const clean = value
+      .map((item) => typeof item === "string" ? item : typeof item === "object" && item && "name" in item ? String(item.name) : "")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    return clean.length >= 3 && new Set(clean).size === clean.length ? clean : null;
+  }, [configuration]);
+  const correctSteps = configuredSteps ?? millSteps;
   const [phase, setPhase] = useState<"intro" | "play" | "result">("intro");
-  const [steps, setSteps] = useState<Step[]>(makeStartingOrder);
+  const [steps, setSteps] = useState<Step[]>(() => makeStartingOrder(correctSteps));
   const [attempts, setAttempts] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [checked, setChecked] = useState(false);
@@ -40,9 +52,14 @@ export default function MillMasterGame() {
     return () => window.clearInterval(timer);
   }, [phase]);
 
-  const correctCount = useMemo(() => steps.filter((step, index) => millSteps[index] === step).length, [steps]);
+  useEffect(() => {
+    if (phase === "intro") setSteps(makeStartingOrder(correctSteps));
+  }, [correctSteps, phase]);
+
+  const correctCount = useMemo(() => steps.filter((step, index) => correctSteps[index] === step).length, [correctSteps, steps]);
 
   function reorder(next: Step[]) {
+    playGameSound("select");
     setSteps(next);
     setChecked(false);
   }
@@ -59,7 +76,11 @@ export default function MillMasterGame() {
     const nextAttempts = attempts + 1;
     setAttempts(nextAttempts);
     setChecked(true);
-    if (correctCount !== millSteps.length) return;
+    if (correctCount !== correctSteps.length) {
+      playGameSound("wrong");
+      return;
+    }
+    playGameSound("complete");
     setFinalScore(Math.max(300, 800 - (nextAttempts - 1) * 70 - Math.floor(seconds / 15) * 10));
     window.setTimeout(() => setPhase("result"), 700);
   }
@@ -71,7 +92,7 @@ export default function MillMasterGame() {
 
   function reset() {
     setPhase("intro");
-    setSteps(makeStartingOrder());
+    setSteps(makeStartingOrder(correctSteps));
     setAttempts(0);
     setSeconds(0);
     setChecked(false);
@@ -82,7 +103,7 @@ export default function MillMasterGame() {
   const badge = finalScore >= 720 ? "Mill Line Master" : finalScore >= 560 ? "Process Engineer" : "Fibre Apprentice";
 
   return (
-    <GameFrame gameId="mill-master" immersive={phase !== "intro"} title="Paper Mill Shuffle" kicker="Game 03 · Build the Process" elapsedSeconds={phase === "intro" ? undefined : seconds} progress={phase === "play" ? correctCount / millSteps.length * 100 : undefined}>
+    <GameFrame gameId="mill-master" immersive={phase !== "intro"} title="Paper Mill Shuffle" kicker="Game 03 · Build the Process" elapsedSeconds={phase === "intro" ? undefined : seconds} progress={phase === "play" ? correctCount / correctSteps.length * 100 : undefined}>
       {phase === "intro" && (
         <GameIntro
           gameId="mill-master"
@@ -101,26 +122,27 @@ export default function MillMasterGame() {
               <aside className="mill-control-panel">
                 <p className="game-kicker">The line is stopped</p>
                 <h1>Reconnect<br />the mill.</h1>
-                <p>Move eight stages into one continuous line—from recovered fibre to a finished reel.</p>
+                <p>Move eight stages into one continuous line, from recovered fibre to a finished reel.</p>
                 <div className="mill-order-status">
                   <span><strong>{String(correctCount).padStart(2, "0")}</strong><small>correct</small></span>
                   <span><strong>{String(attempts).padStart(2, "0")}</strong><small>checks</small></span>
                 </div>
+                <MillProcessVisual progress={correctCount / correctSteps.length} running={checked && correctCount === correctSteps.length} />
 
                 <AnimatePresence mode="wait">
-                  {checked && correctCount < millSteps.length && (
+                  {checked && correctCount < correctSteps.length && (
                     <motion.div key={correctCount} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mill-order-feedback">
                       <span><X size={18} /> Line blocked</span>
                       <p><strong>{correctCount} stages</strong> are placed correctly. Keep the green stages and move the others.</p>
                     </motion.div>
                   )}
-                  {checked && correctCount === millSteps.length && (
+                  {checked && correctCount === correctSteps.length && (
                     <motion.div initial={{ opacity: 0, scale: .94 }} animate={{ opacity: 1, scale: 1 }} className="mill-order-feedback is-success"><span><CheckCircle2 /> Mill running</span><p>The complete fibre-to-reel line is connected.</p></motion.div>
                   )}
                 </AnimatePresence>
 
                 <div className="mill-order-actions">
-                  <button className="mill-shuffle-button" onClick={() => reorder(makeStartingOrder())}><RotateCcw size={16} /> Reshuffle</button>
+                  <button className="mill-shuffle-button" onClick={() => reorder(makeStartingOrder(correctSteps))}><RotateCcw size={16} /> Reshuffle</button>
                   <button className="game-primary-button" onClick={checkLine}><Play size={17} /> Check line</button>
                   <button className="mill-exit-button" onClick={reset}><ArrowLeft size={15} /> Exit</button>
                 </div>
@@ -130,8 +152,8 @@ export default function MillMasterGame() {
                 <header><span>Recovered fibre</span><strong>Drag the process into order</strong><span>Finished reel</span></header>
                 <Reorder.Group axis="y" values={steps} onReorder={reorder} className="mill-order-list" aria-label="Paper mill process order">
                   {steps.map((step, index) => {
-                    const isCorrect = millSteps[index] === step;
-                    return <MillOrderCard key={step} step={step} index={index} checked={checked} isCorrect={isCorrect} onMove={moveStep} />;
+                    const isCorrect = correctSteps[index] === step;
+                    return <MillOrderCard key={step} step={step} index={index} total={correctSteps.length} checked={checked} isCorrect={isCorrect} onMove={moveStep} />;
                   })}
                 </Reorder.Group>
                 <footer><GripVertical /> Drag a row, or use its arrow buttons. Correct positions turn green after checking.</footer>
@@ -144,7 +166,7 @@ export default function MillMasterGame() {
       {phase === "result" && (
         <ResultPanel gameId="mill-master" game="Paper Mill Shuffle" score={finalScore} outOf={800} badge={badge} message={`You rebuilt the complete papermaking line in ${attempts} ${attempts === 1 ? "check" : "checks"} and ${seconds} seconds.`} durationSeconds={seconds} metrics={{ attempts }} onReplay={reset}>
           <div className="mill-result-line">
-            {millSteps.map((step, index) => <div key={step}><span>{index + 1}</span><strong>{step}</strong>{index < millSteps.length - 1 && <i />}</div>)}
+            {correctSteps.map((step, index) => <div key={step}><span>{index + 1}</span><strong>{step}</strong>{index < correctSteps.length - 1 && <i />}</div>)}
           </div>
         </ResultPanel>
       )}
@@ -152,9 +174,29 @@ export default function MillMasterGame() {
   );
 }
 
-function MillOrderCard({ step, index, checked, isCorrect, onMove }: { step: Step; index: number; checked: boolean; isCorrect: boolean; onMove: (index: number, direction: -1 | 1) => void }) {
+function MillProcessVisual({ progress, running }: { progress: number; running: boolean }) {
+  return (
+    <div
+      className={`mill-process-visual ${running ? "is-running" : ""}`}
+      style={{ "--mill-progress": progress } as React.CSSProperties}
+      aria-label={`Mill process ${Math.round(progress * 100)} percent connected`}
+    >
+      <header><span>Fibre flow</span><strong>{running ? "Line running" : `${Math.round(progress * 100)}% connected`}</strong></header>
+      <div className="mill-process-machine" aria-hidden="true">
+        <div className="mill-vat"><i /><i /><i /><b /></div>
+        <div className="mill-flow-pipe"><i /></div>
+        <div className="mill-process-rollers"><i /><i /><i /></div>
+        <div className="mill-dryer"><i /></div>
+        <div className="mill-reel"><i /><b /></div>
+      </div>
+    </div>
+  );
+}
+
+function MillOrderCard({ step, index, total, checked, isCorrect, onMove }: { step: Step; index: number; total: number; checked: boolean; isCorrect: boolean; onMove: (index: number, direction: -1 | 1) => void }) {
   const dragControls = useDragControls();
-  const Icon = stepInfo[step].icon;
+  const details = stepInfo[step] ?? { hint: "A custom production stage configured by the editorial team", icon: Factory };
+  const Icon = details.icon;
   function startDrag(event: PointerEvent<HTMLButtonElement>) {
     dragControls.start(event);
   }
@@ -162,11 +204,11 @@ function MillOrderCard({ step, index, checked, isCorrect, onMove }: { step: Step
     <Reorder.Item value={step} dragListener={false} dragControls={dragControls} className={`mill-order-card ${checked ? isCorrect ? "is-correct" : "is-wrong" : ""}`} whileDrag={{ scale: 1.035, rotate: index % 2 ? 2 : -2, boxShadow: "0 28px 55px rgba(20,38,27,.24)" }}>
       <button className="mill-order-grip" onPointerDown={startDrag} aria-label={`Drag ${step}. Current position ${index + 1}`}><GripVertical /><span>{String(index + 1).padStart(2, "0")}</span></button>
       <div className="mill-order-icon"><Icon size={25} strokeWidth={1.7} /></div>
-      <div className="mill-order-copy"><strong>{step}</strong><span>{stepInfo[step].hint}</span></div>
+      <div className="mill-order-copy"><strong>{step}</strong><span>{details.hint}</span></div>
       <div className="mill-order-verdict" aria-label={checked ? isCorrect ? "Correct position" : "Wrong position" : "Not checked"}>{checked ? isCorrect ? <Check /> : <X /> : <Scissors />}</div>
       <div className="mill-order-move">
         <button onClick={() => onMove(index, -1)} disabled={index === 0} aria-label={`Move ${step} up`}><ArrowUp /></button>
-        <button onClick={() => onMove(index, 1)} disabled={index === millSteps.length - 1} aria-label={`Move ${step} down`}><ArrowDown /></button>
+        <button onClick={() => onMove(index, 1)} disabled={index === total - 1} aria-label={`Move ${step} down`}><ArrowDown /></button>
       </div>
     </Reorder.Item>
   );

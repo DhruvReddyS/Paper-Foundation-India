@@ -7,4 +7,6 @@ export const inquirySchema = z.object({
   subject: z.string().trim().min(2).max(240),
   message: z.string().trim().min(10).max(8000),
   sourceUrl: z.union([z.string().url(), z.literal(""), z.null()]).optional(),
+  attachmentUrl: z.union([z.string().url(), z.literal(""), z.null()]).optional(),
+  attachmentName: z.string().trim().max(180).optional(),
 });

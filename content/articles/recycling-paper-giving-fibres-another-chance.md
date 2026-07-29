@@ -18,7 +18,7 @@ While paper is highly recyclable, the process is not infinite. Mechanical repulp
 
 ### Perspective Matrix Module 3
 
-When paper enters an unmanaged landfill, its natural lifecycle is violently disrupted. In an anaerobic, oxygen-deprived landfill environment, bacteria decompose the cellulose, generating methane (CH4)—a greenhouse gas with a global warming potential over 25 times higher than carbon dioxide over a 100-year timeline. Diverting paper from the waste stream into dedicated recycling loops bypasses this anaerobic digestion entirely, transforming a potential climate liability into a highly valuable secondary raw material.
+When paper enters an unmanaged landfill, its natural lifecycle is violently disrupted. In an anaerobic, oxygen-deprived landfill environment, bacteria decompose the cellulose, generating methane (CH4), a greenhouse gas with a global warming potential over 25 times higher than carbon dioxide over a 100-year timeline. Diverting paper from the waste stream into dedicated recycling loops bypasses this anaerobic digestion entirely, transforming a potential climate liability into a highly valuable secondary raw material.
 
 ## Verified External Resources & Live Links
 

@@ -5,17 +5,22 @@ import { motion, type MotionValue, useMotionValueEvent, useScroll, useTransform 
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { paperEverywhereObjects } from "@/content/paperEverywhere";
 import styles from "./PaperEverywhere.module.css";
 
-const moments = [
-  { no: "01", title: "It carries what we learn.", label: "Education", copy: "Notes, maps and books turn information into something we can hold, revisit and share.", image: "/images/everyday/learning-in-paper.jpg", alt: "Student writing in a paper notebook beside books and a map", note: "The page keeps an idea available after the screen goes dark." },
-  { no: "02", title: "It protects what keeps us well.", label: "Healthcare", copy: "Cartons, prescriptions and leaflets help medicine travel with identity, instructions and protection.", image: "/images/everyday/health-in-paper.jpg", alt: "Pharmacist handing over medicine in paper packaging", note: "Protection and information often travel in the same folded sheet." },
-  { no: "03", title: "It helps livelihoods move.", label: "Enterprise", copy: "Corrugated boxes and paper cushioning connect a maker’s table to a doorstep.", image: "/images/everyday/business-in-paper.jpg", alt: "Small business owner packing a product in corrugated paper", note: "A box is infrastructure disguised as a simple object." },
-  { no: "04", title: "It keeps a public record.", label: "News & civic life", copy: "Newsprint, receipts and public documents make information portable, inspectable and shareable.", image: "/images/everyday/newsprint-in-paper.jpg", alt: "Reader opening a newspaper at an Indian tea stall", note: "Paper lets a public conversation sit open on the table." },
-  { no: "05", title: "It serves, wraps and separates.", label: "Food", copy: "Paperboard cartons, liners and sleeves help food businesses protect products and organise service.", image: "/images/everyday/food-in-paper.jpg", alt: "Bakery owner packing food in paperboard cartons", note: "The right grade is designed for the job—not chosen by appearance alone." },
-  { no: "06", title: "It gives craft a surface.", label: "Print & culture", copy: "Prints, books, invitations and envelopes turn paper into memory, identity and skilled work.", image: "/images/everyday/craft-in-paper.jpg", alt: "Indian printmaker and bookbinder working with handmade paper", note: "Texture is not decoration here. It is part of how the work speaks." },
-  { no: "07", title: "It quietly supports hygiene.", label: "Home & care", copy: "Tissue, towels and napkins solve short, practical tasks where absorbency and cleanliness matter.", image: "/images/everyday/hygiene-in-paper.jpg", alt: "Family using paper napkins in an everyday dining space", note: "Some paper lives are brief because the task itself is brief." },
-] as const;
+const homeSlugs = ["notebooks", "corrugated-boxes", "tissue-and-towels", "newsprint", "food-contact-paper", "one-rupee-note", "medicine-cartons"];
+const moments = homeSlugs.map((slug) => {
+  const item = paperEverywhereObjects.find((entry) => entry.slug === slug)!;
+  return {
+    no: item.number,
+    title: item.thesis,
+    label: item.category,
+    copy: item.figureContext,
+    image: item.image,
+    alt: item.alt,
+    note: `${item.figure} / ${item.source.organisation} / ${item.source.year}`,
+  };
+});
 
 function MomentFrame({ moment, index, total, progress }: { moment: typeof moments[number]; index: number; total: number; progress: MotionValue<number> }) {
   const start = index / total;
@@ -31,7 +36,7 @@ function MomentFrame({ moment, index, total, progress }: { moment: typeof moment
   return <motion.article className={styles.frame} style={{ opacity, x, y, scale }} aria-hidden="true">
     <div className={styles.photo}><motion.div style={{ y: imageY }}><Image src={moment.image} alt={moment.alt} fill sizes="(max-width: 780px) 100vw, 62vw" /></motion.div><i /></div>
     <div className={styles.caption}><span>{moment.no} / {moment.label}</span><h3>{moment.title}</h3><p>{moment.copy}</p></div>
-    <aside><small>FIELD TRANSCRIPT · {moment.no}</small><p>“{moment.note}”</p><i /></aside>
+    <aside><small>VERIFIED RECORD · {moment.no}</small><p>{moment.note}</p><i /></aside>
   </motion.article>;
 }
 
@@ -51,9 +56,9 @@ export default function PaperEverywhere() {
   return <section ref={root} className={styles.section} aria-labelledby="everywhere-title">
     <div className={styles.sticky}>
       <div className={styles.copy}>
-        <p>Paper Everywhere · seven field notes</p>
-        <h2 id="everywhere-title">The material hiding <em>in plain sight.</em></h2>
-        <span>Ordinary scenes carry specialised grades, fibres and functions that are easy to overlook.</span>
+        <p>Paper Everywhere · seven evidence notes</p>
+        <h2 id="everywhere-title">Look closer. <em>The object has a job.</em></h2>
+        <span>Move through familiar scenes, then open the atlas to inspect the source, scope and material decision behind each one.</span>
         <div className={styles.counter}><strong>{moments[active].no}</strong><span>{moments[active].label}</span></div>
         <Link href="/everyday-paper">Open the complete paper atlas <ArrowRight /></Link>
       </div>

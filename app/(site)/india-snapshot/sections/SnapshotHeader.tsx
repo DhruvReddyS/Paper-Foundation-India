@@ -16,7 +16,7 @@ export default function SnapshotHeader() {
             India Paper Snapshot
           </h1>
           <p className="text-lg text-forest/70 max-w-2xl mx-auto">
-            Key statistics and trends shaping India&apos;s paper and paperboard industry — 
+            Key statistics and trends shaping India&apos;s paper and paperboard industry,
             production, consumption, trade, recycling, and more.
           </p>
         </motion.div>

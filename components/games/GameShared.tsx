@@ -11,9 +11,12 @@ import {
   Play,
   RotateCcw,
   Share2,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getGameDefinition, type GameId } from "./gameCatalog";
+import { isGameSoundEnabled, setGameSoundEnabled } from "./gameAudio";
 
 const SITE_URL = "https://paperfoundation.in";
 
@@ -37,6 +40,12 @@ export function GameFrame({
   children: React.ReactNode;
 }) {
   const definition = getGameDefinition(gameId);
+  const remote = useGameConfiguration(gameId);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+
+  useEffect(() => {
+    setSoundEnabled(isGameSoundEnabled());
+  }, []);
 
   useEffect(() => {
     if (!immersive) return;
@@ -56,7 +65,7 @@ export function GameFrame({
     >
       <div className="game-shell">
         <header className="game-session-header">
-          <Link href="/games" className="game-back-link">
+          <Link href="/discover" className="game-back-link">
             <ArrowLeft size={16} /> All games
           </Link>
           <div className="game-session-title">
@@ -65,9 +74,29 @@ export function GameFrame({
           </div>
           <div className="game-session-live">
             {typeof elapsedSeconds === "number" ? <><Clock3 /><span>Time<strong>{formatTime(elapsedSeconds)}</strong></span></> : <span>{definition.skill}</span>}
+            <button
+              type="button"
+              className="game-sound-toggle"
+              aria-label={soundEnabled ? "Mute game sounds" : "Enable game sounds"}
+              aria-pressed={soundEnabled}
+              onClick={() => {
+                const next = !soundEnabled;
+                setSoundEnabled(next);
+                setGameSoundEnabled(next);
+              }}
+            >
+              {soundEnabled ? <Volume2 /> : <VolumeX />}
+            </button>
           </div>
         </header>
-        {typeof progress === "number" && (
+        {remote?.enabled === false ? (
+          <section className="game-unavailable">
+            <p className="game-kicker">Temporarily unavailable</p>
+            <h1>This field test is being prepared.</h1>
+            <p>Choose another game while the editorial team updates this experience.</p>
+            <Link href="/discover">Return to all games</Link>
+          </section>
+        ) : typeof progress === "number" && (
           <div
             className="game-progress"
             role="progressbar"
@@ -81,7 +110,7 @@ export function GameFrame({
             />
           </div>
         )}
-        {children}
+        {remote?.enabled !== false && children}
       </div>
     </div>
   );
@@ -103,52 +132,118 @@ export function GameIntro({
   onStart: () => void;
 }) {
   const definition = getGameDefinition(gameId);
+  const remote = useGameConfiguration(gameId);
   const reducedMotion = useReducedMotion();
+  const briefing = {
+    "grow-or-shred": {
+      desk: "FIELD NOTEBOOK",
+      title: "Grow a living answer",
+      cue: "Roots need evidence",
+      labels: ["QUESTION", "CHOICE", "GROWTH"],
+    },
+    "truth-press": {
+      desk: "VERIFICATION PRESS",
+      title: "Put the claim under pressure",
+      cue: "Ink follows evidence",
+      labels: ["CLAIM", "CONTEXT", "VERDICT"],
+    },
+    "mill-master": {
+      desk: "MILL CONTROL ROOM",
+      title: "Keep the sheet moving",
+      cue: "Sequence is the machine",
+      labels: ["FIBRE", "FLOW", "SHEET"],
+    },
+    "hidden-paper": {
+      desk: "MATERIAL EVIDENCE FILE",
+      title: "Follow the smallest clue",
+      cue: "Look past the surface",
+      labels: ["OBJECT", "CLUE", "REVEAL"],
+    },
+    "paper-word-search": {
+      desk: "TYPE HUNTER'S DESK",
+      title: "Read in every direction",
+      cue: "The grid changes each time",
+      labels: ["SCAN", "MARK", "CLEAR"],
+    },
+  }[gameId];
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`game-intro game-intro-${definition.theme}`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={`game-launch game-launch-${definition.theme}`}
     >
-      <header className="game-intro-heading">
-        <span>{definition.verb}</span>
-        <i />
-        <small>{definition.duration} · {definition.difficulty}</small>
-      </header>
-      <div className="game-intro-layout">
-        <div className="game-intro-copy">
+      <div className="game-launch-main">
+        <header className="game-launch-copy">
+          <div className="game-launch-number">{definition.number}</div>
           <p className="game-kicker">{eyebrow}</p>
-          <h1>{title}</h1>
-          <p>{description}</p>
-          <button className="game-primary-button" onClick={onStart}>
-            Begin the game <Play size={16} fill="currentColor" />
-          </button>
-        </div>
-        <div className="game-intro-visual" aria-hidden="true">
-          <span>{definition.number}</span>
-          <GameMark gameId={gameId} animate={!reducedMotion} />
-          <small>{definition.shortTitle}</small>
-        </div>
-      </div>
-      <aside className="game-rules-card">
-        <header>
-          <div>
-            <small>How to play</small>
-            <strong>Three clear steps</strong>
+          <h1>{remote?.title || title}</h1>
+          <p>{remote?.description || description}</p>
+          <div className="game-launch-actions">
+            <button className="game-primary-button" onClick={onStart}>
+              Start mission <Play size={16} fill="currentColor" />
+            </button>
+            <span>{remote?.duration || definition.duration}<b>{remote?.skill || definition.skill}</b></span>
           </div>
-          <span>{definition.skill}</span>
         </header>
-        <ol>
-          {rules.map((rule, index) => (
-            <li key={rule}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              {rule}
-            </li>
-          ))}
-        </ol>
-      </aside>
+
+        <div className="game-launch-world" aria-hidden="true">
+          <div className="game-launch-world-label"><span>LIVE PREVIEW</span><b>{briefing.cue}</b></div>
+          <GameMark gameId={gameId} animate={!reducedMotion} />
+          <GameScene gameId={gameId} labels={briefing.labels} />
+          <div className="game-launch-orbit"><i /><i /><i /></div>
+        </div>
+
+        <aside className="game-launch-rules">
+          <header><small>{briefing.desk}</small><strong>{briefing.title}</strong></header>
+          <ol>
+            {(remote?.instructions?.length ? remote.instructions : rules).map((rule, index) => (
+              <li key={rule}><span>{String(index + 1).padStart(2, "0")}</span><p>{rule}</p></li>
+            ))}
+          </ol>
+          <footer><span>{remote?.difficulty || definition.difficulty}</span><b>{definition.verb}</b></footer>
+        </aside>
+      </div>
     </motion.section>
+  );
+}
+
+export type PublicGameConfiguration = {
+  gameId: string;
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  instructions?: string[];
+  duration?: string;
+  difficulty?: string;
+  skill?: string;
+  enabled?: boolean;
+  content?: Record<string, unknown>;
+};
+
+export function useGameConfiguration(gameId: GameId) {
+  const [configuration, setConfiguration] = useState<PublicGameConfiguration | null>(null);
+  useEffect(() => {
+    fetch("/api/game-config").then(response => response.json()).then(data => {
+      const item = data.items?.find((candidate: PublicGameConfiguration & { id?: string }) => (candidate.gameId || candidate.id) === gameId);
+      if (item) setConfiguration(item);
+    }).catch(() => undefined);
+  }, [gameId]);
+  return configuration;
+}
+
+function GameScene({ gameId, labels }: { gameId: GameId; labels: string[] }) {
+  return (
+    <div className={`game-scene game-scene-detail-${gameId}`}>
+      <div className="game-scene-track">
+        {labels.map((label, index) => <span key={label}><b>{String(index + 1).padStart(2, "0")}</b>{label}</span>)}
+      </div>
+      {gameId === "grow-or-shred" && <><i className="scene-seed" /><i className="scene-soil" /><i className="scene-sun" /></>}
+      {gameId === "truth-press" && <><i className="scene-roller" /><i className="scene-sheet" /><i className="scene-stamp" /></>}
+      {gameId === "mill-master" && <><i className="scene-pipe" /><i className="scene-gauge" /><i className="scene-belt" /></>}
+      {gameId === "hidden-paper" && <><i className="scene-photo" /><i className="scene-thread" /><i className="scene-pin scene-pin-one" /><i className="scene-pin scene-pin-two" /></>}
+      {gameId === "paper-word-search" && <><i className="scene-cursor" /><i className="scene-selection" /><i className="scene-typebar" /></>}
+    </div>
   );
 }
 
@@ -388,11 +483,21 @@ export function shuffleItems<T>(items: readonly T[]) {
 }
 
 function GameMark({ gameId, animate }: { gameId: GameId; animate: boolean }) {
+  const ambientMotion = gameId === "grow-or-shred"
+    ? { rotate: [-.7, .8, -.7], scaleY: [1, 1.012, 1] }
+    : gameId === "truth-press"
+      ? { rotate: [-8, -5.5, -8], scale: [1, 1.018, 1] }
+      : gameId === "mill-master"
+        ? { y: [0, -3, 0], scale: [1, 1.012, 1] }
+        : gameId === "hidden-paper"
+          ? { x: [-4, 5, -4], y: [2, -4, 2], rotate: [-2, 2, -2] }
+          : { y: [0, -3, 0], rotate: [-1, .5, -1] };
   return (
     <motion.div
       className={`game-mark game-mark-${gameId}`}
-      animate={animate ? { y: [0, -8, 0], rotate: [-1, 1, -1] } : undefined}
-      transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+      animate={animate ? ambientMotion : undefined}
+      transition={{ duration: gameId === "grow-or-shred" ? 5.8 : 3.8, repeat: Infinity, ease: "easeInOut" }}
+      style={{ transformOrigin: gameId === "grow-or-shred" ? "50% 100%" : "50% 50%" }}
     >
       {gameId === "grow-or-shred" && (
         <svg viewBox="0 0 160 160"><path d="M80 145V64M80 88C50 78 36 60 34 32c28 2 46 18 46 44M80 106c30-8 47-27 49-55-28 1-45 18-49 43" /><path d="M55 145h50" /></svg>
@@ -495,9 +600,9 @@ function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accen
     ctx.lineCap = "round";
     ctx.beginPath(); ctx.moveTo(82, 230); ctx.bezierCurveTo(74, 177, 91, 112, 82, 38); ctx.stroke();
     const limbs = [[80,178,25,124],[84,162,141,106],[81,130,41,72],[85,113,128,54],[82,88,64,32],[84,72,106,18]];
-    limbs.slice(0, growth).forEach(([x1,y1,x2,y2], index) => {
+    limbs.slice(0, growth).forEach(([x1, y1, x2, y2], index) => {
       ctx.lineWidth = Math.max(3, 8 - index * .7);
-      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.quadraticCurveTo((x1+x2)/2 + (index % 2 ? 8 : -8),(y1+y2)/2,x2,y2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.quadraticCurveTo((x1+x2)/2 + (index % 2 ? 8 : -8),(y1+y2)/2, x2, y2); ctx.stroke();
       ctx.fillStyle = accent;
       for (let leafIndex = 0; leafIndex < 5; leafIndex += 1) {
         ctx.beginPath();

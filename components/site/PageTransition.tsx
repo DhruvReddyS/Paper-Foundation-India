@@ -2,27 +2,7 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
-
-const routeNames: Record<string, string> = {
-  "/": "Opening the home page",
-  "/journey": "Binding the paper journey",
-  "/knowledge": "Preparing the reading desk",
-  "/knowledge/featured": "Opening the feature folio",
-  "/myths": "Retrieving the evidence files",
-  "/glossary": "Indexing the paper lexicon",
-  "/resources": "Gathering source material",
-  "/games": "Loading the games lab",
-  "/join": "Preparing the membership folio",
-  "/contact": "Opening the correspondence desk",
-  "/report": "Preparing the evidence desk",
-};
-
-function labelFor(pathname: string) {
-  if (routeNames[pathname]) return routeNames[pathname];
-  if (pathname.startsWith("/knowledge/")) return "Opening the selected article";
-  if (pathname.startsWith("/discover/")) return "Setting the game table";
-  return "Turning to the next page";
-}
+import RouteLogoLoader from "@/components/site/RouteLogoLoader";
 
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -30,37 +10,19 @@ export default function PageTransition({ children }: { children: React.ReactNode
 
   return (
     <div className="paper-page-transition">
-      <AnimatePresence mode="popLayout" initial={false}>
+      <AnimatePresence mode="wait" initial={false}>
         {!reduced && (
           <motion.div
             key={pathname}
-            className="route-paper-transition"
-            aria-hidden="true"
-            initial={{ y: "0%" }}
-            animate={{ y: "-105%" }}
+            className="route-logo-transition"
+            role="status"
+            aria-label="Loading page"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.86, delay: 0.22, ease: [0.76, 0, 0.24, 1] }}
+            transition={{ duration: .3, delay: .68, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="route-paper-grain" />
-            <motion.div
-              className="route-paper-fibre route-paper-fibre-a"
-              animate={{ x: [0, 18, 0], rotate: [-8, 7, -8] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="route-paper-fibre route-paper-fibre-b"
-              animate={{ x: [0, -14, 0], rotate: [14, -4, 14] }}
-              transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <div className="route-paper-press">
-              <span className="route-paper-monogram">P</span>
-              <div>
-                <small>Paper Foundation India</small>
-                <strong>{labelFor(pathname)}</strong>
-              </div>
-              <i><b /></i>
-            </div>
-            <div className="route-paper-edge" />
+            <RouteLogoLoader pathname={pathname} />
           </motion.div>
         )}
       </AnimatePresence>

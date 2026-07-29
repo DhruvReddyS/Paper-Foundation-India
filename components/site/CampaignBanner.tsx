@@ -10,7 +10,7 @@ interface CampaignBannerProps {
 }
 
 export default function CampaignBanner({
-  message = '🌿 India recycles 70% of its paper — learn how the industry leads in sustainability.',
+  message = '🌿 India recycles 70% of its paper, learn how the industry leads in sustainability.',
   ctaText = 'Read More',
   ctaHref = '/articles',
 }: CampaignBannerProps) {

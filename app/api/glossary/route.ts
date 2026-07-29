@@ -3,6 +3,7 @@ import { z } from "zod";
 import { glossaryData } from "@/content/glossary";
 import { connectDB } from "@/lib/db";
 import { Glossary } from "@/lib/models/Glossary";
+import { requireAdmin } from "@/lib/api-auth";
 
 const schema = z.object({
   term: z.string().min(1),
@@ -19,11 +20,13 @@ export async function GET(request: NextRequest) {
   }
   await connectDB();
   const status = request.nextUrl.searchParams.get("status") ?? "published";
+  if (status !== "published" && await requireAdmin()) return NextResponse.json({ error: "Admin access required" }, { status: 401 });
   const items = await Glossary.find(status === "all" ? {} : { status }).sort({ letter: 1, order: 1, term: 1 }).lean();
   return NextResponse.json({ items, source: "cms" });
 }
 
 export async function POST(request: NextRequest) {
+  const denied = await requireAdmin(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ error: "CMS database is not configured" }, { status: 503 });
   const parsed = schema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: "Invalid glossary entry", issues: parsed.error.flatten() }, { status: 400 });
@@ -32,6 +35,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const denied = await requireAdmin(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ error: "CMS database is not configured" }, { status: 503 });
   const payload = await request.json();
   const parsed = schema.partial().safeParse(payload);
@@ -42,6 +46,7 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const denied = await requireAdmin(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ error: "CMS database is not configured" }, { status: 503 });
   const id = request.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing glossary id" }, { status: 400 });

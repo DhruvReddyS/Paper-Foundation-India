@@ -3,6 +3,7 @@ import { z } from "zod";
 import { resourceCatalog } from "@/content/resources";
 import { connectDB } from "@/lib/db";
 import { Resource } from "@/lib/models/Resource";
+import { requireAdmin } from "@/lib/api-auth";
 
 const schema = z.object({
   title: z.string().min(1),
@@ -22,11 +23,13 @@ export async function GET(request: NextRequest) {
   if (!process.env.MONGODB_URI) return NextResponse.json({ items: resourceCatalog, source: "editorial-manifest" });
   await connectDB();
   const status = request.nextUrl.searchParams.get("status") ?? "published";
+  if (status !== "published" && await requireAdmin()) return NextResponse.json({ error: "Admin access required" }, { status: 401 });
   const items = await Resource.find(status === "all" ? {} : { status }).sort({ order: 1, createdAt: -1 }).lean();
   return NextResponse.json({ items, source: "cms" });
 }
 
 export async function POST(request: NextRequest) {
+  const denied = await requireAdmin(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ error: "CMS database is not configured" }, { status: 503 });
   const parsed = schema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: "Invalid resource", issues: parsed.error.flatten() }, { status: 400 });
@@ -35,6 +38,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const denied = await requireAdmin(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ error: "CMS database is not configured" }, { status: 503 });
   const payload = await request.json();
   const parsed = schema.partial().safeParse(payload);
@@ -45,6 +49,7 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const denied = await requireAdmin(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ error: "CMS database is not configured" }, { status: 503 });
   const id = request.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing resource id" }, { status: 400 });

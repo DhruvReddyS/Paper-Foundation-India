@@ -39,7 +39,7 @@ export default function ContactSuccess() {
             Message Sent Successfully!
           </h2>
           <p className="text-charcoal/60 mb-6">
-            Thank you for reaching out. We typically respond within 24–48 hours.
+            Thank you for reaching out. We typically respond within 24-48 hours.
             You&apos;ll receive a confirmation email shortly.
           </p>
           <button className="px-6 py-3 rounded-lg bg-forest text-paper-white font-semibold hover:bg-dark-green transition-colors">

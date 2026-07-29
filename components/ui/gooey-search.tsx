@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo, useId, useCallback } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -43,7 +43,7 @@ const iconMotionVariants = {
 
 const getResultVariants = (index: number, unsupported: boolean) => ({
   initial: { y: 0, scale: 0.3, filter: unsupported ? "none" : "blur(10px)" },
-  animate: { y: (index + 1) * 54, scale: 1, filter: "blur(0px)" },
+  animate: { y: (index + 1) * 64, scale: 1, filter: "blur(0px)" },
   exit: { y: unsupported ? 0 : -4, scale: 0.8 },
 });
 
@@ -179,9 +179,6 @@ export function GooeySearch({
   debounceMs = 500,
   maxResults = 5,
 }: GooeySearchProps) {
-  const uid = useId().replace(/:/g, "_");
-  const filterId = `gooey-search-${uid}`;
-
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState<1 | 2>(1);
@@ -286,40 +283,21 @@ export function GooeySearch({
         .gooey-search-input::placeholder { color: var(--background); opacity: 0.55; }
       `}</style>
 
-      {/* SVG gooey filter — zero size, no layout impact */}
-      <svg aria-hidden="true" style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}>
-        <defs>
-          <filter id={filterId}>
-            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-            <feColorMatrix
-              in="blur"
-              type="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -15"
-              result="goo"
-            />
-            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-          </filter>
-        </defs>
-      </svg>
-
-      {/* Gooey container — this is where the morphing magic happens */}
       <div
         style={{
-          filter: isUnsupported ? "none" : `url(#${filterId})`,
           cursor: "pointer",
           width: step === 1 ? 100 : 238,
-          height: 46,
+          height: "var(--gooey-search-height, 46px)",
           position: "relative",
           transition: "width .72s cubic-bezier(.22,1,.36,1)",
         }}
       >
-        {/* Results — z-index -1 so they live "behind" the button until animated out */}
         <AnimatePresence mode="popLayout">
           <motion.div
             key="results-wrapper"
             role="listbox"
             aria-label="Search results"
-            style={{ position: "absolute", zIndex: -1, left: -62, top: 0, width: 300 }}
+            style={{ position: "absolute", zIndex: 2, right: 0, top: 0, width: 316 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ delay: isUnsupported ? 0.5 : 1.25, duration: 0.5 }}
           >
@@ -343,15 +321,17 @@ export function GooeySearch({
                   exit="exit"
                   transition={getResultTransition(index)}
                   style={{
-                    backgroundColor: "var(--foreground)",
-                    borderRadius: 40,
+                    backgroundColor: "var(--background)",
+                    border: "1px solid rgba(41, 76, 53, .18)",
+                    borderRadius: 12,
                     padding: resultPadding,
                     width: "100%",
-                    color: "var(--background)",
+                    color: "var(--foreground)",
                     position: "absolute",
                     left: 0,
                     fontSize: 14,
                     cursor: "pointer",
+                    boxShadow: "0 14px 32px rgba(24, 42, 30, .14)",
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
@@ -394,7 +374,7 @@ export function GooeySearch({
             position: "absolute",
             left: 0,
             top: 0,
-            minHeight: 46,
+            minHeight: "var(--gooey-search-height, 46px)",
             backgroundColor: "var(--foreground)",
             color: "var(--background)",
             cursor: "pointer",
@@ -403,6 +383,7 @@ export function GooeySearch({
             border: "none",
             borderRadius: 9999,
             padding: btnPadding,
+            zIndex: 4,
           }}
         >
           {step === 1 ? (
@@ -411,13 +392,16 @@ export function GooeySearch({
                 pointerEvents: "none",
                 textAlign: "center",
                 position: "relative",
-                left: 4,
                 color: "var(--background)",
-                opacity: 0.72,
+                opacity: 0.9,
                 fontSize: 14,
-                display: "block",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 7,
               }}
             >
+              <SearchSvgIcon isUnsupported={isUnsupported} />
               {buttonLabel}
             </span>
           ) : (
@@ -472,6 +456,7 @@ export function GooeySearch({
                 alignItems: "center",
                 borderRadius: 9999,
                 color: "var(--background)",
+                zIndex: 5,
               }}
             >
               {isLoading ? <LoadingSvgIcon /> : <SearchSvgIcon isUnsupported={isUnsupported} />}

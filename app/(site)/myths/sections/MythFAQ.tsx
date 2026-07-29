@@ -12,7 +12,7 @@ const faqs: FAQItem[] = [
   {
     question: "Where does India's paper industry get its wood?",
     answer:
-      "Over 80% of wood for India's paper industry comes from social and farm forestry plantations grown on degraded, non-forest land — not natural forests. These plantations have greened over 1.5 million hectares.",
+      "Over 80% of wood for India's paper industry comes from social and farm forestry plantations grown on degraded, non-forest land, not natural forests. These plantations have greened over 1.5 million hectares.",
   },
   {
     question: "Is paper packaging better than plastic?",
@@ -22,7 +22,7 @@ const faqs: FAQItem[] = [
   {
     question: "How many times can paper be recycled?",
     answer:
-      "Paper fibres can be recycled 5–7 times before they become too short. After that, they biodegrade naturally, returning nutrients to the soil.",
+      "Paper fibres can be recycled 5-7 times before they become too short. After that, they biodegrade naturally, returning nutrients to the soil.",
   },
   {
     question: "How are myths selected and verified?",

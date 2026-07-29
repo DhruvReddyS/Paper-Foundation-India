@@ -4,25 +4,44 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Clock, Feather, Layers3, Search, Sparkles, Sprout } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState, type CSSProperties } from "react";
-import { articleCatalog, articleCoverImage } from "@/content/articleCatalog";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { articleCatalog, articleCoverImage, type ArticleCatalogItem } from "@/content/articleCatalog";
 const categories = ["All", "Forestry", "Recovery", "Method", "Production", "Education", "Use"];
 const deskNotes = [
   { icon: Feather, label: "Reading note", title: "A headline is a door, not the whole room.", copy: "Look for scope, source and the system around the claim." },
-  { icon: Layers3, label: "Method card", title: "Compare products—not only material names.", copy: "Use, geography and end-of-life change the answer." },
+  { icon: Layers3, label: "Method card", title: "Compare products, not only material names.", copy: "Use, geography and end-of-life change the answer." },
   { icon: Sprout, label: "Field note", title: "Renewable still needs responsible management.", copy: "Traceability turns a broad promise into something inspectable." },
 ] as const;
 
 export default function KnowledgeExperience() {
+  const [articles, setArticles] = useState<ArticleCatalogItem[]>(articleCatalog);
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
-  const featured = useMemo(() => articleCatalog.filter(article => article.featured), []);
-  const filtered = useMemo(() => articleCatalog.filter(article =>
+  useEffect(() => {
+    fetch("/api/articles?status=published").then(response => response.json()).then(data => {
+      if (data.source !== "cms" || !data.items?.length) return;
+      setArticles(data.items.map((item: Record<string, unknown>, index: number) => ({
+        id: index + 1,
+        slug: String(item.slug),
+        title: String(item.title),
+        category: item.category as ArticleCatalogItem["category"],
+        format: (item.format || "Core lesson") as ArticleCatalogItem["format"],
+        featured: Boolean(item.featured),
+        time: `${Number(item.readingMinutes || 7)} min`,
+        summary: String(item.excerpt || ""),
+        sourceFile: "",
+        status: "published",
+        coverImage: String(item.coverImage || ""),
+      })));
+    }).catch(() => undefined);
+  }, []);
+  const featured = useMemo(() => articles.filter(article => article.featured), [articles]);
+  const filtered = useMemo(() => articles.filter(article =>
     !article.featured &&
     (category === "All" || article.category === category) &&
     `${article.title} ${article.summary}`.toLowerCase().includes(query.toLowerCase())
-  ), [category, query]);
+  ), [articles, category, query]);
 
   return <main className="articles-card-room">
     <section className="articles-card-toolbar">
@@ -62,10 +81,9 @@ export default function KnowledgeExperience() {
           const articleCard = <motion.article layout key={article.slug} initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: .96 }} transition={{ delay: Math.min(index * .035, .2) }} className={`article-paper-card article-paper-tone-${index % 4 + 1} ${selectedSlug === article.slug ? "is-selected" : ""}`}>
             <Link href={`/knowledge/${article.slug}`} onPointerDown={() => setSelectedSlug(article.slug)} onFocus={() => setSelectedSlug(article.slug)} aria-label={`Read ${article.title}`}>
               <div className="article-paper-cover">
-                <Image src={articleCoverImage(article)} alt={`Editorial cover for ${article.title}`} fill sizes="(max-width: 680px) 94vw, (max-width: 1050px) 47vw, 31vw" />
+                <Image src={(article as ArticleCatalogItem & { coverImage?: string }).coverImage || articleCoverImage(article)} alt={`Editorial cover for ${article.title}`} fill sizes="(max-width: 680px) 94vw, (max-width: 1050px) 47vw, 31vw" />
                 <span>{String(article.id).padStart(2, "0")}</span>
                 <small>{article.category}</small>
-                <i aria-hidden="true" />
               </div>
               <div className="article-paper-copy">
                 <p>{article.format}</p>

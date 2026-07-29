@@ -10,4 +10,8 @@ export const mythSchema = z.object({
   tags: z.array(z.string().trim().min(1)).default([]),
   status: z.enum(["draft", "review", "published", "archived"]).default("draft"),
   featured: z.boolean().default(false),
+  order: z.coerce.number().int().min(0).default(0),
+  coverImage: z.string().default(""),
+  revisionNote: z.string().max(500).optional(),
+  lastEditedBy: z.string().max(120).optional(),
 });

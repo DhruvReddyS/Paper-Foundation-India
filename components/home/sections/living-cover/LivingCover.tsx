@@ -42,7 +42,7 @@ export default function LivingCover() {
     <div className={styles.copy}>
       <p className={styles.kicker}><span /> A living material archive</p>
       <h1 id="hero-title"><span>Paper has more than</span> <em>one life.</em></h1>
-      <p className={styles.deck}>One sheet can begin in a working landscape, carry an idea, protect what matters—and return as fibre for something new.</p>
+      <p className={styles.deck}>One sheet can begin in a working landscape, carry an idea, protect what matters, and return as fibre for something new.</p>
       <div className={styles.actions}><a href="#understand-fairly">Unfold the story <ArrowDown /></a><Link href="/journey">Enter the paper journey <ArrowRight /></Link></div>
       <button className={styles.transcript} onClick={() => setNote((note + 1) % fieldNotes.length)} aria-label="Show the next field transcript"><small>Field transcript · 0{note + 1}</small><p>“{fieldNotes[note]}”</p><i /><b>Tap note · PFI</b></button>
     </div>
@@ -53,7 +53,7 @@ export default function LivingCover() {
         <span>CLICK THE MATERIAL / FOLLOW ITS NEXT LIFE</span>
       </button>
       <button className={`${styles.newspaper} ${newspaperOpen ? styles.newspaperOpen : ""}`} onClick={() => setNewspaperOpen(!newspaperOpen)} aria-expanded={newspaperOpen}><small>The Material Daily</small><strong>ONE SHEET.<br />MANY CHAPTERS.</strong><i /><i /><i /><p>Every chapter changes the question. Open the journey, then inspect the evidence.</p><b>{newspaperOpen ? "FOLD STORY" : "UNFOLD STORY"}</b></button>
-      <button className={`${styles.envelope} ${envelopeOpen ? styles.envelopeOpen : ""}`} onClick={() => setEnvelopeOpen(!envelopeOpen)} aria-expanded={envelopeOpen} aria-label={envelopeOpen ? "Close the reader letter" : "Open the reader letter"}><i /><span><small>PRIVATE LETTER · TO THE CURIOUS READER</small><strong>Dear reader,</strong><p>Do not ask whether paper is simply “good” or “bad”. Follow the fibre, the purpose and the route back.</p><b>— The Evidence Desk</b></span><em>{envelopeOpen ? "CLOSE LETTER" : "OPEN THIS LETTER"}</em><u aria-hidden="true">PFI</u></button>
+      <button className={`${styles.envelope} ${envelopeOpen ? styles.envelopeOpen : ""}`} onClick={() => setEnvelopeOpen(!envelopeOpen)} aria-expanded={envelopeOpen} aria-label={envelopeOpen ? "Close the reader letter" : "Open the reader letter"}><i /><span><small>PRIVATE LETTER · TO THE CURIOUS READER</small><strong>Dear reader,</strong><p>Do not ask whether paper is simply “good” or “bad”. Follow the fibre, the purpose and the route back.</p><b>, The Evidence Desk</b></span><em>{envelopeOpen ? "CLOSE LETTER" : "OPEN THIS LETTER"}</em><u aria-hidden="true">PFI</u></button>
       <button className={styles.lifeCard} key={life.label} onClick={nextLife} aria-label="Show the next life of paper">
         <header><span>Life {life.number}</span><small>{life.label}</small></header>
         <Icon />

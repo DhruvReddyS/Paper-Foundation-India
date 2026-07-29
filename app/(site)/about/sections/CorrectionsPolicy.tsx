@@ -21,8 +21,8 @@ export default function CorrectionsPolicy() {
 
           <div className="space-y-4 text-charcoal/70 leading-relaxed">
             <p>
-              We hold ourselves to the highest standards of accuracy. When we make a mistake — 
-              and we know it will happen — we correct it promptly, transparently, and visibly.
+              We hold ourselves to the highest standards of accuracy. When we make a mistake,
+              and we know it will happen, we correct it promptly, transparently, and visibly.
             </p>
 
             <div className="grid md:grid-cols-3 gap-6 mt-8">

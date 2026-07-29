@@ -3,11 +3,13 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Eye, ExternalLink, Lightbulb, ScanSearch, Sparkles } from "lucide-react";
-import { useState } from "react";
-import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameTimer } from "./GameShared";
+import { useEffect, useState } from "react";
+import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameConfiguration, useGameTimer } from "./GameShared";
+import { playGameSound } from "./gameAudio";
 import { hiddenProducts, type HiddenProduct } from "./gameData";
 
 export default function HiddenPaperGame() {
+  const configuration = useGameConfiguration("hidden-paper");
   const [phase, setPhase] = useState<"intro" | "play" | "result">("intro");
   const [products, setProducts] = useState<HiddenProduct[]>(() => shuffleItems(hiddenProducts));
   const [index, setIndex] = useState(0);
@@ -19,39 +21,54 @@ export default function HiddenPaperGame() {
   const { seconds, resetTimer } = useGameTimer(phase === "play");
   const product = products[index];
   const availablePoints = Math.max(20, 120 - (clues - 1) * 20 - wrong * 15);
+  useEffect(() => {
+    const configured = configuration?.content?.products;
+    if (phase === "intro" && Array.isArray(configured) && configured.length) setProducts(shuffleItems(configured as HiddenProduct[]));
+  }, [configuration, phase]);
 
   function guess(option: string) {
     if (solved) return;
     const normalizedOption = option.toLocaleLowerCase();
     const normalizedAnswer = product.name.toLocaleLowerCase();
     if (normalizedOption === normalizedAnswer || normalizedAnswer.includes(normalizedOption)) {
+      playGameSound("correct");
       setSolved(true);
       setScore((value) => value + availablePoints);
       setClueHistory((value) => [...value, clues]);
     } else {
+      playGameSound("wrong");
       setWrong((value) => value + 1);
       setClues((value) => Math.min(product.clues.length, value + 1));
     }
   }
 
   function next() {
-    if (index === products.length - 1) setPhase("result");
+    if (index === products.length - 1) {
+      playGameSound("complete");
+      setPhase("result");
+    }
     else { setIndex((value) => value + 1); setClues(1); setWrong(0); setSolved(false); }
   }
 
-  function reset() { setPhase("intro"); setIndex(0); setClues(1); setWrong(0); setSolved(false); setScore(0); setClueHistory([]); setProducts(shuffleItems(hiddenProducts)); resetTimer(); }
+  function reset() { const configured = configuration?.content?.products; setPhase("intro"); setIndex(0); setClues(1); setWrong(0); setSolved(false); setScore(0); setClueHistory([]); setProducts(shuffleItems(Array.isArray(configured) && configured.length ? configured as HiddenProduct[] : hiddenProducts)); resetTimer(); }
   const averageClues = clueHistory.length ? clueHistory.reduce((a, b) => a + b, 0) / clueHistory.length : 0;
   const badge = averageClues <= 1.8 ? "Fibre Visionary" : averageClues <= 2.8 ? "Material Detective" : "Curious Observer";
 
   return (
     <GameFrame gameId="hidden-paper" immersive={phase !== "intro"} title="Hidden Paper" kicker="Game 04 · The clue hunt" elapsedSeconds={phase === "intro" ? undefined : seconds} progress={phase === "play" ? ((index + (solved ? 1 : 0)) / products.length) * 100 : undefined}>
-      {phase === "intro" && <GameIntro gameId="hidden-paper" eyebrow="Unexpected paper, hiding in plain sight" title="How soon can you see the paper?" description="Identify five products using the fewest clues possible. Begin with language, then unlock material behaviour and a clearer visual—but every clue costs points." rules={["Read the first cryptic clue and make a guess or request another clue.", "A wrong guess automatically reveals more information and lowers the available score.", "After solving, peel back the object to learn exactly why a paper component works there."]} onStart={() => setPhase("play")} />}
+      {phase === "intro" && <GameIntro gameId="hidden-paper" eyebrow="Unexpected paper, hiding in plain sight" title="How soon can you see the paper?" description="Identify five products using the fewest clues possible. Begin with language, then unlock material behaviour and a clearer visual, but every clue costs points." rules={["Read the first cryptic clue and make a guess or request another clue.", "A wrong guess automatically reveals more information and lowers the available score.", "After solving, peel back the object to learn exactly why a paper component works there."]} onStart={() => setPhase("play")} />}
 
       {phase === "play" && (
         <section className="hidden-stage">
           <div className="mystery-visual">
-            <div className="mystery-image-frame">
+            <div className={`mystery-image-frame ${solved ? "is-solved" : ""}`}>
               <Image src={product.image} alt={solved ? product.name : "Mystery paper-based product"} fill sizes="(max-width: 900px) 100vw, 50vw" priority className="object-cover" style={{ filter: solved ? "none" : `blur(${Math.max(0, 22 - clues * 4)}px) saturate(${.5 + clues * .12})`, transform: solved ? "scale(1)" : `scale(${1.12 - clues * .012})` }} />
+              <div className="mystery-scan-system" aria-hidden="true">
+                <i className="mystery-scan-line" />
+                <i className="mystery-focus-ring mystery-focus-ring-one" />
+                <i className="mystery-focus-ring mystery-focus-ring-two" />
+                <span className="mystery-reticle"><i /><i /><i /><i /></span>
+              </div>
               {!solved && <div className="mystery-mask"><ScanSearch size={46} /><span>Visual clarity {clues}/{product.clues.length}</span></div>}
               <div className="mystery-points"><strong>{availablePoints}</strong><span>points available</span></div>
             </div>
@@ -68,8 +85,8 @@ export default function HiddenPaperGame() {
             {!solved ? (
               <>
                 <div className="mystery-options">{product.options.map((option) => <button key={option} onClick={() => guess(option)}>{option}</button>)}</div>
-                <button disabled={clues === product.clues.length} onClick={() => setClues((value) => Math.min(product.clues.length, value + 1))} className="reveal-clue-button"><Lightbulb size={18} /> Reveal another clue <span>−20 pts</span></button>
-                {wrong > 0 && <p className="wrong-guess-note">Not that one. The next clue has been uncovered.</p>}
+                <button disabled={clues === product.clues.length} onClick={() => { playGameSound("reveal"); setClues((value) => Math.min(product.clues.length, value + 1)); }} className="reveal-clue-button"><Lightbulb size={18} /> Reveal another clue <span>−20 pts</span></button>
+                {wrong > 0 && <p className="wrong-guess-note" role="status" aria-live="polite">Not that one. The next clue has been uncovered.</p>}
               </>
             ) : (
               <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="product-reveal-card">

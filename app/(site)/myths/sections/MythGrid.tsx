@@ -29,7 +29,7 @@ const mythsData: MythItem[] = [
   {
     id: 3,
     myth: "Paper bags are worse than plastic bags",
-    fact: "Paper bags biodegrade in 2–6 weeks and are widely recyclable. Plastic bags persist for 500+ years.",
+    fact: "Paper bags biodegrade in 2-6 weeks and are widely recyclable. Plastic bags persist for 500+ years.",
     category: "Environment",
     source: "CPCB India",
   },

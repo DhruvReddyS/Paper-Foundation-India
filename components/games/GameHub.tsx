@@ -18,6 +18,7 @@ type HistoryResult = {
 export default function GameHub() {
   const reducedMotion = useReducedMotion();
   const [history, setHistory] = useState<HistoryResult[]>([]);
+  const [games, setGames] = useState<GameDefinition[]>(gameCatalog);
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
   const cursorX = useSpring(pointerX, { stiffness: 110, damping: 18 });
@@ -29,6 +30,24 @@ export default function GameHub() {
     } catch {
       setHistory([]);
     }
+    fetch("/api/game-config").then(response => response.json()).then(data => {
+      if (!Array.isArray(data.items)) return;
+      const merged = gameCatalog.map(game => {
+        const remote = data.items.find((item: { gameId?: string; id?: string }) => (item.gameId || item.id) === game.id);
+        return remote ? {
+          ...game,
+          title: remote.title || game.title,
+          subtitle: remote.subtitle || game.subtitle,
+          description: remote.description || game.description,
+          duration: remote.duration || game.duration,
+          difficulty: remote.difficulty || game.difficulty,
+          skill: remote.skill || game.skill,
+          order: Number(remote.order ?? 0),
+          enabled: remote.enabled !== false,
+        } : { ...game, order: gameCatalog.indexOf(game), enabled: true };
+      });
+      setGames(merged.filter(game => game.enabled).sort((a, b) => a.order - b.order));
+    }).catch(() => undefined);
   }, []);
 
   function trackPointer(event: PointerEvent<HTMLElement>) {
@@ -62,7 +81,7 @@ export default function GameHub() {
               worth sharing.
             </p>
             <div className="games-new-actions">
-              <Link href={gameCatalog[0].href}>
+              <Link href={(games[0] ?? gameCatalog[0]).href}>
                 Start with the living quiz <ArrowRight />
               </Link>
               <a href="#game-deck">
@@ -84,7 +103,7 @@ export default function GameHub() {
               <small>Five ways to test<br />your paper sense</small>
               <i />
             </motion.div>
-            {gameCatalog.map((game, index) => (
+            {games.map((game, index) => (
               <motion.div
                 key={game.id}
                 className={`games-new-tab games-new-tab-${game.theme}`}
@@ -124,7 +143,7 @@ export default function GameHub() {
           </header>
 
           <div className="games-new-cards">
-            {gameCatalog.map((game, index) => (
+            {games.map((game, index) => (
               <GameCard
                 key={game.id}
                 game={game}
@@ -149,14 +168,14 @@ export default function GameHub() {
           </div>
           <div className="games-new-passport-copy">
             <p className="game-kicker">Your local game desk</p>
-            <h2>{played ? `${played} of 5 games played.` : "Your first score is waiting."}</h2>
+            <h2>{played ? `${played} of ${games.length} games played.` : "Your first score is waiting."}</h2>
             <div>
               <span><strong>{String(played).padStart(2, "0")}</strong> titles explored</span>
               <span><strong>{history.length}</strong> completed sessions</span>
               <span><strong>{bestPercent}%</strong> best score</span>
             </div>
-            <Link href={gameCatalog.find((game) => !history.some((result) => result.gameId === game.id))?.href ?? gameCatalog[0].href}>
-              {played === 5 ? "Play another round" : "Continue the edition"} <ArrowRight />
+            <Link href={games.find((game) => !history.some((result) => result.gameId === game.id))?.href ?? games[0]?.href ?? gameCatalog[0].href}>
+              {played === games.length ? "Play another round" : "Continue the edition"} <ArrowRight />
             </Link>
           </div>
         </div>
@@ -165,12 +184,14 @@ export default function GameHub() {
   );
 }
 
+type DisplayGame = GameDefinition & { order?: number; enabled?: boolean };
+
 function GameCard({
   game,
   index,
   completed,
 }: {
-  game: GameDefinition;
+  game: DisplayGame;
   index: number;
   completed: boolean;
 }) {

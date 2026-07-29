@@ -46,7 +46,7 @@ export default function JourneyPreview() {
         <p>Paper Journey · process folio</p>
         <h2 id="journey-home-title">A sheet is not made in one moment.</h2>
         <span>
-          Pull the process apart—source, prepare, make and return—then open the
+          Pull the process apart, source, prepare, make and return, then open the
           full field book for all thirteen evidence-led chapters.
         </span>
         <Link href="/journey">Enter the complete journey <ArrowRight /></Link>

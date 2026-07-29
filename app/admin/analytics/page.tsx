@@ -1,2 +1,2 @@
-import React from 'react';
-export default function AdminAnalytics() { return <div>Analytics Dashboard</div>; }
+import AdminAnalytics from "@/components/admin/AdminAnalytics";
+export default function Page() { return <AdminAnalytics />; }

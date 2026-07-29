@@ -26,7 +26,7 @@ export default function OurStory() {
 
               <p className="text-lg leading-relaxed mb-6">
                 Founded in 2023, we set out to bridge this gap. Our team of researchers,
-                journalists, and sustainability experts began documenting the real story — 
+                journalists, and sustainability experts began documenting the real story,
                 one backed by data, verified by experts, and told with clarity.
               </p>
 
@@ -39,7 +39,7 @@ export default function OurStory() {
 
               <p className="text-lg leading-relaxed">
                 Today, Paper Foundation India is the country&apos;s leading independent voice on
-                paper sustainability — trusted by educators, policymakers, journalists, and
+                paper sustainability, trusted by educators, policymakers, journalists, and
                 millions of citizens who want the facts.
               </p>
             </div>

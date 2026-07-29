@@ -26,7 +26,7 @@ export function MythOfTheDay() {
             transition={{ duration: 0.6 }}
             style={{ transformStyle: "preserve-3d", perspective: 1000 }}
           >
-            {/* Front — Myth */}
+            {/* Front, Myth */}
             <div
               className="absolute inset-0 rounded-2xl border-2 border-copper bg-gradient-to-br from-paper-warm to-kraft p-10 flex flex-col justify-between"
               style={{ backfaceVisibility: "hidden" }}
@@ -51,7 +51,7 @@ export function MythOfTheDay() {
               </div>
             </div>
 
-            {/* Back — Fact */}
+            {/* Back, Fact */}
             <div
               className="absolute inset-0 rounded-2xl border-2 border-forest bg-forest text-white p-10 flex flex-col justify-between"
               style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}

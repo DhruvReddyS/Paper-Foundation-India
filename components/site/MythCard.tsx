@@ -36,7 +36,7 @@ export default function MythCard({
         transition={{ duration: 0.6, ease: 'easeInOut' }}
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* Front — Myth */}
+        {/* Front, Myth */}
         <div
           className="absolute inset-0 rounded-xl bg-[#c4a97d] p-6 flex flex-col justify-between shadow-lg"
           style={{ backfaceVisibility: 'hidden' }}
@@ -53,7 +53,7 @@ export default function MythCard({
           </div>
         </div>
 
-        {/* Back — Fact */}
+        {/* Back, Fact */}
         <div
           className="absolute inset-0 rounded-xl bg-white p-6 flex flex-col justify-between shadow-lg"
           style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}

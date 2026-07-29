@@ -3,31 +3,49 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Check, ExternalLink, Gamepad2, Search, ScanSearch, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState, type CSSProperties, type PointerEvent } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import handbookCards from "@/content/mythCatalog.json";
 import heroStyles from "./MythsHero.module.css";
 
-type HandbookCard = (typeof handbookCards)[number] & { category: string; number: number };
+type HandbookCard = { id: string | number; myth: string; reality: string; indiaContext: string; evidence: string; category: string; number: number };
 
-const categories = [
+const fallbackCategories = [
   ["Forests & fibre", 8], ["Carbon & biodiversity", 13], ["India & agroforestry", 19],
   ["Recovery", 30], ["Packaging", 38], ["Digital & print", 44],
   ["Mills & chemistry", 52], ["Responsible use", 60],
 ] as const;
-const categoryFor = (index: number) => categories.find(([, end]) => index < end)?.[0] ?? "Paper systems";
+const categoryFor = (index: number) => fallbackCategories.find(([, end]) => index < end)?.[0] ?? "Paper systems";
 const categorySlug = (category: string) => category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 export default function MythsExperience({ initialSearch = "" }: { initialSearch?: string }) {
   const reduced = useReducedMotion();
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
   const [query, setQuery] = useState(initialSearch);
-  const [activeCategory, setActiveCategory] = useState(categories[0][0] as string);
-  const library = useMemo(() => handbookCards.map((card, index) => ({ ...card, category: categoryFor(index), number: index + 1 })), []);
-  const grouped = useMemo(() => categories.map(([name], index) => ({
+  const [activeCategory, setActiveCategory] = useState(fallbackCategories[0][0] as string);
+  const [cmsCards, setCmsCards] = useState<HandbookCard[] | null>(null);
+  useEffect(() => {
+    fetch("/api/myths?status=published").then(response => response.json()).then(data => {
+      if (data.source !== "cms" || !data.items?.length) return;
+      const next = data.items.map((item: Record<string, unknown>, index: number): HandbookCard => ({
+        id: String(item._id || index + 1),
+        myth: String(item.claim),
+        reality: String(item.correction),
+        indiaContext: String(item.explanation),
+        evidence: Array.isArray(item.sources) ? item.sources.map(source => String((source as { label?: string }).label || "")).filter(Boolean).join(", ") : "Source record available",
+        category: String(item.category || "Paper systems"),
+        number: index + 1,
+      }));
+      setCmsCards(next);
+      setActiveCategory(next[0].category);
+    }).catch(() => undefined);
+  }, []);
+  const library = useMemo<HandbookCard[]>(() => cmsCards ?? handbookCards.map((card, index) => ({ ...card, category: categoryFor(index), number: index + 1 })), [cmsCards]);
+  const categoryNames = useMemo(() => cmsCards ? Array.from(new Set(library.map(item => item.category))) : fallbackCategories.map(([name]) => name), [cmsCards, library]);
+  const grouped = useMemo(() => categoryNames.map((name) => ({
     name,
     slug: categorySlug(name),
-    items: library.slice(index === 0 ? 0 : categories[index - 1][1], categories[index][1]),
-  })), [library]);
+    items: library.filter(item => item.category === name),
+  })), [categoryNames, library]);
   const filteredLibrary = useMemo(() => library.filter((item) => `${item.category} ${item.myth} ${item.reality} ${item.indiaContext}`.toLowerCase().includes(query.toLowerCase())), [library, query]);
   const activeGroup = grouped.find((group) => group.name === activeCategory) ?? grouped[0];
 
@@ -61,7 +79,7 @@ export default function MythsExperience({ initialSearch = "" }: { initialSearch?
       </div>
       <motion.div className={`myths-hero-copy ${heroStyles.copy}`} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .22 }}>
         <h1>What if the claim<br /><em>is only half the story?</em></h1>
-        <p>Pull one from the pile. Break its seal. Decide whether it is a myth, a fact—or a sentence missing the context that changes everything.</p>
+        <p>Pull one from the pile. Break its seal. Decide whether it is a myth, a fact, or a sentence missing the context that changes everything.</p>
       </motion.div>
     </section>
 
@@ -92,8 +110,8 @@ export default function MythsExperience({ initialSearch = "" }: { initialSearch?
     </section>
 
     <section className="myth-method-premium">
-      <div><p className="premium-kicker">Before you share</p><h2>Pause the headline.<br />Read what surrounds it.</h2><p>Paper Foundation examines claims through source, boundary, method and Indian context—then publishes the evidence trail.</p></div>
-      <div className="credibility-stack">{["Source — who made the claim?", "Boundary — what was included?", "Method — can it be inspected?", "Context — does place change it?"].map((item, index) => <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * .09 }} key={item}><span>{index + 1}</span><strong>{item}</strong><Check /></motion.div>)}</div>
+      <div><p className="premium-kicker">Before you share</p><h2>Pause the headline.<br />Read what surrounds it.</h2><p>Paper Foundation examines claims through source, boundary, method and Indian context, then publishes the evidence trail.</p></div>
+      <div className="credibility-stack">{["Source, who made the claim?", "Boundary, what was included?", "Method, can it be inspected?", "Context, does place change it?"].map((item, index) => <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * .09 }} key={item}><span>{index + 1}</span><strong>{item}</strong><Check /></motion.div>)}</div>
     </section>
 
     <section className="myth-game-bridge">

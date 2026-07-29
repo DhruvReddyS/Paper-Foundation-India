@@ -97,7 +97,6 @@ export default function PaperFeatureExplorer() {
             <p>{current.fact}</p>
             <a href="#everyday-atlas">Inspect the everyday atlas <ArrowUpRight /></a>
           </motion.article>
-          <i className="paper-feature-fibre" aria-hidden="true" />
         </div>
       </div>
     </section>

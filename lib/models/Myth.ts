@@ -10,7 +10,11 @@ const MythSchema = new Schema({
   tags: [String],
   status: { type: String, enum: ["draft", "review", "published", "archived"], default: "draft", index: true },
   featured: { type: Boolean, default: false },
+  order: { type: Number, default: 0, index: true },
+  coverImage: { type: String, default: "" },
   publishedAt: Date,
+  revisionNote: String,
+  lastEditedBy: String,
 }, { timestamps: true });
 
 export const Myth = mongoose.models.Myth || mongoose.model("Myth", MythSchema);

@@ -64,7 +64,7 @@ const articles: Article[] = [
     slug: "innovation-in-indian-mills",
     category: "Innovation",
     title: "Innovation in Indian Paper Mills: A New Era",
-    excerpt: "From AI-powered quality control to biomass energy — mills are transforming.",
+    excerpt: "From AI-powered quality control to biomass energy, mills are transforming.",
     readTime: "6 min",
     date: "Apr 20, 2026",
     tags: ["Innovation", "Technology"],
@@ -90,7 +90,7 @@ export function ArticleGrid() {
               transition={{ duration: 0.4, delay: i * 0.08 }}
             >
               <div className={`knowledge-index-cover cover-${i + 1}`}>
-                <span>FIG. {String(i + 1).padStart(2, "0")}</span><CoverIcon /><i />
+                <span>FIG. {String(i + 1).padStart(2, "0")}</span><CoverIcon />
               </div>
 
               <div className="p-6">

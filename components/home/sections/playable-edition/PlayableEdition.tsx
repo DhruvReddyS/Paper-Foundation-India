@@ -8,13 +8,13 @@ import styles from "./PlayableEdition.module.css";
 
 export default function PlayableEdition(){
  const rail=useRef<HTMLDivElement>(null);
- const drag=useRef({pointerId:-1,startX:0,startScroll:0,moved:false});
- const [dragging,setDragging]=useState(false);
- const move=(direction:number)=>rail.current?.scrollBy({left:direction*360,behavior:"smooth"});
+ const drag=useRef({pointerId:-1, startX:0, startScroll:0, moved:false});
+ const [dragging, setDragging]=useState(false);
+ const move=(direction:number)=>rail.current?.scrollBy({left:direction*360, behavior:"smooth"});
  const beginDrag=(event:PointerEvent<HTMLDivElement>)=>{
   if(event.pointerType==="mouse"&&event.button!==0)return;
   const target=rail.current;if(!target)return;
-  drag.current={pointerId:event.pointerId,startX:event.clientX,startScroll:target.scrollLeft,moved:false};
+  drag.current={pointerId:event.pointerId, startX:event.clientX, startScroll:target.scrollLeft, moved:false};
   target.setPointerCapture(event.pointerId);
   setDragging(true);
  };
@@ -43,6 +43,6 @@ export default function PlayableEdition(){
    onPointerUp={endDrag}
    onPointerCancel={endDrag}
    onClickCapture={(event)=>{if(drag.current.moved){event.preventDefault();event.stopPropagation();drag.current.moved=false;}}}
-  >{playableGames.map((game,index)=>{const Icon=game.icon;return <Link draggable={false} data-cursor-label="DRAG / PLAY" href={game.href} className={`${styles.ticket} ${styles[`ticket${index+1}`]}`} key={game.title}><header><span>Game {game.number}</span><small>{game.format}</small></header><div className={styles.visual}><Icon/><i/><i/></div><div className={styles.body}><h3>{game.title}</h3><p>{game.note}</p></div><footer><span>{game.interaction}</span><b>Play <ArrowRight/></b></footer></Link>})}</div>
+  >{playableGames.map((game, index)=>{const Icon=game.icon;return <Link draggable={false} data-cursor-label="DRAG / PLAY" href={game.href} className={`${styles.ticket} ${styles[`ticket${index+1}`]}`} key={game.title}><header><span>Game {game.number}</span><small>{game.format}</small></header><div className={styles.visual}><Icon/><i/><i/></div><div className={styles.body}><h3>{game.title}</h3><p>{game.note}</p></div><footer><span>{game.interaction}</span><b>Play <ArrowRight/></b></footer></Link>})}</div>
  </section>
 }

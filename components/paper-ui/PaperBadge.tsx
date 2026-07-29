@@ -18,7 +18,7 @@ export function PaperBadge({
   };
 
   return (
-    <span 
+    <span
       className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide text-white uppercase ${bgColors[variant]} shadow-sm ${className}`}
     >
       {label}

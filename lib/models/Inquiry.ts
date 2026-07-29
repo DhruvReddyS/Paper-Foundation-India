@@ -7,6 +7,8 @@ const InquirySchema = new Schema({
   subject: { type: String, required: true, trim: true },
   message: { type: String, required: true },
   sourceUrl: String,
+  attachmentUrl: String,
+  attachmentName: String,
   status: { type: String, enum: ["new", "reviewing", "resolved", "archived"], default: "new", index: true },
   internalNotes: String,
 }, { timestamps: true });

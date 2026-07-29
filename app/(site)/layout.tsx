@@ -5,6 +5,7 @@ import Footer from "@/components/site/Footer";
 import Nav from "@/components/site/Nav";
 import PaperCursor from "@/components/site/PaperCursor";
 import PageTransition from "@/components/site/PageTransition";
+import SiteAnalytics from "@/components/site/SiteAnalytics";
 
 /* ── Layout ──────────────────────────────────────────── */
 export default function SiteLayout({
@@ -19,6 +20,7 @@ export default function SiteLayout({
   return (
     <>
       <PaperCursor />
+      <SiteAnalytics />
       {!immersive && <Nav />}
       <main className="min-h-screen"><PageTransition>{children}</PageTransition></main>
       {!immersive && <Footer />}

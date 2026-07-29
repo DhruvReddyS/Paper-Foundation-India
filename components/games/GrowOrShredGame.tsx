@@ -3,12 +3,14 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ExternalLink, Leaf, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameTimer } from "./GameShared";
+import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameConfiguration, useGameTimer } from "./GameShared";
+import { playGameSound } from "./gameAudio";
 import { quizQuestions, type QuizQuestion } from "./gameData";
 
 type Phase = "intro" | "play" | "result";
 
 export default function GrowOrShredGame() {
+  const configuration = useGameConfiguration("grow-or-shred");
   const [phase, setPhase] = useState<Phase>("intro");
   const [questions, setQuestions] = useState<QuizQuestion[]>(() => shuffleItems(quizQuestions));
   const [index, setIndex] = useState(0);
@@ -19,21 +21,32 @@ export default function GrowOrShredGame() {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const { seconds, resetTimer } = useGameTimer(phase === "play");
   const question = questions[index];
+  useEffect(() => {
+    const configured = configuration?.content?.questions;
+    if (phase === "intro" && Array.isArray(configured) && configured.length) setQuestions(shuffleItems(configured as QuizQuestion[]));
+  }, [configuration, phase]);
 
   function answer(option: number) {
     if (selected !== null) return;
     setSelected(option);
     if (option === question.correct) {
+      playGameSound("correct");
       const nextStreak = streak + 1;
       setScore((value) => value + 100 + Math.min(nextStreak * 10, 40));
       setCorrectAnswers((value) => value + 1);
       setStreak(nextStreak);
       setBestStreak((value) => Math.max(value, nextStreak));
-    } else setStreak(0);
+    } else {
+      playGameSound("wrong");
+      setStreak(0);
+    }
   }
 
   function next() {
-    if (index === questions.length - 1) setPhase("result");
+    if (index === questions.length - 1) {
+      playGameSound("complete");
+      setPhase("result");
+    }
     else {
       setIndex((value) => value + 1);
       setSelected(null);
@@ -48,7 +61,8 @@ export default function GrowOrShredGame() {
     setBestStreak(0);
     setSelected(null);
     setCorrectAnswers(0);
-    setQuestions(shuffleItems(quizQuestions));
+    const configured = configuration?.content?.questions;
+    setQuestions(shuffleItems(Array.isArray(configured) && configured.length ? configured as QuizQuestion[] : quizQuestions));
     resetTimer();
   }
 
@@ -64,7 +78,7 @@ export default function GrowOrShredGame() {
           description="A freshly shuffled set of evidence-backed questions shapes one living tree. Correct knowledge grows its canopy; weak assumptions return to fibre."
           rules={[
             "Choose one answer for each paper, recycling or forestry question.",
-            "Read the evidence reveal—every answer explains why and links to a source.",
+            "Read the evidence reveal, every answer explains why and links to a source.",
             "Build a streak to unlock denser leaves, flowers and a stronger final tree.",
           ]}
           onStart={() => setPhase("play")}
@@ -105,9 +119,9 @@ export default function GrowOrShredGame() {
 
               <AnimatePresence>
                 {selected !== null && (
-                  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="evidence-reveal">
+                  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="evidence-reveal" role="status" aria-live="polite">
                     <div className={selected === question.correct ? "evidence-good" : "evidence-correction"}>
-                      {selected === question.correct ? "The canopy grows" : "Assumption shredded—new evidence recovered"}
+                      {selected === question.correct ? "The canopy grows" : "Assumption shredded, new evidence recovered"}
                     </div>
                     <p>{question.explanation}</p>
                     <div className="flex flex-wrap items-center justify-between gap-4">
@@ -162,7 +176,7 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
       const rect = canvas.getBoundingClientRect();
       const width = Math.max(1, rect.width);
       const height = Math.max(1, rect.height);
-      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.75);
       if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
         canvas.width = Math.round(width * ratio);
         canvas.height = Math.round(height * ratio);
@@ -171,16 +185,40 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
       context.clearRect(0, 0, width, height);
 
       const elapsed = (now - startedAt) / 1000;
-      const growth = reducedMotion ? 1 : Math.min(1, elapsed / 1.25);
-      const wind = reducedMotion ? 0 : Math.sin(now / 1900) * .025;
+      const rawGrowth = reducedMotion ? 1 : Math.min(1, elapsed / 1.6);
+      const growth = 1 - Math.pow(1 - rawGrowth, 3);
+      const wind = reducedMotion ? 0 : (Math.sin(now / 2100) + Math.sin(now / 730) * .22) * .022;
       const random = seeded(8204 + correct * 31);
       const baseX = width * .5;
       const baseY = height * .9;
       const scale = Math.min(width / 430, height / 475);
       const depth = Math.max(1, Math.min(6, correct + 1));
 
+      const sky = context.createLinearGradient(0, 0, 0, height);
+      sky.addColorStop(0, "rgba(222,232,213,.88)");
+      sky.addColorStop(.58, "rgba(239,237,214,.56)");
+      sky.addColorStop(1, "rgba(205,185,151,.32)");
+      context.fillStyle = sky;
+      context.fillRect(0, 0, width, height);
+
+      const sunlight = context.createRadialGradient(width * .78, height * .16, 2, width * .78, height * .16, width * .28);
+      sunlight.addColorStop(0, "rgba(255,228,164,.52)");
+      sunlight.addColorStop(.35, "rgba(255,229,177,.18)");
+      sunlight.addColorStop(1, "rgba(255,229,177,0)");
+      context.fillStyle = sunlight;
+      context.fillRect(0, 0, width, height * .62);
+
+      context.fillStyle = "rgba(57,90,61,.07)";
+      context.beginPath();
+      context.moveTo(0, height * .68);
+      context.bezierCurveTo(width * .18, height * .59, width * .32, height * .68, width * .48, height * .61);
+      context.bezierCurveTo(width * .67, height * .53, width * .78, height * .66, width, height * .56);
+      context.lineTo(width, height);
+      context.lineTo(0, height);
+      context.fill();
+
       const ground = context.createRadialGradient(baseX, baseY, 8, baseX, baseY, width * .35);
-      ground.addColorStop(0, "rgba(69,91,56,.28)");
+      ground.addColorStop(0, "rgba(55,74,45,.34)");
       ground.addColorStop(1, "rgba(69,91,56,0)");
       context.fillStyle = ground;
       context.beginPath();
@@ -191,22 +229,31 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
       context.lineJoin = "round";
 
       function leaf(x: number, y: number, angle: number, size: number, shade: number, alpha: number) {
+        const flutter = reducedMotion ? 0 : Math.sin(now / 420 + shade * 1.73) * .1;
         context.save();
         context.translate(x, y);
-        context.rotate(angle);
-        context.scale(size, size * .62);
+        context.rotate(angle + flutter + wind * 2.4);
+        context.scale(size * (1 + flutter * .08), size * .62);
         context.globalAlpha = alpha;
+        context.shadowColor = "rgba(20,44,27,.2)";
+        context.shadowBlur = 3 * scale;
+        context.shadowOffsetY = 2 * scale;
         context.fillStyle = shade % 7 === 0 ? "#a8794e" : shade % 4 === 0 ? "#789064" : shade % 3 === 0 ? "#315f3e" : "#4b744c";
         context.beginPath();
         context.moveTo(0, 0);
-        context.bezierCurveTo(-8, -8, -10, -20, 0, -28);
-        context.bezierCurveTo(11, -19, 10, -7, 0, 0);
+        context.bezierCurveTo(-8, -7, -11, -20, 0, -29);
+        context.bezierCurveTo(12, -20, 10, -7, 0, 0);
         context.fill();
+        context.shadowColor = "transparent";
         context.strokeStyle = "rgba(244,239,217,.42)";
         context.lineWidth = .8;
         context.beginPath();
         context.moveTo(0, -2);
         context.lineTo(0, -24);
+        context.moveTo(0, -13);
+        context.lineTo(-5, -17);
+        context.moveTo(0, -17);
+        context.lineTo(5, -21);
         context.stroke();
         context.restore();
       }
@@ -216,14 +263,15 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
         const branchStart = Math.min(.8, order * .075);
         const localGrowth = Math.max(0, Math.min(1, (growth - branchStart) / .34));
         if (localGrowth <= 0) return;
-        const sway = wind * (7 - remaining);
+        const sway = wind * (7 - remaining) * (1 + order * .12) + (reducedMotion ? 0 : Math.sin(now / 1300 + order * .83 + x * .01) * .003 * order);
         const finalAngle = angle + sway;
         const endX = x + Math.cos(finalAngle) * length * localGrowth;
         const endY = y + Math.sin(finalAngle) * length * localGrowth;
         const bend = (random() - .5) * length * .24;
 
-        context.strokeStyle = remaining > 2 ? "#6d4931" : "#765238";
-        context.lineWidth = Math.max(1.2, thickness * localGrowth);
+        const branchWidth = Math.max(1.2, thickness * localGrowth);
+        context.strokeStyle = "rgba(43,28,19,.24)";
+        context.lineWidth = branchWidth + 2.2 * scale;
         context.beginPath();
         context.moveTo(x, y);
         context.bezierCurveTo(
@@ -235,6 +283,27 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
           endY
         );
         context.stroke();
+        context.strokeStyle = remaining > 2 ? "#65412c" : "#745139";
+        context.lineWidth = branchWidth;
+        context.beginPath();
+        context.moveTo(x, y);
+        context.bezierCurveTo(
+          x + Math.cos(finalAngle) * length * .42 + bend,
+          y + Math.sin(finalAngle) * length * .36,
+          endX - Math.cos(finalAngle) * length * .24 - bend * .35,
+          endY - Math.sin(finalAngle) * length * .2,
+          endX,
+          endY
+        );
+        context.stroke();
+        if (remaining > 1) {
+          context.strokeStyle = "rgba(222,185,132,.24)";
+          context.lineWidth = Math.max(.55, branchWidth * .12);
+          context.beginPath();
+          context.moveTo(x + 1.2 * scale, y);
+          context.quadraticCurveTo((x + endX) / 2 + bend * .18, (y + endY) / 2, endX, endY);
+          context.stroke();
+        }
 
         if (remaining > 0 && localGrowth > .78) {
           const split = remaining > 3 ? 2 : (random() > .67 ? 3 : 2);
@@ -278,12 +347,25 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
 
       branch(baseX, baseY, height * .285, -Math.PI / 2, 23 * scale, depth, 0);
 
-      context.strokeStyle = "rgba(96,63,41,.68)";
-      context.lineWidth = 5 * scale;
+      const soil = context.createLinearGradient(0, baseY - 5, 0, height);
+      soil.addColorStop(0, "rgba(113,78,49,.16)");
+      soil.addColorStop(1, "rgba(73,50,32,.36)");
+      context.fillStyle = soil;
+      context.fillRect(0, baseY, width, height - baseY);
+
+      context.strokeStyle = "rgba(88,56,37,.72)";
+      context.lineWidth = 5.5 * scale;
       [-1, -.46, .45, 1].forEach((direction, index) => {
         context.beginPath();
         context.moveTo(baseX, baseY - 2);
-        context.quadraticCurveTo(baseX + direction * 42 * scale, baseY + 4, baseX + direction * (72 + index * 8) * scale, baseY + 20 * scale);
+        context.bezierCurveTo(
+          baseX + direction * 25 * scale,
+          baseY + 3,
+          baseX + direction * 52 * scale,
+          baseY + 12 * scale,
+          baseX + direction * (72 + index * 8) * scale,
+          baseY + 25 * scale
+        );
         context.stroke();
       });
 
@@ -292,6 +374,20 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
         const x = baseX + Math.sin(item * 2.1 + elapsed) * width * .2;
         const y = height * (.2 + fall * .68);
         leaf(x, y, elapsed + item, .34 * scale, item, .58 * (1 - fall * .35));
+      }
+
+      if (correct >= 3) {
+        for (let mote = 0; mote < 18; mote += 1) {
+          const phase = mote * 1.93;
+          const drift = reducedMotion ? 0 : Math.sin(elapsed * .42 + phase) * 18 * scale;
+          const moteX = (mote * 71 % Math.max(1, width)) + drift;
+          const moteY = height * (.12 + ((mote * 47) % 67) / 100);
+          context.globalAlpha = .15 + (mote % 4) * .045;
+          context.fillStyle = mote % 3 === 0 ? "#d5aa68" : "#f1dfad";
+          context.beginPath();
+          context.arc(moteX, moteY, (1.1 + mote % 3 * .45) * scale, 0, Math.PI * 2);
+          context.fill();
+        }
       }
 
       context.globalAlpha = 1;

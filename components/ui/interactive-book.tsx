@@ -199,7 +199,7 @@ export default function InteractiveBook({
                     {pages.map((page, index) => {
                         const isFlipped = index <= currentPageIndex;
                         const shouldRenderContent = index >= Math.max(-1, currentPageIndex - 1) && index <= currentPageIndex + 2;
-                        // Stagger delays slightly for a realistic "whip" effect if user clicks fast, 
+                        // Stagger delays slightly for a realistic "whip" effect if user clicks fast,
                         // but mostly we want instant feedback with smooth transition.
 
                         return (

@@ -1,2 +1,2 @@
-import React from 'react';
-export default function AdminMedia() { return <div>Media Library</div>; }
+import AdminMedia from "@/components/admin/AdminMedia";
+export default function Page() { return <AdminMedia />; }

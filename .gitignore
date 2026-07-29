@@ -9,3 +9,4 @@ node_modules/
 .DS_Store
 *.tsbuildinfo
 app 21-59-10-823/
+tmp/

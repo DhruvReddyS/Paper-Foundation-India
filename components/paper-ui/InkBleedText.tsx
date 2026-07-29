@@ -27,13 +27,13 @@ export function InkBleedText({
   }, [trigger]);
 
   const Component = as === 'display' ? 'h1' : as;
-  
-  const baseClasses = as === 'display' ? 'text-5xl md:text-7xl font-serif font-bold tracking-tight' 
+
+  const baseClasses = as === 'display' ? 'text-5xl md:text-7xl font-serif font-bold tracking-tight'
                     : as === 'h1' ? 'text-4xl md:text-5xl font-serif font-bold tracking-tight'
                     : 'text-3xl md:text-4xl font-serif font-semibold';
 
   return (
-    <Component 
+    <Component
       className={`${baseClasses} ink-bleed ${animating ? 'animating' : ''} ${className}`}
     >
       {children}

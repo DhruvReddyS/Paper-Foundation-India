@@ -2,6 +2,7 @@ import { articleCatalog } from "@/content/articleCatalog";
 import { gameCatalog } from "@/components/games/gameCatalog";
 import { glossaryData } from "@/content/glossary";
 import mythCatalog from "@/content/mythCatalog.json";
+import { paperEverywhereObjects } from "@/content/paperEverywhere";
 import { resourceCatalog } from "@/content/resources";
 
 export type SearchEntryType =
@@ -50,6 +51,15 @@ const articleEntries: SiteSearchEntry[] = articleCatalog.map((article) => ({
   keywords: `${article.category} ${article.format} ${article.time} paper article`,
 }));
 
+const paperEverywhereEntries: SiteSearchEntry[] = paperEverywhereObjects.map((item) => ({
+  id: `paper-everywhere-${item.slug}`,
+  label: item.title,
+  href: `/everyday-paper/${item.slug}`,
+  type: "Page",
+  description: item.thesis,
+  keywords: `${item.category} ${item.figureLabel} ${item.material.join(" ")} ${item.job.join(" ")}`,
+}));
+
 const mythEntries: SiteSearchEntry[] = mythCatalog.map((item, index) => ({
   id: item.id,
   label: item.myth,
@@ -90,6 +100,7 @@ const resourceEntries: SiteSearchEntry[] = resourceCatalog.map((resource, index)
 
 export const siteSearchIndex: SiteSearchEntry[] = [
   ...pages,
+  ...paperEverywhereEntries,
   ...articleEntries,
   ...mythEntries,
   ...gameEntries,

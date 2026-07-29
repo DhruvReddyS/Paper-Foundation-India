@@ -56,7 +56,7 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         <ul className="space-y-1">
           {navItems.map((item) => {
-            const active = pathname === item.href || 
+            const active = pathname === item.href ||
               (item.href !== '/admin' && pathname?.startsWith(item.href));
 
             return (

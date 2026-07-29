@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Mono, DM_Sans, Fraunces } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import "./games-rework.css";
 import "./transitions.css";
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | Paper Foundation India",
   },
   description:
-    "Championing sustainable paper — debunking myths, sharing knowledge, and celebrating India's paper industry.",
+    "Championing sustainable paper, debunking myths, sharing knowledge, and celebrating India's paper industry.",
   keywords: [
     "paper",
     "sustainability",
@@ -53,12 +54,22 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
   return (
     <html lang="en" className="scroll-smooth">
       <body
         className={`${fraunces.variable} ${dmSans.variable} ${dmMono.variable} min-h-screen bg-paper-white text-charcoal font-sans antialiased`}
       >
         {children}
+        {gaId && <>
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
+          <Script id="google-analytics" strategy="afterInteractive">{`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gaId}');
+          `}</Script>
+        </>}
       </body>
     </html>
   );

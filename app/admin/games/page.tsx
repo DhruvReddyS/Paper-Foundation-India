@@ -1,2 +1,2 @@
-import React from 'react';
-export default function AdminGames() { return <div>Games Manager</div>; }
+import AdminGames from "@/components/admin/AdminGames";
+export default function Page() { return <AdminGames />; }

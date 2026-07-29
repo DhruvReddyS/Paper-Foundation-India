@@ -19,7 +19,7 @@ export function SubmitMythCTA() {
           </h2>
           <p className="text-paper-warm/70 max-w-md mx-auto mb-8">
             Submit a myth and our editorial team will research, verify, and add it
-            to our database — with full source citations.
+            to our database, with full source citations.
           </p>
           <Link
             href="/contact"

@@ -27,7 +27,7 @@ export default function ConsumptionChart() {
             Per Capita Consumption
           </h2>
           <p className="text-forest/60 text-sm">
-            Kg per person per year — India has significant room for growth
+            Kg per person per year, India has significant room for growth
           </p>
         </motion.div>
 
