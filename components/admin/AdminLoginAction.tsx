@@ -1,21 +1,17 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, KeyRound, LoaderCircle, UserRound } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-
-function GoogleMark() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="#4285f4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.91h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.33 2.98-7.4Z" />
-      <path fill="#34a853" d="M12 22c2.7 0 4.98-.9 6.63-2.43l-3.24-2.52c-.9.6-2.05.96-3.39.96-2.61 0-4.82-1.76-5.61-4.13H3.05v2.6A10 10 0 0 0 12 22Z" />
-      <path fill="#fbbc05" d="M6.39 13.88A6.01 6.01 0 0 1 6.08 12c0-.65.11-1.29.31-1.88v-2.6H3.05A10 10 0 0 0 2 12c0 1.61.38 3.14 1.05 4.48l3.34-2.6Z" />
-      <path fill="#ea4335" d="M12 5.99c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.62 9.62 0 0 0 12 2a10 10 0 0 0-8.95 5.52l3.34 2.6C7.18 7.75 9.39 5.99 12 5.99Z" />
-    </svg>
-  );
-}
+import { useState } from "react";
 
 export function AdminLoginAction({ preview }: { preview: boolean }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
+  const [working, setWorking] = useState(false);
+  const [error, setError] = useState("");
+
   if (preview) {
     return (
       <Link className="admin-login-modern-action" href="/admin">
@@ -26,11 +22,34 @@ export function AdminLoginAction({ preview }: { preview: boolean }) {
     );
   }
 
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    setWorking(true);
+    setError("");
+    const result = await signIn("credentials", {
+      username,
+      password,
+      redirect: false,
+      callbackUrl: "/admin",
+    });
+    setWorking(false);
+    if (!result?.ok) {
+      setError(result?.error === "ACCOUNT_LOCKED" ? "Too many attempts. Try again in 15 minutes." : "User ID or password is incorrect.");
+      return;
+    }
+    window.location.assign(result.url || "/admin");
+  }
+
   return (
-    <button className="admin-login-modern-action" onClick={() => void signIn("google", { callbackUrl: "/admin" })}>
-      <GoogleMark />
-      <strong>Continue with Google</strong>
-      <ArrowRight />
-    </button>
+    <form className="admin-credential-form" onSubmit={submit}>
+      <label><span>User ID</span><div><UserRound /><input autoComplete="username" value={username} onChange={event => setUsername(event.target.value)} placeholder="Enter your admin ID" required minLength={3} /></div></label>
+      <label><span>Password</span><div><KeyRound /><input autoComplete="current-password" type={show ? "text" : "password"} value={password} onChange={event => setPassword(event.target.value)} placeholder="Enter your password" required minLength={8} /><button type="button" onClick={() => setShow(value => !value)} aria-label={show ? "Hide password" : "Show password"}>{show ? <EyeOff /> : <Eye />}</button></div></label>
+      {error && <p className="admin-login-error" role="alert">{error}</p>}
+      <button className="admin-login-modern-action" disabled={working}>
+        {working ? <LoaderCircle className="is-spinning" /> : <span className="admin-login-preview-mark">PF</span>}
+        <strong>{working ? "Checking access..." : "Sign in securely"}</strong>
+        <ArrowRight />
+      </button>
+    </form>
   );
 }

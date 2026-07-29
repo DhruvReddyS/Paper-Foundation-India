@@ -13,12 +13,16 @@ export async function connectDB() {
   const uri = process.env.MONGODB_URI;
   if (!uri) throw new Error("MONGODB_URI is not configured");
   cache.promise ??= mongoose.connect(uri, {
-    bufferCommands: false,
-    maxPoolSize: 10,
-    minPoolSize: 0,
-    maxIdleTimeMS: 60_000,
-    serverSelectionTimeoutMS: 10_000,
-  });
+      bufferCommands: false,
+      maxPoolSize: 10,
+      minPoolSize: 0,
+      maxIdleTimeMS: 60_000,
+      serverSelectionTimeoutMS: 10_000,
+    })
+    .catch(error => {
+      cache.promise = null;
+      throw error;
+    });
   cache.connection = await cache.promise;
   return cache.connection;
 }

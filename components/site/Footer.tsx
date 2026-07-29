@@ -6,7 +6,7 @@ import styles from "./Footer.module.css";
 const columns = [
   { label: "Understand", links: [["Knowledge Hub", "/knowledge"], ["Myths vs Facts", "/myths"], ["Glossary", "/glossary"], ["Resources", "/resources"]] },
   { label: "Experience", links: [["Paper Journey", "/journey"], ["Games Lab", "/games"], ["Paper Everywhere", "/everyday-paper"], ["Circularity", "/circularity"]] },
-  { label: "India and Foundation", links: [["India Fibre Map", "/india-map"], ["India by Numbers", "/india-snapshot"], ["About the Foundation", "/about"], ["Join the Initiative", "/join"]] },
+  { label: "India and Foundation", links: [["India Fibre Atlas", "/india-map"], ["India Paper Ledger", "/india-snapshot"], ["About the Foundation", "/about"], ["Join the Initiative", "/join"]] },
 ] as const;
 
 export default function Footer() {

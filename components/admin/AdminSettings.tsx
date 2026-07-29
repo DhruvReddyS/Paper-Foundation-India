@@ -10,7 +10,7 @@ type Status = { services: Service[]; ready: number; total: number; preview: bool
 const setupLinks: Record<string, string> = {
   database: "https://cloud.mongodb.com/",
   media: "https://console.cloudinary.com/",
-  admin: "https://console.cloud.google.com/apis/credentials",
+  admin: "/admin/users",
   campaigns: "https://console.cloud.google.com/apis/credentials",
   analytics: "https://analytics.google.com/",
   site: "/",
@@ -39,7 +39,7 @@ export default function AdminSettings() {
     <section className="admin-setup-hero">
       <div><p>WORKSPACE READINESS</p><strong>{percent}%</strong><span>{data.ready} of {data.total} services connected</span></div>
       <div className="admin-setup-progress"><i style={{ width: `${percent}%` }} /></div>
-      <aside><ShieldCheck /><span><strong>{data.preview ? "Preview access is active" : "Secure access is active"}</strong><small>{data.preview ? "Add the authentication keys before deployment." : "Google OAuth and the administrator allowlist are protecting this workspace."}</small></span></aside>
+      <aside><ShieldCheck /><span><strong>{data.preview ? "Preview access is active" : "Secure access is active"}</strong><small>{data.preview ? "Add the database, secret and bootstrap credentials before deployment." : "MongoDB accounts, encrypted passwords and secure sessions protect this workspace."}</small></span></aside>
     </section>
 
     <div className="admin-toolbar"><label><KeyRound /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Find a service or environment key" /></label><span>{filtered.length} integrations</span></div>
@@ -49,7 +49,7 @@ export default function AdminSettings() {
         <header><div><i>{service.ready ? <Check /> : <Wrench />}</i><span><strong>{service.label}</strong><small>{service.provider}</small></span></div><em>{service.ready ? "Connected" : service.required ? "Setup needed" : "Optional"}</em></header>
         <div>{service.keys.map(key => <button key={key} onClick={() => void copy(key)} title={`Copy ${key}`}><code>{key}</code>{copied === key ? <Check /> : <Copy />}</button>)}</div>
         <footer>
-          {setupLinks[service.id].startsWith("/") ? <Link href={setupLinks[service.id]} target="_blank">Open website <ChevronRight /></Link> : <a href={setupLinks[service.id]} target="_blank" rel="noreferrer">Open {service.provider} <ExternalLink /></a>}
+          {setupLinks[service.id].startsWith("/") ? <Link href={setupLinks[service.id]}>{service.id === "admin" ? "Manage administrators" : "Open website"} <ChevronRight /></Link> : <a href={setupLinks[service.id]} target="_blank" rel="noreferrer">Open {service.provider} <ExternalLink /></a>}
         </footer>
       </article>)}
     </section>

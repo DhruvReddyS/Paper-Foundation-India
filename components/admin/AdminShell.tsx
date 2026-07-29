@@ -3,7 +3,7 @@
 import {
   BarChart3, BookOpen, Boxes, ChevronLeft, FileText, FolderOpen,
   Gamepad2, Image as ImageIcon, Inbox, LayoutDashboard, Menu, Search, Settings,
-  Users, X, LogOut, MailPlus,
+  Users, UserCog, X, LogOut, MailPlus,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -14,7 +14,7 @@ const groups = [
   { label: "Overview", items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard }, { label: "Analytics", href: "/admin/analytics", icon: BarChart3 }] },
   { label: "Website", items: [{ label: "Website controls", href: "/admin/website", icon: LayoutDashboard }, { label: "Articles", href: "/admin/articles", icon: FileText }, { label: "Myths and facts", href: "/admin/myths", icon: Boxes }, { label: "Games", href: "/admin/games", icon: Gamepad2 }, { label: "Glossary", href: "/admin/glossary", icon: BookOpen }, { label: "Resources", href: "/admin/resources", icon: FolderOpen }, { label: "Media", href: "/admin/media", icon: ImageIcon }] },
   { label: "Audience", items: [{ label: "Email campaigns", href: "/admin/campaigns", icon: MailPlus }, { label: "Subscribers", href: "/admin/subscribers", icon: Users }, { label: "Inbox", href: "/admin/inquiries", icon: Inbox }] },
-  { label: "System", items: [{ label: "Settings", href: "/admin/settings", icon: Settings }] },
+  { label: "System", items: [{ label: "Administrators", href: "/admin/users", icon: UserCog }, { label: "Settings", href: "/admin/settings", icon: Settings }] },
 ];
 
 export default function AdminShell({ children, preview = false }: { children: React.ReactNode; preview?: boolean }) {

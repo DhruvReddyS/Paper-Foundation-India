@@ -26,11 +26,11 @@ export default function AdminLogin() {
         <div className="admin-login-modern-intro">
           <p>SECURE ADMIN PORTAL</p>
           <h1>Manage the website with clarity.</h1>
-          <span>{preview ? "Preview mode is ready. Enter the complete workspace without Google authentication." : "Sign in using an approved Paper Foundation India Google account."}</span>
+          <span>{preview ? "Preview mode is ready. Enter the complete workspace without authentication." : "Use your Paper Foundation India administrator ID and password."}</span>
           <AdminLoginAction preview={preview} />
           <div className="admin-login-modern-access">
             <ShieldCheck />
-            <span><strong>{preview ? "Local preview access" : "Restricted access"}</strong><small>{preview ? "Google authentication activates automatically after its keys and allowlist are configured." : "Only emails in the administrator allowlist can continue."}</small></span>
+            <span><strong>{preview ? "Local preview access" : "Restricted access"}</strong><small>{preview ? "Credential authentication activates when MongoDB and the admin secret are configured." : "Passwords are encrypted and repeated failed attempts are temporarily locked."}</small></span>
           </div>
         </div>
 
@@ -49,7 +49,7 @@ export default function AdminLogin() {
               </li>
             ))}
           </ul>
-          <footer><i /> {preview ? "Complete admin preview is active" : "Protected by Google OAuth and allowlisted access"}</footer>
+          <footer><i /> {preview ? "Complete admin preview is active" : "Protected by encrypted credentials and secure sessions"}</footer>
         </div>
       </aside>
     </main>

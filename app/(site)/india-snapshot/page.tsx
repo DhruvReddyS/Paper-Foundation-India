@@ -1,10 +1,5 @@
-import IndiaInvestigation from "./sections/IndiaInvestigation";
-import styles from "../paper-everywhere-pages.module.css";
+import IndiaPaperLedger from "@/components/editorial/IndiaPaperLedger";
 
 export default function IndiaSnapshotPage() {
-  return (
-    <main className={styles.snapshot}>
-      <IndiaInvestigation />
-    </main>
-  );
+  return <IndiaPaperLedger />;
 }

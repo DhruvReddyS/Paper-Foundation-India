@@ -1,382 +1,182 @@
-export type JourneyImage = {
-  src: string;
-  alt: string;
-  caption?: string;
-};
-
-export type JourneySpread = {
+export type JourneyStep = {
   id: number;
-  chapter: string;
-  eyebrow: string;
-  processStep: string;
+  phase: "Source" | "Prepare" | "Make" | "Finish";
+  process: string;
   title: string;
   body: string[];
-  stat?: string;
-  statLabel?: string;
+  insight: string;
   image: string;
-  images: JourneyImage[];
-  accent: string;
+  alt: string;
+  tone: string;
 };
 
-/**
- * Editorial model for the Paper Journey book.
- *
- * Each spread explains one real process decision without implying that every
- * paper grade or mill follows an identical recipe. The first image remains as
- * `image` for backwards compatibility; `images` lets the book compose richer
- * right-hand pages when the new spread layout is available.
- */
-export const journeySpreads: JourneySpread[] = [
+export const journeySteps: JourneyStep[] = [
   {
     id: 1,
-    chapter: "Opening note",
-    eyebrow: "Follow the fibre",
-    processStep: "Orientation",
-    title: "A sheet begins before the paper machine",
+    phase: "Source",
+    process: "Collect recovered paper",
+    title: "The urban harvest",
     body: [
-      "Paper is made from cellulose fibre, water, energy and carefully chosen process inputs. Its route can begin with responsibly sourced fresh fibre, recovered paper, or a blend selected for the product.",
-      "No single recipe describes every sheet. This book follows the main decisions that turn separated fibre into paper, and help useful fibre return.",
+      "Used corrugated boxes, office sheets, newspapers and notebooks are collected from homes, institutions and businesses. Keeping them clean and dry preserves fibre quality.",
+      "Recovered paper is not one material. Sorting by grade helps a mill direct each fibre stream toward a product it can make well.",
     ],
-    stat: "LOOK CLOSER",
-    statLabel: "Every grade begins with a purpose and a fibre plan",
-    image: "/images/journey/spreads-v2/spread1.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread1.jpg",
-        alt: "A single sheet of paper revealing a subtle network of cellulose fibres",
-        caption: "The visible sheet begins with an invisible fibre structure.",
-      },
-    ],
-    accent: "#c99b4f",
+    insight: "Collection quality determines how much usable fibre reaches the next sheet.",
+    image: "/images/journey/process-2026/01-urban-harvest.jpg",
+    alt: "Workers sorting dry recovered paper and cardboard into mill-ready grades",
+    tone: "#b1744d",
   },
   {
     id: 2,
-    chapter: "Chapter I",
-    eyebrow: "Fibre enters the story",
-    processStep: "Source + recover",
-    title: "Two routes bring fibre to the mill",
+    phase: "Source",
+    process: "Grow fresh fibre",
+    title: "Cultivating strength",
     body: [
-      "Fresh fibre may come from wood grown in responsibly managed forests and plantations, or from suitable non-wood sources such as agricultural residues. Traceability and landscape management matter.",
-      "Recovered fibre begins with used paper kept dry, collected and directed to an appropriate recycling stream. Both routes must match the quality and performance the next product needs.",
+      "Fresh cellulose can supply the long fibres needed for strength and for grades that cannot rely only on recycled furnish. In India, industry-supported farm forestry is an important wood route.",
+      "These planted crops are managed on farms and marginal land. They are different from natural forests, which carry wider ecological functions and require protection.",
     ],
-    stat: "START WELL",
-    statLabel: "Ask where fibre came from and where the used sheet can go",
-    image: "/images/journey/spreads-v2/spread5.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread5.jpg",
-        alt: "Responsibly managed fibre source beside neatly collected recovered paper",
-        caption: "Fresh and recovered fibre can serve different, complementary roles.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread2.jpg",
-        alt: "Clean recovered paper sorted into mill-ready bales",
-      },
-    ],
-    accent: "#6f8f68",
+    insight: "IPMA reports that more than 90% of sector wood demand is met through agro and farm forestry.",
+    image: "/images/journey/process-2026/02-farm-forestry.jpg",
+    alt: "Farmer inspecting orderly pulpwood trees and new saplings on agricultural land",
+    tone: "#597b52",
   },
   {
     id: 3,
-    chapter: "Chapter II",
-    eyebrow: "Quality begins outside the pulper",
-    processStep: "Collect + sort",
-    title: "Paper grades travel in separate streams",
+    phase: "Prepare",
+    process: "Repulp recovered fibre",
+    title: "Hydrapulping the past",
     body: [
-      "Used corrugated boxes, newspapers, office sheets and coated papers contain different fibres and process inputs. Recovery systems collect and grade them so a mill receives material suited to its recipe.",
-      "Food residue, liquids, plastic films and other unwanted materials reduce yield and can disrupt production. Clean separation protects both the fibre and the equipment.",
+      "Bales of recovered paper enter a hydrapulper with water. Mechanical motion breaks the old sheets apart and releases their cellulose fibres into a pumpable suspension.",
+      "The paper structure disappears, but the fibre remains. Large contaminants can begin leaving the stream at this stage.",
     ],
-    stat: "KEEP IT CLEAN",
-    statLabel: "Dry, correctly separated paper is easier to recover",
-    image: "/images/journey/spreads-v2/spread3.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread3.jpg",
-        alt: "Several grades of recovered paper being carefully sorted",
-        caption: "A bale is not simply 'waste paper'; its grade guides what it can become.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread2.jpg",
-        alt: "Close views of corrugated, newspaper and office-paper fibre grades",
-      },
-    ],
-    accent: "#a9754f",
+    insight: "The goal is separation, not dissolving the fibre.",
+    image: "/images/journey/process-2026/03-hydrapulping.jpg",
+    alt: "Recovered paper entering a large hydrapulper filled with moving fibre slurry",
+    tone: "#647c78",
   },
   {
     id: 4,
-    chapter: "Chapter III",
-    eyebrow: "The old sheet lets go",
-    processStep: "Pulp",
-    title: "Water and motion release the fibres",
+    phase: "Prepare",
+    process: "Screen and clean",
+    title: "Remove what does not belong",
     body: [
-      "In a pulper, recovered paper is mixed with water and agitated until the old sheet breaks apart into a pumpable fibre suspension. Large unwanted items can be removed during this stage.",
-      "Fresh-fibre pulps reach the mill through a different preparation route, then are dispersed and adjusted for the grade being made.",
+      "Pressure screens separate by size and shape. Centrifugal cleaners use density differences to remove grit, metal, plastic and other unwanted material.",
+      "Cleaning happens in stages because no single device can remove every contaminant. Rejects are collected and managed separately.",
     ],
-    stat: "DISPERSE",
-    statLabel: "The sheet disappears; usable fibres remain",
-    image: "/images/journey/spreads-v2/spread4.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread4.jpg",
-        alt: "Paper fibres swirling in a mill pulper",
-        caption: "Mechanical action separates the network without dissolving the fibre.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread6.jpg",
-        alt: "Macro view of cellulose fibres suspended in water",
-      },
-    ],
-    accent: "#c89a55",
+    insight: "Clean incoming paper improves yield and protects mill equipment.",
+    image: "/images/journey/process-2026/04-screening.jpg",
+    alt: "Paper fibre passing through industrial screens with contaminants collected separately",
+    tone: "#527785",
   },
   {
     id: 5,
-    chapter: "Chapter IV",
-    eyebrow: "Remove what does not belong",
-    processStep: "Screen + clean",
-    title: "The fibre stream is cleaned in stages",
+    phase: "Prepare",
+    process: "Deink when needed",
+    title: "Ink rises away",
     body: [
-      "Screens separate contaminants by size and shape, while cleaners can use differences in density to remove grit, metals, plastics and other unwanted material.",
-      "The exact sequence depends on the incoming furnish and the paper grade. Removed material is managed separately; not everything entering a recycling mill becomes new paper.",
+      "For brighter grades, chemicals help release ink particles from recovered fibre. Fine air bubbles carry the detached ink upward as a dark foam that can be skimmed away.",
+      "Not every paper grade needs deinking. Brown packaging papers can avoid processing that adds no useful performance.",
     ],
-    stat: "PROTECT THE SHEET",
-    statLabel: "Cleaner furnish supports stable production and better quality",
-    image: "/images/journey/spreads-v2/spread6.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread6.jpg",
-        alt: "A clean fibre stream passing through industrial screening equipment",
-        caption: "Different separation methods target different contaminants.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread4.jpg",
-        alt: "Detailed view of a pressure screen separating fibre from debris",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread1.jpg",
-        alt: "Cleaned paper fibre suspension after screening",
-      },
-    ],
-    accent: "#78938a",
+    insight: "Good papermaking processes only as far as the intended grade requires.",
+    image: "/images/journey/process-2026/05-deinking.jpg",
+    alt: "Dark ink foam separating from pale recovered fibre in a flotation deinking tank",
+    tone: "#686f72",
   },
   {
     id: 6,
-    chapter: "Chapter V",
-    eyebrow: "Only when the grade requires it",
-    processStep: "Deink + brighten",
-    title: "Printed fibre may need another cleaning route",
+    phase: "Prepare",
+    process: "Pulp fresh fibre",
+    title: "Release long cellulose fibres",
     body: [
-      "For grades that require cleaner or brighter recovered pulp, ink can be detached from fibres and removed by flotation, washing or a combination of processes.",
-      "Not every recycled product needs deinking or high brightness. Avoiding unnecessary treatment can conserve resources when a naturally coloured sheet will do the job.",
+      "Along the fresh-fibre route, prepared wood chips enter a controlled digester. Heat and cooking chemistry separate cellulose from lignin, the natural material binding the wood structure.",
+      "The resulting long fibres are washed and prepared before they join the paper recipe. Mills recover chemicals and energy where their process design permits.",
     ],
-    stat: "FIT FOR PURPOSE",
-    statLabel: "Process only as far as the next paper grade requires",
-    image: "/images/journey/spreads-v2/spread6.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread6.jpg",
-        alt: "Ink particles separating from recovered paper fibre during flotation",
-        caption: "Air bubbles can carry detached ink away from the fibre suspension.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread4.jpg",
-        alt: "Recovered pulp shown before and after deinking",
-      },
-    ],
-    accent: "#9b8f72",
+    insight: "Fresh fibre and recovered fibre reach the mixing stage through different preparation systems.",
+    image: "/images/journey/process-2026/06-digester.jpg",
+    alt: "Uniform wood chips travelling toward a large pulp digester inside a mill",
+    tone: "#9a704a",
   },
   {
     id: 7,
-    chapter: "Chapter VI",
-    eyebrow: "Build the recipe",
-    processStep: "Refine + blend",
-    title: "Fibres are prepared to work together",
+    phase: "Make",
+    process: "Build the furnish",
+    title: "The streams meet",
     body: [
-      "Refining changes the fibre surface so fibres can bond more effectively when the sheet dries. Too little or too much refining can alter strength, drainage and formation.",
-      "Papermakers blend fibre types and add process or functional ingredients according to the required strength, printability, absorbency, colour and durability.",
+      "Prepared fibre streams enter a blending chest. Papermakers choose the furnish according to the strength, surface, absorbency, colour and useful life the product requires.",
+      "There is no universal 80 to 20 recipe for every sheet. The responsible choice is the highest suitable recovered content while maintaining the required performance.",
     ],
-    stat: "BALANCE",
-    statLabel: "Performance comes from a controlled furnish, not one fibre alone",
-    image: "/images/journey/spreads-v2/spread6.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread6.jpg",
-        alt: "Papermaking fibres being refined and blended in a controlled mill process",
-        caption: "The furnish is the fibre-and-water recipe prepared for the machine.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread4.jpg",
-        alt: "Scientific macro illustration of refined cellulose fibres bonding",
-      },
-    ],
-    accent: "#8e704f",
+    insight: "Furnish means the complete fibre and water recipe supplied to the paper machine.",
+    image: "/images/journey/process-2026/07-blending.jpg",
+    alt: "Two clean pulp streams entering a stainless steel blending chest",
+    tone: "#607d67",
   },
   {
     id: 8,
-    chapter: "Chapter VII",
-    eyebrow: "The sheet appears",
-    processStep: "Form",
-    title: "A dilute flow becomes a continuous web",
+    phase: "Make",
+    process: "Refine the fibres",
+    title: "Prepare fibres to bond",
     body: [
-      "The prepared furnish is distributed evenly onto a moving forming fabric. Water drains away as fibres settle, overlap and begin to create a continuous wet web.",
-      "Flow, drainage and machine conditions shape formation, the evenness that influences how the finished paper looks and performs.",
+      "Refining changes the fibre surface so the fibres can flex, overlap and form stronger bonds as the sheet dries. It is a controlled mechanical treatment, not simple chopping.",
+      "Too little or too much refining changes drainage, strength and formation. Operators tune it for the grade and machine.",
     ],
-    stat: "FORM",
-    statLabel: "Distribute · drain · interlock",
-    image: "/images/journey/spreads-v2/spread4.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread4.jpg",
-        alt: "A wet paper web forming on the moving wire of a paper machine",
-        caption: "The first recognisable sheet is still fragile and wet.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread6.jpg",
-        alt: "Close view of water draining through forming fabric beneath paper fibres",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread1.jpg",
-        alt: "A continuous wet paper web leaving the forming section",
-      },
-    ],
-    accent: "#6f9287",
+    insight: "Microscopic fibre preparation shapes the performance of the visible sheet.",
+    image: "/images/journey/process-2026/08-refining.jpg",
+    alt: "Pulp flowing from a stainless steel disc refiner in a paper mill",
+    tone: "#77735b",
   },
   {
     id: 9,
-    chapter: "Chapter VIII",
-    eyebrow: "Remove water efficiently",
-    processStep: "Press + dry",
-    title: "Pressure first, controlled heat next",
+    phase: "Make",
+    process: "Form the wet web",
+    title: "The sheet first appears",
     body: [
-      "Pressing squeezes water from the wet web and strengthens contact between fibres. The sheet then passes through a controlled drying section where the remaining moisture is removed.",
-      "Stable moisture and careful tension are essential: the web must travel quickly without losing its shape, surface or strength.",
+      "A very dilute furnish flows evenly from the headbox onto a moving forming fabric. Water drains through the mesh while fibres settle, overlap and become a continuous wet web.",
+      "Flow and drainage must remain even across the machine. This formation influences the sheet's appearance, print behaviour and strength.",
     ],
-    stat: "DRY WITH CARE",
-    statLabel: "Mechanical water removal comes before thermal drying",
-    image: "/images/journey/spreads-v2/spread6.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread6.jpg",
-        alt: "Paper web moving from press rolls toward heated drying cylinders",
-        caption: "Pressing and drying turn a delicate wet web into stable paper.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread4.jpg",
-        alt: "Close view of water leaving paper at a press nip",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread1.jpg",
-        alt: "Continuous sheet travelling over paper-machine drying cylinders",
-      },
-    ],
-    accent: "#c2834c",
+    insight: "At this point the sheet is recognisable, continuous and still mostly water.",
+    image: "/images/journey/process-2026/09-formation.jpg",
+    alt: "Dilute pulp forming a continuous wet paper web on moving wire mesh",
+    tone: "#4f7a72",
   },
   {
     id: 10,
-    chapter: "Chapter IX",
-    eyebrow: "Give the sheet its working surface",
-    processStep: "Finish + convert",
-    title: "A reel becomes a product",
+    phase: "Make",
+    process: "Press out water",
+    title: "Pressure builds the bond",
     body: [
-      "Depending on the grade, paper may be sized, coated, calendered or otherwise finished to tune its surface, appearance and performance. The continuous sheet is inspected and wound into large reels.",
-      "Converters then cut, print, fold, corrugate or shape it into notebooks, cartons, labels, tissues and many other products.",
+      "The fragile web travels between absorbent felts and heavy press rolls. Mechanical pressure removes more water and brings fibres into closer contact.",
+      "Removing water by pressing is more energy efficient than evaporating all of it later. The sheet also gains enough strength to continue through the machine.",
     ],
-    stat: "MAKE IT USEFUL",
-    statLabel: "Finish for the function; avoid complexity without purpose",
-    image: "/images/journey/spreads-v2/spread8.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread8.jpg",
-        alt: "A finished paper reel beside precisely converted paper products",
-        caption: "One machine reel can take many carefully designed forms.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread6.jpg",
-        alt: "Paper surface passing through finishing rolls",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread1.jpg",
-        alt: "Paper being cut, folded and converted into useful products",
-      },
-    ],
-    accent: "#a87951",
+    insight: "The press section saves drying energy while consolidating the sheet.",
+    image: "/images/journey/process-2026/10-pressing.jpg",
+    alt: "Wet paper web passing through felt-covered press rolls",
+    tone: "#5a6665",
   },
   {
     id: 11,
-    chapter: "Chapter X",
-    eyebrow: "The reason for the sheet",
-    processStep: "Use",
-    title: "Paper carries, protects and communicates",
+    phase: "Finish",
+    process: "Dry and size",
+    title: "Heat completes the sheet",
     body: [
-      "A paper product should deliver its function with an appropriate amount of material: protecting goods, recording knowledge, enabling hygiene, carrying information or helping ideas travel.",
-      "How it is designed and used affects what happens next. Unnecessary mixed materials, heavy contamination and poor disposal choices can make fibre harder to recover.",
+      "The paper weaves through steam-heated cylinders that remove its remaining moisture under controlled tension. Stable drying prevents wrinkles, breaks and uneven properties.",
+      "Some grades receive surface sizing, often based on starch, to adjust strength, liquid resistance and the way ink sits on the sheet.",
     ],
-    stat: "USE WELL",
-    statLabel: "Value the function, then keep the recovery route open",
-    image: "/images/journey/spreads-v2/spread8.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread8.jpg",
-        alt: "Paper serving education, packaging, hygiene and communication",
-        caption: "Different uses ask different things of the sheet.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread2.jpg",
-        alt: "A thoughtfully designed paper package being flattened for recovery",
-      },
-    ],
-    accent: "#c59a53",
+    insight: "Moisture is controlled, not simply removed.",
+    image: "/images/journey/process-2026/11-drying.jpg",
+    alt: "Paper moving through a long row of steam-heated drying cylinders",
+    tone: "#a06c42",
   },
   {
     id: 12,
-    chapter: "Chapter XI",
-    eyebrow: "The hand-off after use",
-    processStep: "Separate + return",
-    title: "A useful next life starts at the bin",
+    phase: "Finish",
+    process: "Calender and reel",
+    title: "Ready for the next chapter",
     body: [
-      "After use, suitable paper needs to stay clean, dry and separate from food, liquids and mixed materials. That everyday decision protects the fibre before collection begins.",
-      "Clear local guidance matters because collection systems and accepted grades differ. A well-designed product still needs the right return route to become useful mill furnish.",
+      "Calender rolls adjust smoothness and thickness before the finished web is wound onto a jumbo reel. The reel can then be slit, sheeted, coated or converted into the product people use.",
+      "Its journey is not finished at sale. Good design, clean use and correct separation decide whether suitable fibre can return to the mill.",
     ],
-    stat: "RETURN WELL",
-    statLabel: "Keep it clean · follow local guidance · protect the fibre",
-    image: "/images/journey/spreads-v2/spread2.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread2.jpg",
-        alt: "Clean used paper being separated into the correct collection stream",
-        caption: "The recovery route begins with a small, deliberate hand-off.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread5.jpg",
-        alt: "Collected paper kept dry and ready for grading",
-      },
-    ],
-    accent: "#688968",
-  },
-  {
-    id: 13,
-    chapter: "Finale",
-    eyebrow: "Keep useful fibre moving",
-    processStep: "Recover + renew",
-    title: "The next sheet begins with connected choices",
-    body: [
-      "Collected paper is graded and prepared to enter another papermaking cycle when its fibre and condition suit the next product. Yield is never absolute: contaminants are removed and fibres gradually shorten through repeated processing.",
-      "Circular paper systems therefore connect effective recovery with responsible fresh-fibre inputs. The loop is not a claim on a label, it is the result of sourcing, design, use, collection and mill decisions working together.",
-    ],
-    stat: "CONTINUE",
-    statLabel: "Source responsibly · design intelligently · recover effectively",
-    image: "/images/journey/spreads-v2/spread5.jpg",
-    images: [
-      {
-        src: "/images/journey/spreads-v2/spread5.jpg",
-        alt: "Recovered fibre and responsible fresh fibre joining a new papermaking cycle",
-        caption: "A loop works only when every hand-off works.",
-      },
-      {
-        src: "/images/journey/spreads-v2/spread2.jpg",
-        alt: "A finished sheet beside recovered fibre ready for its next useful life",
-      },
-    ],
-    accent: "#537b5b",
+    insight: "The final reel is both an ending and the start of another recovery decision.",
+    image: "/images/journey/process-2026/12-final-reel.jpg",
+    alt: "Finished paper winding onto a jumbo reel at the end of a paper machine",
+    tone: "#8b6b4c",
   },
 ];
-
-export const journeyTotal = journeySpreads.length + 1;

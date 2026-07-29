@@ -1,8 +1,8 @@
 import crypto from "node:crypto";
 
 const sender = () => process.env.GMAIL_SENDER_EMAIL ?? "";
-const clientId = () => process.env.GMAIL_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || "";
-const clientSecret = () => process.env.GMAIL_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || "";
+const clientId = () => process.env.GMAIL_CLIENT_ID || "";
+const clientSecret = () => process.env.GMAIL_CLIENT_SECRET || "";
 
 export function gmailConfigured() {
   return Boolean(sender() && clientId() && clientSecret() && process.env.GMAIL_REFRESH_TOKEN);

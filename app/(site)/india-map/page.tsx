@@ -1,5 +1,5 @@
-import IndiaAtlas from "@/components/editorial/IndiaAtlas";
+import IndiaFibreAtlas from "@/components/editorial/IndiaFibreAtlas";
 
 export default function IndiaMapPage() {
-  return <IndiaAtlas />;
+  return <IndiaFibreAtlas />;
 }

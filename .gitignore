@@ -6,6 +6,7 @@ node_modules/
 .next-dev/
 .env
 .env.local
+env.txt
 .DS_Store
 *.tsbuildinfo
 app 21-59-10-823/

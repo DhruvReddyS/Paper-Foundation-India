@@ -70,8 +70,8 @@ const navGroups: NavGroup[] = [
     introduction: "See how paper moves through Indian industry, daily life and circular material systems.",
     items: [
       { href: "/everyday-paper", label: "Everyday Paper", description: "Paper products around us", icon: PackageOpen },
-      { href: "/india-map", label: "India Fibre Map", description: "Explore the story state by state", icon: MapPinned },
-      { href: "/india-snapshot", label: "India Facts & Numbers", description: "Production, recovery, trade and people", icon: BarChart3 },
+      { href: "/india-map", label: "India Fibre Atlas", description: "Explore fibre hubs and state demand", icon: MapPinned },
+      { href: "/india-snapshot", label: "India Paper Ledger", description: "Production, recovery, trade and people", icon: BarChart3 },
       { href: "/circularity", label: "Paper Circularity", description: "Follow fibre through use and recovery", icon: Recycle },
     ],
   },

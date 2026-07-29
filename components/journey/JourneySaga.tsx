@@ -1,149 +1,77 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowDown, ArrowRight, CheckCircle2, ExternalLink, Recycle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpen, ExternalLink, Leaf, Recycle, Trees } from "lucide-react";
-import { useCallback, useState, type CSSProperties } from "react";
-import InteractiveBook, { type BookPage } from "@/components/ui/interactive-book";
-import { journeySpreads, type JourneySpread } from "./journeyData";
+import { useEffect, useState, type CSSProperties } from "react";
+import { journeySteps } from "./journeyData";
 import styles from "./JourneySaga.module.css";
 
-const journeyPages: BookPage[] = journeySpreads.map((spread, index) => {
-  const nextSpread = journeySpreads[index + 1];
-
-  return {
-    pageNumber: spread.id,
-    content: <ProcessVisual spread={spread} />,
-    backContent: nextSpread ? <ProcessNotes spread={nextSpread} /> : <ClosingPage />,
-  };
-});
-
 export default function JourneySaga() {
-  const [activeChapter, setActiveChapter] = useState(0);
-  const [requestedPage, setRequestedPage] = useState<number>();
-  const updateChapter = useCallback((pageIndex: number) => {
-    setActiveChapter(Math.min(Math.max(pageIndex + 1, 0), journeySpreads.length - 1));
+  const [active, setActive] = useState(1);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-journey-step]"));
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) setActive(Number((visible.target as HTMLElement).dataset.journeyStep));
+    }, { threshold: [.35, .55, .75] });
+    sections.forEach(section => observer.observe(section));
+    return () => observer.disconnect();
   }, []);
-  const active = journeySpreads[activeChapter];
 
-  return (
-    <div className={styles.page}>
-      <section className={styles.stage} aria-labelledby="journey-title">
-        <div className={styles.atmosphere} aria-hidden="true"><i /><i /><i /></div>
+  function goTo(id: number) {
+    document.getElementById(`journey-step-${id}`)?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
+  }
 
-        <div className={styles.intro}>
-          <p className={styles.kicker}><BookOpen /> The Paper Journey · Field book</p>
-          <h1 id="journey-title">See how a sheet <em>really</em> takes form.</h1>
-          <p className={styles.lede}>
-            Open the book and follow fibre through sourcing, preparation, formation,
-            use and recovery. Every chapter names the decision, not just the machinery.
-          </p>
-          <div className={styles.activeChapter} style={{ "--chapter-accent": active.accent } as CSSProperties}>
-            <span>{String(active.id).padStart(2, "0")} / {String(journeySpreads.length).padStart(2, "0")}</span>
-            <div><small>{active.processStep}</small><strong>{active.title}</strong></div>
-          </div>
-          <div className={styles.instructions}>
-            <span>Click the cover to open</span><i />
-            <span>Click a right page to turn</span><i />
-            <span>Use arrows or keyboard</span>
-          </div>
-        </div>
+  return <main className={styles.journey}>
+    <nav className={styles.rail} aria-label="Paper journey steps">
+      {journeySteps.map(step => <button key={step.id} onClick={() => goTo(step.id)} className={active === step.id ? styles.active : ""} aria-label={`Go to step ${step.id}: ${step.title}`}><span>{String(step.id).padStart(2, "0")}</span><i /></button>)}
+    </nav>
 
-        <div className={styles.bookWindow}>
-          <InteractiveBook
-            coverImage="/images/journey/paper-journey-cover-v2.jpg"
-            bookTitle="The Paper Journey"
-            bookAuthor="Paper Foundation India"
-            pages={journeyPages}
-            width={430}
-            height={600}
-            className={styles.book}
-            insideCoverContent={<ProcessNotes spread={journeySpreads[0]} />}
-            onPageChange={updateChapter}
-            requestedPageIndex={requestedPage}
-          />
-        </div>
+    {journeySteps.map((step, index) => (
+      <section
+        id={`journey-step-${step.id}`}
+        data-journey-step={step.id}
+        className={styles.page}
+        style={{ "--step-tone": step.tone } as CSSProperties}
+        key={step.id}
+      >
+        <motion.article
+          className={styles.copy}
+          initial={reducedMotion ? false : { opacity: 0, y: 35 }}
+          whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ amount: .45, once: true }}
+          transition={{ duration: .7, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <header><span>{String(step.id).padStart(2, "0")}</span><p>{step.phase} / {step.process}</p></header>
+          <h1>{step.title}</h1>
+          <div className={styles.body}>{step.body.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
+          <aside><CheckCircle2 /><p>{step.insight}</p></aside>
+          <footer>
+            {index < journeySteps.length - 1 ? <button onClick={() => goTo(step.id + 1)}>Continue to step {String(step.id + 1).padStart(2, "0")} <ArrowDown /></button> : <Link href="/circularity">Keep the fibre in motion <ArrowRight /></Link>}
+          </footer>
+        </motion.article>
 
-        <div className={styles.chapterRail} aria-label="Paper-making chapters">
-          {journeySpreads.map((spread, index) => (
-            <button
-              type="button"
-              key={spread.id}
-              className={index === activeChapter ? styles.isActive : ""}
-              style={{ "--chapter-accent": spread.accent } as CSSProperties}
-              aria-label={`${spread.processStep}: ${spread.title}`}
-              onClick={() => setRequestedPage(index - 1)}
-            >
-              <span>{String(spread.id).padStart(2, "0")}</span>
-              <strong>{spread.processStep}</strong>
-            </button>
-          ))}
-        </div>
+        <motion.figure
+          className={styles.image}
+          initial={reducedMotion ? false : { opacity: 0, scale: 1.04 }}
+          whileInView={reducedMotion ? undefined : { opacity: 1, scale: 1 }}
+          viewport={{ amount: .3, once: true }}
+          transition={{ duration: 1 }}
+        >
+          <Image src={step.image} alt={step.alt} fill sizes="(max-width: 800px) 100vw, 58vw" priority={step.id <= 2} />
+          <figcaption><span>PROCESS IMAGE / {String(step.id).padStart(2, "0")}</span><p>{step.process}</p></figcaption>
+        </motion.figure>
       </section>
+    ))}
 
-      <section className={styles.afterword}>
-        <div>
-          <p>Close the book. Keep the loop open.</p>
-          <h2>A useful sheet deserves a thoughtful next life.</h2>
-        </div>
-        <nav>
-          <Link href="/circularity"><Recycle /> Explore circularity <ArrowRight /></Link>
-          <Link href="/myths"><Leaf /> Check paper myths <ArrowRight /></Link>
-          <a href="https://www.fao.org/sustainable-forest-management/toolbox/modules/management-of-planted-forests/further-learning/en/" target="_blank" rel="noreferrer"><Trees /> FAO forest guidance <ExternalLink /></a>
-        </nav>
-      </section>
-    </div>
-  );
-}
-
-function ProcessNotes({ spread }: { spread: JourneySpread }) {
-  return (
-    <article className={styles.notes} style={{ "--chapter-accent": spread.accent } as CSSProperties}>
-      <header><span>{spread.chapter}</span><small>{spread.processStep}</small></header>
-      <i />
-      <h2>{spread.title}</h2>
-      <div>{spread.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
-      {spread.stat && <footer><strong>{spread.stat}</strong><span>{spread.statLabel}</span></footer>}
-    </article>
-  );
-}
-
-function ProcessVisual({ spread }: { spread: JourneySpread }) {
-  const images = spread.images.slice(0, Math.min(3, spread.images.length));
-  return (
-    <article className={styles.visual} style={{ "--chapter-accent": spread.accent } as CSSProperties}>
-      <div className={`${styles.gallery} ${styles[`gallery${images.length}`]}`}>
-        {images.map((image, index) => (
-          <figure key={`${image.src}-${index}`} className={styles[`shot${index + 1}`]}>
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              sizes="(max-width: 700px) 42vw, 350px"
-              priority={spread.id < 2}
-            />
-          </figure>
-        ))}
-        <div className={styles.imageWash} />
-        <span className={styles.imageNumber}>{String(spread.id).padStart(2, "0")}</span>
-      </div>
-      <div className={styles.visualCaption}>
-        <small>{spread.eyebrow}</small>
-        <strong>{spread.images[0]?.caption ?? spread.title}</strong>
-        <span>Turn the page <ArrowRight /></span>
-      </div>
-    </article>
-  );
-}
-
-function ClosingPage() {
-  return (
-    <article className={styles.closing}>
-      <Recycle />
-      <small>The next chapter is shared</small>
-      <h2>Keep the fibre useful.</h2>
-      <p>Source responsibly. Design for purpose. Keep suitable used paper clean, separate and moving toward recovery.</p>
-      <Link href="/circularity">Continue into circularity <ArrowRight /></Link>
-    </article>
-  );
+    <section className={styles.sources}>
+      <div><Recycle /><span>One sheet. Twelve controlled decisions.</span></div>
+      <p>This journey shows a representative combined route. Actual mill sequences and fibre recipes vary by grade, raw material, equipment and quality target.</p>
+      <a href="https://www.cseindia.org/improving-wastepaper-circularity-for-the-pulp-and-paper-sector-12004" target="_blank" rel="noreferrer">Read the CSE circularity study <ExternalLink /></a>
+    </section>
+  </main>;
 }
