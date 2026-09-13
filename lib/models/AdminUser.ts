@@ -8,6 +8,7 @@ const AdminUserSchema = new mongoose.Schema({
   active: { type: Boolean, default: true, index: true },
   failedAttempts: { type: Number, default: 0, select: false },
   lockedUntil: { type: Date, default: null, select: false },
+  sessionVersion: { type: Number, default: 1, min: 1, select: false },
   lastLoginAt: { type: Date, default: null },
   createdBy: { type: String, default: "bootstrap" },
 }, { timestamps: true, collection: "admin_users" });
@@ -18,6 +19,7 @@ AdminUserSchema.set("toJSON", {
     delete safe.passwordHash;
     delete safe.failedAttempts;
     delete safe.lockedUntil;
+    delete safe.sessionVersion;
     return value;
   },
 });

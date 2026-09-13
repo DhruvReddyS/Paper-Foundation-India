@@ -129,7 +129,7 @@ async function findArticle(slug: string): Promise<ReaderItem | undefined> {
   if (process.env.MONGODB_URI) {
     try {
       await connectDB();
-      const dbItem = await Article.findOne({ slug, status: "published" }).lean() as CmsArticle | null;
+      const dbItem = await Article.findOne({ slug, status: "published", deletedAt: null }).lean() as CmsArticle | null;
       if (dbItem) return {
         id: Number(dbItem.order ?? 0) + 1,
         slug: dbItem.slug,

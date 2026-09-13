@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { Article } from "@/lib/models/Article";
 import { articleSchema } from "@/lib/validators/article";
 import { validDocumentId } from "@/lib/validators/id";
+import { recordContentChange } from "@/lib/content-history";
 import { currentAdmin, requireAdmin, requireEditor } from "@/lib/api-auth";
 
 const catalogItems = articleCatalog.map((item, order) => ({
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
   const status = requestedStatus ?? "published";
   if (status !== "published") { const denied = await requireAdmin(); if (denied) return denied; }
   const category = request.nextUrl.searchParams.get("category");
-  const filter = { ...(status !== "all" ? { status } : {}), ...(category ? { category } : {}) };
+  const filter = { deletedAt: null, ...(status !== "all" ? { status } : {}), ...(category ? { category } : {}) };
   try {
     await connectDB();
     const items = await Article.find(filter).sort({ order: 1, featured: -1, publishedAt: -1, createdAt: -1 }).lean();
@@ -39,7 +40,9 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: "Invalid article", issues: parsed.error.flatten() }, { status: 400 });
   await connectDB();
   const admin = await currentAdmin();
-  const item = await Article.create({ ...parsed.data, lastEditedBy: admin?.email || admin?.name, ...(parsed.data.status === "published" ? { publishedAt: new Date() } : {}) });
+  if (!admin) return NextResponse.json({ error: "Admin access required" }, { status: 401 });
+  const item = await Article.create({ ...parsed.data, version: 1, lastEditedBy: admin.email || admin.name, ...(parsed.data.status === "published" ? { publishedAt: new Date() } : {}) });
+  await recordContentChange({ resourceType: "article", resourceId: String(item._id), resourceLabel: item.title, action: parsed.data.status === "published" ? "publish" : "create", after: item, actor: admin, note: parsed.data.revisionNote });
   return NextResponse.json({ item }, { status: 201 });
 }
 
@@ -51,9 +54,16 @@ export async function PATCH(request: NextRequest) {
   if (!validDocumentId(payload.id) || !parsed.success) return NextResponse.json({ error: "Invalid article update" }, { status: 400 });
   await connectDB();
   const admin = await currentAdmin();
+  if (!admin) return NextResponse.json({ error: "Admin access required" }, { status: 401 });
+  const before = await Article.findOne({ _id: payload.id, deletedAt: null }).lean() as Record<string, unknown> | null;
+  if (!before) return NextResponse.json({ error: "Article not found" }, { status: 404 });
   const update = { ...parsed.data, lastEditedBy: admin?.email || admin?.name, ...(parsed.data.status === "published" ? { publishedAt: new Date() } : {}) };
-  const item = await Article.findByIdAndUpdate(payload.id, update, { new: true, runValidators: true });
-  return item ? NextResponse.json({ item }) : NextResponse.json({ error: "Article not found" }, { status: 404 });
+  const expectedVersion = Number(payload.expectedVersion);
+  const item = await Article.findOneAndUpdate({ _id: payload.id, deletedAt: null, ...(Number.isInteger(expectedVersion) ? { version: expectedVersion } : {}) }, { $set: update, $inc: { version: 1 } }, { new: true, runValidators: true });
+  if (!item) return NextResponse.json({ error: "This article changed after you opened it. Reload before saving.", conflict: true }, { status: 409 });
+  const action = parsed.data.status === "published" && before.status !== "published" ? "publish" : Object.keys(parsed.data).length === 1 && typeof parsed.data.order === "number" ? "reorder" : "update";
+  await recordContentChange({ resourceType: "article", resourceId: String(item._id), resourceLabel: item.title, action, before, after: item, actor: admin, note: parsed.data.revisionNote });
+  return NextResponse.json({ item });
 }
 
 export async function DELETE(request: NextRequest) {
@@ -62,6 +72,11 @@ export async function DELETE(request: NextRequest) {
   const id = request.nextUrl.searchParams.get("id");
   if (!validDocumentId(id)) return NextResponse.json({ error: "Invalid article id" }, { status: 400 });
   await connectDB();
-  const item = await Article.findByIdAndDelete(id);
-  return item ? NextResponse.json({ deleted: true }) : NextResponse.json({ error: "Article not found" }, { status: 404 });
+  const admin = await currentAdmin();
+  if (!admin) return NextResponse.json({ error: "Admin access required" }, { status: 401 });
+  const before = await Article.findOne({ _id: id, deletedAt: null }).lean() as Record<string, unknown> | null;
+  if (!before) return NextResponse.json({ error: "Article not found" }, { status: 404 });
+  const item = await Article.findByIdAndUpdate(id, { $set: { deletedAt: new Date(), deletedBy: admin.email || admin.name }, $inc: { version: 1 } }, { new: true });
+  await recordContentChange({ resourceType: "article", resourceId: id, resourceLabel: String(before.title), action: "delete", before, after: item, actor: admin, note: "Moved to recoverable trash" });
+  return NextResponse.json({ deleted: true, recoverable: true });
 }

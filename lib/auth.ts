@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
       if (!parsed.success || !adminAuthConfigured()) return null;
       await connectDB();
       const { username, password } = parsed.data;
-      let admin = await AdminUser.findOne({ username }).select("+passwordHash +failedAttempts +lockedUntil");
+      let admin = await AdminUser.findOne({ username }).select("+passwordHash +failedAttempts +lockedUntil +sessionVersion");
       if (!admin) admin = await bootstrapOwner(username, password);
       if (!admin || !admin.active) return null;
       if (admin.lockedUntil && admin.lockedUntil.getTime() > Date.now()) throw new Error("ACCOUNT_LOCKED");
@@ -65,7 +65,7 @@ export const authOptions: NextAuthOptions = {
       admin.lockedUntil = null;
       admin.lastLoginAt = new Date();
       await admin.save();
-      return { id: String(admin._id), name: admin.name, email: admin.username, role: admin.role };
+      return { id: String(admin._id), name: admin.name, email: admin.username, role: admin.role, sessionVersion: admin.sessionVersion ?? 1 };
     },
   })],
   session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
@@ -75,6 +75,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.adminId = user.id;
         token.role = (user as { role?: string }).role ?? "editor";
+        token.sessionVersion = (user as { sessionVersion?: number }).sessionVersion ?? 1;
       }
       return token;
     },
@@ -82,6 +83,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as typeof session.user & { id?: string; role?: string }).id = String(token.adminId ?? token.sub ?? "");
         (session.user as typeof session.user & { id?: string; role?: string }).role = String(token.role ?? "editor");
+        (session.user as typeof session.user & { sessionVersion?: number }).sessionVersion = Number(token.sessionVersion ?? 1);
       }
       return session;
     },

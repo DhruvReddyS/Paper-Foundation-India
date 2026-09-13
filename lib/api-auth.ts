@@ -11,12 +11,12 @@ export async function currentAdmin() {
     return { id: "preview", name: "Preview administrator", email: "preview@local", role: "owner" as AdminRole };
   }
   const session = await getServerSession(authOptions);
-  const user = session?.user as { id?: string; name?: string | null; email?: string | null; role?: string } | undefined;
+  const user = session?.user as { id?: string; name?: string | null; email?: string | null; role?: string; sessionVersion?: number } | undefined;
   if (!user?.id || !["owner", "editor", "analyst"].includes(user.role ?? "")) return null;
   try {
     await connectDB();
-    const stored = await AdminUser.findOne({ _id: user.id, active: true }).select("name username role").lean() as { _id: unknown; name: string; username: string; role: AdminRole } | null;
-    if (!stored) return null;
+    const stored = await AdminUser.findOne({ _id: user.id, active: true }).select("name username role +sessionVersion").lean() as { _id: unknown; name: string; username: string; role: AdminRole; sessionVersion?: number } | null;
+    if (!stored || (stored.sessionVersion ?? 1) !== (user.sessionVersion ?? 1)) return null;
     return { id: String(stored._id), name: stored.name, email: stored.username, role: stored.role };
   } catch {
     return null;

@@ -6,7 +6,7 @@ import { gmailConfigured } from "@/lib/gmail";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const services = { database: false, authentication: Boolean(process.env.NEXTAUTH_SECRET), media: cloudinaryConfigured(), campaigns: gmailConfigured() };
+  const services = { database: false, authentication: Boolean(process.env.NEXTAUTH_SECRET), media: cloudinaryConfigured(), campaigns: gmailConfigured(), automation: Boolean(process.env.CRON_SECRET) };
   try {
     const connection = await connectDB();
     await connection.connection.db?.admin().ping();

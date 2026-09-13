@@ -12,6 +12,9 @@ const ResourceSchema = new mongoose.Schema({
   accent: { type: String, enum: ["green", "copper", "sage", "kraft"], default: "green" },
   status: { type: String, enum: ["draft", "published"], default: "published", index: true },
   order: { type: Number, default: 0 },
+  version: { type: Number, default: 1, min: 1 },
+  deletedAt: { type: Date, default: null, index: true },
+  deletedBy: { type: String, default: "" },
 }, { timestamps: true });
 
 export const Resource = mongoose.models.Resource || mongoose.model("Resource", ResourceSchema);

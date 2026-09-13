@@ -15,6 +15,8 @@ const GameConfigSchema = new mongoose.Schema({
   revision: { type: Number, default: 1 },
   revisionNote: String,
   lastEditedBy: String,
+  deletedAt: { type: Date, default: null, index: true },
+  deletedBy: { type: String, default: "" },
 }, { timestamps: true });
 
 export const GameConfig = mongoose.models.GameConfig || mongoose.model("GameConfig", GameConfigSchema);

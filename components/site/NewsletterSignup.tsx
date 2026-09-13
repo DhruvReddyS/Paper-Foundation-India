@@ -13,17 +13,21 @@ export default function NewsletterSignup({
 }: NewsletterSignupProps) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
 
     try {
-      await fetch('/api/subscribers', {
+      const response = await fetch('/api/subscribers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, source: 'newsletter' }),
       });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Subscription could not be started.');
+      setMessage(result.confirmationRequired === false ? 'You are already subscribed.' : 'Check your inbox and confirm within 24 hours.');
       setStatus('success');
       setEmail('');
     } catch {
@@ -34,8 +38,8 @@ export default function NewsletterSignup({
   if (status === 'success') {
     return (
       <div className={`text-center p-4 ${className}`}>
-        <p className="text-[#1a3c2a] font-semibold">✓ You&apos;re subscribed!</p>
-        <p className="text-sm text-stone-500 mt-1">Thank you for joining our community.</p>
+        <p className="text-[#1a3c2a] font-semibold">✓ Almost there</p>
+        <p className="text-sm text-stone-500 mt-1">{message}</p>
       </div>
     );
   }

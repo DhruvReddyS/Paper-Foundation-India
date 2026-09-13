@@ -42,29 +42,21 @@ async function accessToken() {
   return String(result.access_token);
 }
 
-export function unsubscribeToken(email: string) {
-  return crypto.createHmac("sha256", process.env.NEXTAUTH_SECRET || "development-only").update(email.toLowerCase()).digest("hex");
-}
-
-export async function sendGmail({ to, name, subject, previewText, body }: { to: string; name: string; subject: string; previewText: string; body: string }) {
+async function sendRawEmail({ to, subject, text, html, headers = [] }: { to: string; subject: string; text: string; html: string; headers?: string[] }) {
   if (!gmailConfigured()) throw new Error("Gmail sending is not configured");
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
-  const unsubscribeUrl = `${origin}/unsubscribe?email=${encodeURIComponent(to)}&token=${unsubscribeToken(to)}`;
-  const html = renderCampaignHtml(body, name, previewText, unsubscribeUrl);
   const boundary = `pfi_${crypto.randomBytes(12).toString("hex")}`;
   const raw = [
     `From: Paper Foundation India <${safeHeader(sender())}>`,
     `To: ${safeHeader(to)}`,
     `Subject: ${safeHeader(subject)}`,
+    ...headers.map(safeHeader),
     "MIME-Version: 1.0",
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
     "",
     `--${boundary}`,
     "Content-Type: text/plain; charset=UTF-8",
     "",
-    body.replace(/\{\{name\}\}/g, name || "there"),
-    "",
-    `Unsubscribe: ${unsubscribeUrl}`,
+    text,
     `--${boundary}`,
     "Content-Type: text/html; charset=UTF-8",
     "",
@@ -79,5 +71,30 @@ export async function sendGmail({ to, name, subject, previewText, body }: { to: 
   });
   const result = await response.json();
   if (!response.ok) throw new Error(result.error?.message || "Gmail rejected the message");
-  return result;
+  return { id: String(result.id ?? "") };
+}
+
+export function unsubscribeToken(email: string) {
+  return crypto.createHmac("sha256", process.env.NEXTAUTH_SECRET || "development-only").update(email.toLowerCase()).digest("hex");
+}
+
+export function confirmationTokenHash(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+export async function sendSubscriptionConfirmation({ to, token }: { to: string; token: string }) {
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const confirmationUrl = `${origin}/api/subscribers/confirm?email=${encodeURIComponent(to)}&token=${encodeURIComponent(token)}`;
+  const text = `Confirm your subscription to Paper Foundation India updates:\n\n${confirmationUrl}\n\nIf you did not request this, you can ignore this email.`;
+  const html = `<!doctype html><html><body style="margin:0;background:#f2eee5;font-family:Arial,sans-serif"><table width="100%" role="presentation" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:40px 16px"><table width="620" role="presentation" style="max-width:620px;width:100%;background:#fff"><tr><td style="padding:28px 36px;background:#173b29;color:#fff"><strong style="font-family:Georgia,serif;font-size:22px">Paper Foundation India</strong></td></tr><tr><td style="padding:38px 36px;color:#354139"><h1 style="font-family:Georgia,serif;font-size:28px">Confirm your subscription</h1><p style="font-size:16px;line-height:1.7">One final step keeps the list accurate and ensures nobody subscribes you without permission.</p><p style="margin:30px 0"><a href="${confirmationUrl}" style="display:inline-block;padding:14px 22px;background:#173b29;color:#fff;text-decoration:none;border-radius:6px">Confirm subscription</a></p><p style="font-size:12px;color:#737a75">This link expires in 24 hours. If you did not request it, no action is needed.</p></td></tr></table></td></tr></table></body></html>`;
+  return sendRawEmail({ to, subject: "Confirm your Paper Foundation India subscription", text, html });
+}
+
+export async function sendGmail({ to, name, subject, previewText, body }: { to: string; name: string; subject: string; previewText: string; body: string }) {
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const unsubscribeUrl = `${origin}/unsubscribe?email=${encodeURIComponent(to)}&token=${unsubscribeToken(to)}`;
+  const oneClickUrl = `${origin}/api/unsubscribe?email=${encodeURIComponent(to)}&token=${unsubscribeToken(to)}`;
+  const html = renderCampaignHtml(body, name, previewText, unsubscribeUrl);
+  const text = `${body.replace(/\{\{name\}\}/g, name || "there")}\n\nUnsubscribe: ${unsubscribeUrl}`;
+  return sendRawEmail({ to, subject, text, html, headers: [`List-Unsubscribe: <${oneClickUrl}>`, "List-Unsubscribe-Post: List-Unsubscribe=One-Click"] });
 }

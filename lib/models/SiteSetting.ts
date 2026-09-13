@@ -5,6 +5,9 @@ const SiteSettingSchema = new mongoose.Schema({
   value: mongoose.Schema.Types.Mixed,
   description: String,
   updatedBy: String,
+  version: { type: Number, default: 1, min: 1 },
+  deletedAt: { type: Date, default: null, index: true },
+  deletedBy: { type: String, default: "" },
 }, { timestamps: true });
 
 export const SiteSetting = mongoose.models.SiteSetting || mongoose.model("SiteSetting", SiteSettingSchema);

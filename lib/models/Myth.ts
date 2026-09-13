@@ -15,6 +15,9 @@ const MythSchema = new Schema({
   publishedAt: Date,
   revisionNote: String,
   lastEditedBy: String,
+  version: { type: Number, default: 1, min: 1 },
+  deletedAt: { type: Date, default: null, index: true },
+  deletedBy: { type: String, default: "" },
 }, { timestamps: true });
 
 export const Myth = mongoose.models.Myth || mongoose.model("Myth", MythSchema);

@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import { SiteSetting } from "@/lib/models/SiteSetting";
 import { currentAdmin, requireAdmin, requireEditor } from "@/lib/api-auth";
 import { z } from "zod";
+import { changedContentFields, contentSnapshot, recordContentChange } from "@/lib/content-history";
 
 const settingSchema = z.object({
   key: z.string().regex(/^public\.(brand|navigation|footer|contact|home)\.[a-z0-9.-]+$/).max(120),
@@ -15,7 +16,7 @@ export async function GET() {
   const denied = await requireAdmin(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ items: [], configured: false });
   await connectDB();
-  return NextResponse.json({ items: await SiteSetting.find().sort({ key: 1 }).lean(), configured: true });
+  return NextResponse.json({ items: await SiteSetting.find({ deletedAt: null }).sort({ key: 1 }).lean(), configured: true });
 }
 
 export async function PUT(request: NextRequest) {
@@ -25,7 +26,16 @@ export async function PUT(request: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: "Invalid public website setting", issues: parsed.error.flatten() }, { status: 400 });
   await connectDB();
   const admin = await currentAdmin();
+  if (!admin) return NextResponse.json({ error: "Admin access required" }, { status: 401 });
   const items = "items" in parsed.data ? parsed.data.items : [parsed.data];
-  await SiteSetting.bulkWrite(items.map(item => ({ updateOne: { filter: { key: item.key }, update: { $set: { ...item, updatedBy: admin?.email || admin?.name } }, upsert: true } })), { ordered: true });
+  const beforeItems = await SiteSetting.find({ key: { $in: items.map(item => item.key) } }).lean();
+  const beforeByKey = new Map(beforeItems.map(item => [item.key, item]));
+  await SiteSetting.bulkWrite(items.map(item => ({ updateOne: { filter: { key: item.key }, update: { $set: { ...item, deletedAt: null, deletedBy: "", updatedBy: admin.email || admin.name }, $inc: { version: 1 } }, upsert: true } })), { ordered: true });
+  const afterItems = await SiteSetting.find({ key: { $in: items.map(item => item.key) } }).lean();
+  await Promise.all(afterItems.map(after => {
+    const before = beforeByKey.get(after.key);
+    const changed = changedContentFields(contentSnapshot(before), contentSnapshot(after));
+    return changed.length ? recordContentChange({ resourceType: "setting", resourceId: String(after._id), resourceLabel: after.key, action: before ? "update" : "create", before, after, actor: admin }) : Promise.resolve();
+  }));
   return NextResponse.json({ updated: items.length });
 }

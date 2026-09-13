@@ -6,6 +6,9 @@ const GlossarySchema = new mongoose.Schema({
   letter: { type: String, required: true, uppercase: true, minlength: 1, maxlength: 1, index: true },
   status: { type: String, enum: ["draft", "published"], default: "published", index: true },
   order: { type: Number, default: 0 },
+  version: { type: Number, default: 1, min: 1 },
+  deletedAt: { type: Date, default: null, index: true },
+  deletedBy: { type: String, default: "" },
 }, { timestamps: true });
 
 export const Glossary = mongoose.models.Glossary || mongoose.model("Glossary", GlossarySchema);

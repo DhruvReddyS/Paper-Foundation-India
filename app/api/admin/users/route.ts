@@ -5,6 +5,7 @@ import { currentAdmin } from "@/lib/api-auth";
 import { connectDB } from "@/lib/db";
 import { AdminUser } from "@/lib/models/AdminUser";
 import { validDocumentId } from "@/lib/validators/id";
+import { recordAuditEvent } from "@/lib/content-history";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
     role: parsed.data.role,
     createdBy: owner.email || owner.name || "owner",
   });
+  await recordAuditEvent({ actor: owner, action: "administrator.create", resourceType: "administrator", resourceId: String(user._id), resourceLabel: user.name, changedFields: ["username", "name", "role"] });
   return NextResponse.json({ user }, { status: 201 });
 }
 
@@ -62,7 +64,7 @@ export async function PATCH(request: NextRequest) {
   const parsed = updateSchema.safeParse(await request.json());
   if (!parsed.success || !validDocumentId(parsed.data.id)) return NextResponse.json({ error: parsed.success ? "Invalid administrator ID" : parsed.error.issues[0]?.message ?? "Invalid update" }, { status: 400 });
   await connectDB();
-  const target = await AdminUser.findById(parsed.data.id);
+  const target = await AdminUser.findById(parsed.data.id).select("+sessionVersion");
   if (!target) return NextResponse.json({ error: "Administrator not found" }, { status: 404 });
   if (String(target._id) === owner.id && parsed.data.active === false) return NextResponse.json({ error: "You cannot disable your own account" }, { status: 400 });
   if (target.role === "owner" && parsed.data.role && parsed.data.role !== "owner" && await AdminUser.countDocuments({ role: "owner", active: true }) <= 1) {
@@ -75,8 +77,10 @@ export async function PATCH(request: NextRequest) {
     target.passwordHash = await bcrypt.hash(parsed.data.password, 12);
     target.failedAttempts = 0;
     target.lockedUntil = null;
+    target.sessionVersion = (target.sessionVersion ?? 1) + 1;
   }
   await target.save();
+  await recordAuditEvent({ actor: owner, action: parsed.data.password ? "administrator.credentials_reset" : "administrator.update", resourceType: "administrator", resourceId: String(target._id), resourceLabel: target.name, changedFields: Object.keys(parsed.data).filter(key => key !== "id" && key !== "password").concat(parsed.data.password ? ["credentials"] : []) });
   return NextResponse.json({ user: target });
 }
 
@@ -93,6 +97,8 @@ export async function DELETE(request: NextRequest) {
   if (target.role === "owner" && await AdminUser.countDocuments({ role: "owner", active: true }) <= 1) {
     return NextResponse.json({ error: "Keep at least one active owner" }, { status: 400 });
   }
+  const label = target.name;
   await target.deleteOne();
+  await recordAuditEvent({ actor: owner, action: "administrator.delete", resourceType: "administrator", resourceId: String(target._id), resourceLabel: label, changedFields: [] });
   return NextResponse.json({ ok: true });
 }

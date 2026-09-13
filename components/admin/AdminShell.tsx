@@ -2,7 +2,7 @@
 
 import {
   BarChart3, BookOpen, Boxes, ChevronLeft, FileText, FolderOpen,
-  Gamepad2, Image as ImageIcon, Inbox, LayoutDashboard, Menu, Search, Settings,
+  ClipboardCheck, Gamepad2, History, Image as ImageIcon, Inbox, LayoutDashboard, Menu, Search, Settings,
   Users, UserCog, X, LogOut, MailPlus,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
@@ -12,10 +12,10 @@ import { useEffect, useMemo, useState } from "react";
 import { createContext, useContext } from "react";
 
 const groups = [
-  { label: "Overview", items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard }, { label: "Analytics", href: "/admin/analytics", icon: BarChart3 }] },
+  { label: "Overview", items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard }, { label: "Team workflow", href: "/admin/workflow", icon: ClipboardCheck }, { label: "Analytics", href: "/admin/analytics", icon: BarChart3 }] },
   { label: "Website", items: [{ label: "Website controls", href: "/admin/website", icon: LayoutDashboard }, { label: "Articles", href: "/admin/articles", icon: FileText }, { label: "Myths and facts", href: "/admin/myths", icon: Boxes }, { label: "Games", href: "/admin/games", icon: Gamepad2 }, { label: "Glossary", href: "/admin/glossary", icon: BookOpen }, { label: "Resources", href: "/admin/resources", icon: FolderOpen }, { label: "Media", href: "/admin/media", icon: ImageIcon }] },
   { label: "Audience", items: [{ label: "Email campaigns", href: "/admin/campaigns", icon: MailPlus }, { label: "Subscribers", href: "/admin/subscribers", icon: Users }, { label: "Inbox", href: "/admin/inquiries", icon: Inbox }] },
-  { label: "System", items: [{ label: "Administrators", href: "/admin/users", icon: UserCog }, { label: "Settings", href: "/admin/settings", icon: Settings }] },
+  { label: "System", items: [{ label: "History & rollback", href: "/admin/history", icon: History }, { label: "Administrators", href: "/admin/users", icon: UserCog }, { label: "Settings", href: "/admin/settings", icon: Settings }] },
 ];
 
 type AdminAccess = { name: string; email: string; role: string; canEdit: boolean; isOwner: boolean; preview: boolean };

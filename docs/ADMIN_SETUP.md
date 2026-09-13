@@ -49,7 +49,9 @@ GMAIL_CLIENT_SECRET=
 GMAIL_REFRESH_TOKEN=
 GMAIL_SENDER_EMAIL=
 
+CRON_SECRET=
+
 NEXT_PUBLIC_GA_ID=
 ```
 
-Gmail API credentials are used only for sending subscriber campaigns. They are unrelated to admin sign-in.
+Gmail API credentials are used only for confirmation messages and subscriber campaigns. They are unrelated to admin sign-in. `CRON_SECRET` protects the recurring `/api/cron/campaigns` delivery endpoint and must be a separate random value of at least 32 characters.

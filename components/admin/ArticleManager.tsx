@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import ArticleEditor from "./ArticleEditor";
 import { useAdminAccess } from "./AdminShell";
 
-type ArticleItem = { _id?: string; title: string; slug: string; category: string; excerpt?: string; summary?: string; body?: string; status?: string; featured?: boolean; format?: string; order?: number; time?: string; coverImage?: string; readingMinutes?: number; revisionNote?: string; tags?: string[]; sources?: { label: string; url: string }[] };
+type ArticleItem = { _id?: string; title: string; slug: string; category: string; excerpt?: string; summary?: string; body?: string; status?: string; featured?: boolean; format?: string; order?: number; time?: string; coverImage?: string; readingMinutes?: number; revisionNote?: string; tags?: string[]; sources?: { label: string; url: string }[]; version?: number };
 
 export default function ArticleManager() {
   const searchParams = useSearchParams();
@@ -27,12 +27,12 @@ export default function ArticleManager() {
 
   async function save(data: Record<string, unknown>) {
     const current = editing && editing !== "new" ? editing : null;
-    const payload = { ...data, ...(current?._id ? { id: current._id } : {}), format: data.format ?? current?.format ?? "Core lesson", readingMinutes: Number(data.readingMinutes ?? current?.readingMinutes ?? String(current?.time ?? "7").match(/\d+/)?.[0] ?? 7), order: current?.order ?? items.length };
+    const payload = { ...data, ...(current?._id ? { id: current._id, expectedVersion: current.version } : {}), format: data.format ?? current?.format ?? "Core lesson", readingMinutes: Number(data.readingMinutes ?? current?.readingMinutes ?? String(current?.time ?? "7").match(/\d+/)?.[0] ?? 7), order: current?.order ?? items.length };
     const response = await fetch("/api/articles", { method: current?._id ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     const result = await response.json(); setNotice(response.ok ? "Article saved." : result.error ?? "Article could not be saved."); if (response.ok) { setEditing(null); await load(); }
   }
-  async function remove(item: ArticleItem) { if (!item._id || !confirm(`Delete "${item.title}"?`)) return; const response = await fetch(`/api/articles?id=${item._id}`, { method: "DELETE" }); setNotice(response.ok ? "Article deleted." : "Article could not be deleted."); if (response.ok) await load(); }
-  async function move(index: number, direction: number) { const target = index + direction; if (target < 0 || target >= items.length) return; const next = [...items]; [next[index], next[target]] = [next[target], next[index]]; setItems(next); const changed = [next[index], next[target]]; await Promise.all(changed.filter(item => item._id).map(item => fetch("/api/articles", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: item._id, order: next.indexOf(item) }) }))); }
+  async function remove(item: ArticleItem) { if (!item._id || !confirm(`Move "${item.title}" to recoverable trash?`)) return; const response = await fetch(`/api/articles?id=${item._id}`, { method: "DELETE" }); const result = await response.json(); setNotice(response.ok ? "Article moved to trash. Restore it from History & rollback." : result.error ?? "Article could not be deleted."); if (response.ok) await load(); }
+  async function move(index: number, direction: number) { const target = index + direction; if (target < 0 || target >= items.length) return; const next = [...items]; [next[index], next[target]] = [next[target], next[index]]; setItems(next); const changed = [next[index], next[target]]; const responses = await Promise.all(changed.filter(item => item._id).map(item => fetch("/api/articles", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: item._id, order: next.indexOf(item), expectedVersion: item.version }) }))); if (responses.some(response => !response.ok)) { setNotice("Order changed elsewhere. Reloading the latest version."); await load(); } }
 
   return <div>
     <header className="admin-workspace-heading"><div><p>Editorial publishing</p><h1>Articles</h1></div><div><button className="admin-action" onClick={() => void load()}><RefreshCw /> Refresh</button>{canEdit && <button className="admin-action primary" onClick={() => setEditing("new")}><FilePlus2 /> New article</button>}</div></header>

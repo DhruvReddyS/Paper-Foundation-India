@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cloudinaryConfigured, uploadAsset } from "@/lib/cloudinary";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -10,6 +11,7 @@ function safeFileName(name: string) {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = await enforceRateLimit(request, "membership-upload", 5, 60 * 60_000); if (limited) return limited;
   const form = await request.formData();
   const file = form.get("file");
 
