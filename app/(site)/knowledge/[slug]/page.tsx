@@ -56,7 +56,7 @@ const readingTools: Record<ArticleCatalogItem["category"], Array<{ label: string
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const article = articleCatalog.find(item => item.slug === slug);
+  const article = await findArticle(slug);
   return article ? { title: article.title, description: article.summary } : { title: "Article not found" };
 }
 
@@ -100,11 +100,12 @@ const newArticleAngles: Record<string, string[]> = {
 
 function generatedBody(item: ArticleCatalogItem) {
   const angles = newArticleAngles[item.slug] ?? ["Define the system", "Inspect the material", "Follow the evidence", "Choose the responsible action"];
+  const tools = readingTools[item.category] ?? readingTools.Method;
   return angles.map((heading, index) => ({
     heading,
     paragraphs: [
       `${index === 0 ? item.summary : `${heading} changes how the question should be framed.`} Start with the product and the service it must provide. Fibre furnish, mill practice, converting choices, duration of use and the available route after use all shape the result. Treating paper as one uniform material hides the decisions that matter most.`,
-      `${readingTools[item.category][index].body} A useful account separates observation from assumption and identifies the point in the system where a choice can improve the outcome. It also avoids turning a single percentage, certification mark or laboratory property into a verdict about every paper product.`,
+      `${tools[index].body} A useful account separates observation from assumption and identifies the point in the system where a choice can improve the outcome. It also avoids turning a single percentage, certification mark or laboratory property into a verdict about every paper product.`,
       `For an Indian reader, the route may include recovered paper traders, farm-grown wood, agricultural residues, mills of very different scales and local collection markets. The conclusion should therefore name its geography and grade. Where evidence is incomplete, the honest response is to mark the gap, keep the claim narrow and state what information would change the decision.`,
     ],
   }));
@@ -126,22 +127,26 @@ type CmsArticle = {
 
 async function findArticle(slug: string): Promise<ReaderItem | undefined> {
   if (process.env.MONGODB_URI) {
-    await connectDB();
-    const dbItem = await Article.findOne({ slug, status: "published" }).lean() as CmsArticle | null;
-    if (dbItem) return {
-      id: Number(dbItem.order ?? 0) + 1,
-      slug: dbItem.slug,
-      title: dbItem.title,
-      category: dbItem.category as ArticleCatalogItem["category"],
-      format: dbItem.format as ArticleCatalogItem["format"],
-      featured: Boolean(dbItem.featured),
-      time: `${dbItem.readingMinutes ?? 7} min`,
-      summary: dbItem.excerpt,
-      sourceFile: "",
-      status: "published",
-      body: dbItem.body,
-      coverImage: dbItem.coverImage,
-    };
+    try {
+      await connectDB();
+      const dbItem = await Article.findOne({ slug, status: "published" }).lean() as CmsArticle | null;
+      if (dbItem) return {
+        id: Number(dbItem.order ?? 0) + 1,
+        slug: dbItem.slug,
+        title: dbItem.title,
+        category: dbItem.category as ArticleCatalogItem["category"],
+        format: dbItem.format as ArticleCatalogItem["format"],
+        featured: Boolean(dbItem.featured),
+        time: `${dbItem.readingMinutes ?? 7} min`,
+        summary: dbItem.excerpt,
+        sourceFile: "",
+        status: "published",
+        body: dbItem.body,
+        coverImage: dbItem.coverImage,
+      };
+    } catch {
+      // The editorial manifest keeps public reading available during a database outage.
+    }
   }
   return articleCatalog.find(article => article.slug === slug);
 }
@@ -150,7 +155,8 @@ export default async function ArticleReaderPage({ params }: { params: Promise<{ 
   const { slug } = await params;
   const item = await findArticle(slug);
   if (!item) notFound();
-  const note = categoryNotes[item.category];
+  const safeCategory = categoryNotes[item.category] ? item.category : "Method";
+  const note = categoryNotes[safeCategory];
   const next = articleCatalog[item.id % articleCatalog.length];
   const generated = generatedBody(item);
 
@@ -171,14 +177,14 @@ export default async function ArticleReaderPage({ params }: { params: Promise<{ 
         <section id="question"><span>01 · Begin</span><h2>{note.question}</h2><p className="article-dropcap">{item.summary} The useful starting point is not a verdict about a material in isolation, but a clearly bounded question about a real product and system.</p></section>
         <blockquote><Quote /><p>Good paper literacy keeps source, manufacture, purpose and recovery in the same sentence.</p></blockquote>
         <section id="article-body"><span>02 · Full article</span><h2>Read through {note.lens}.</h2>
-          {item.body ? <div className="article-generated-section article-cms-body">{item.body.split(/\n{2,}/).filter(Boolean).map((paragraph, index) => index === 0 ? <p className="article-dropcap" key={paragraph}>{paragraph}</p> : <p key={paragraph}>{paragraph}</p>)}</div> : generated.map((section, index) => <div className="article-generated-section" key={section.heading}>
-            {index === 2 && <ArticleInterlude number={index} note={readingTools[item.category][index - 1]} />}
+          {item.body ? <ArticleBody body={item.body} /> : generated.map((section, index) => <div className="article-generated-section" key={section.heading}>
+            {index === 2 && <ArticleInterlude number={index} note={readingTools[safeCategory][index - 1]} />}
             <h3>{String(index + 1).padStart(2, "0")} · {section.heading}</h3>
             {section.paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
           </div>)}
           <div className="article-field-guide">
             <header><small>Keep beside the article</small><strong>A four-part reading card</strong></header>
-            <div>{readingTools[item.category].map((tool, index) => <ArticleInterlude key={tool.title} number={index + 1} note={tool} compact />)}</div>
+            <div>{readingTools[safeCategory].map((tool, index) => <ArticleInterlude key={tool.title} number={index + 1} note={tool} compact />)}</div>
           </div>
           <div className="article-evidence-card"><small>Evidence habit</small><strong>Prefer a named source and visible method over a confident, context-free number.</strong></div>
         </section>
@@ -190,6 +196,19 @@ export default async function ArticleReaderPage({ params }: { params: Promise<{ 
 
     <footer className="article-reader-next"><p className="home-micro-label">Continue reading</p><Link href={`/knowledge/${next.slug}`}><span>Next desk · {next.category}</span><strong>{next.title}</strong><ArrowRight /></Link></footer>
   </article>;
+}
+
+function ArticleBody({ body }: { body: string }) {
+  const blocks = body.split(/\n{2,}/).map(block => block.trim()).filter(Boolean);
+  return <div className="article-generated-section article-cms-body">{blocks.map((block, index) => {
+    if (block.startsWith("### ")) return <h3 key={`${index}-${block}`}>{block.slice(4)}</h3>;
+    if (block.startsWith("## ")) return <h2 key={`${index}-${block}`}>{block.slice(3)}</h2>;
+    if (block.startsWith("> ")) return <blockquote key={`${index}-${block}`}><Quote /><p>{block.slice(2)}</p></blockquote>;
+    const lines = block.split("\n");
+    if (lines.every(line => /^[-*] /.test(line))) return <ul key={`${index}-${block}`}>{lines.map(line => <li key={line}>{line.slice(2)}</li>)}</ul>;
+    if (lines.every(line => /^\d+\. /.test(line))) return <ol key={`${index}-${block}`}>{lines.map(line => <li key={line}>{line.replace(/^\d+\. /, "")}</li>)}</ol>;
+    return <p className={index === 0 ? "article-dropcap" : undefined} key={`${index}-${block}`}>{lines.map((line, lineIndex) => <span key={`${lineIndex}-${line}`}>{line}{lineIndex < lines.length - 1 && <br />}</span>)}</p>;
+  })}</div>;
 }
 
 function ArticleInterlude({ number, note, compact = false }: { number: number; note: { label: string; title: string; body: string }; compact?: boolean }) {

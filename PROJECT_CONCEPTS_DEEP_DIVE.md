@@ -150,15 +150,17 @@ Layer 2: requireAdmin() / ownerSession()
 
 Why use middleware? It gives a fast user experience and prevents rendering protected pages for logged-out users.
 
-Why is middleware alone insufficient? A malicious user can call `/api/articles` directly with curl/Postman. Each mutation route therefore also calls `requireAdmin()`.
+Why is middleware alone insufficient? A malicious user can call `/api/articles` directly with curl/Postman. Each mutation route therefore also calls `requireEditor()` (or the stricter owner check), while authenticated read routes call `requireAdmin()`.
 
 #### API authorization helper
 
 ```ts
-export async function requireAdmin() {
-  return await canManageContent()
-    ? null
-    : NextResponse.json({ error: "Admin access required" }, { status: 401 });
+export async function requireEditor() {
+  const admin = await currentAdmin();
+  if (!admin) return NextResponse.json({ error: "Admin access required" }, { status: 401 });
+  return admin.role === "analyst"
+    ? NextResponse.json({ error: "This account has read-only analyst access" }, { status: 403 })
+    : null;
 }
 ```
 
@@ -181,9 +183,9 @@ The route enforces important invariants:
 - A role change cannot demote the final active owner.
 - Deleting an owner is blocked if only one active owner remains.
 
-### Important current limitation
+### Role enforcement
 
-The schema contains `owner`, `editor`, and `analyst`, but most content API routes only check **is this person an authenticated admin?** They do not yet block analysts from editing content. In an interview, do not overclaim full role-based permissions.
+The schema contains `owner`, `editor`, and `analyst`. Protected mutation routes call `requireEditor()`, which blocks analysts with `403 Forbidden`; administrator management additionally requires an owner. The helper re-reads the active account and current role from MongoDB, so disabling or demoting a user takes effect on their next protected API request.
 
 ### Better RBAC design
 
@@ -648,7 +650,7 @@ Game React state
 
 ### "How did you secure the admin dashboard?"
 
-"I use NextAuth credentials authentication, bcrypt password hashes, JWT sessions, route middleware for `/admin`, and server-side API checks. User administration is restricted to an owner role. I also added failed-login lockout logic and prevent the final active owner from being deleted or demoted."
+"I use NextAuth credentials authentication, bcrypt password hashes, JWT sessions, route middleware for `/admin`, and server-side API checks. Editors can mutate CMS content, analysts are read-only, and user administration is restricted to owners. Protected APIs re-check the active account and current role in MongoDB. I also added failed-login lockout logic and prevent the final active owner from being deleted or demoted."
 
 ### "How did you handle data relationships without foreign keys?"
 
@@ -656,7 +658,7 @@ Game React state
 
 ### "What would you improve?"
 
-"I would add granular permissions for editor versus analyst roles, centralized logging/error monitoring, rate limiting, stronger private document storage and scanning, pagination, automated integration tests, and a background queue for larger email sends. If relational reporting and delivery audit requirements grew, I would consider PostgreSQL for those modules."
+"I would add permission scopes beyond the current owner/editor/analyst roles, centralized logging/error monitoring, rate limiting, stronger private document storage and scanning, pagination, broader automated integration tests, and a background queue for larger email sends. If relational reporting and delivery audit requirements grew, I would consider PostgreSQL for those modules."
 
 ### "What is the difference between scraping and your extraction script?"
 

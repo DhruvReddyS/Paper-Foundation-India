@@ -3,10 +3,13 @@
 import { Check, CheckCircle2, CornerDownRight, FileSearch, Flag, Inbox, Mail, MessageCircle, ScanSearch, Send, ShieldCheck } from "lucide-react";
 import { FormEvent, useState } from "react";
 import styles from "./CorrespondencePage.module.css";
+import { usePublicSettings } from "./usePublicSettings";
 
 type Mode = "contact" | "report";
 
 export default function CorrespondencePage({ mode }: { mode: Mode }) {
+  const settings = usePublicSettings();
+  const contactEmail = String(settings["public.contact.email"] || "paperfoundationindia@gmail.com");
   const reporting = mode === "report";
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [channel, setChannel] = useState("General Inquiry");
@@ -85,7 +88,7 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
                 </>}
                 <label className={styles.full}><span>{reporting ? "Exact claim and context *" : "Message *"}</span><textarea required name="message" rows={4} minLength={20} maxLength={1800} onChange={(event) => setMessageLength(event.currentTarget.value.length)} placeholder={reporting ? "Paste the exact wording first. Then explain where it appeared and why it may be misleading." : "What would you like the Foundation to understand or help with?"} /><small className={styles.counter}>{messageLength} / 1800</small></label>
               </div>
-              <footer><p>{reporting ? "A submission begins a review. It does not guarantee a published correction." : "Please do not include confidential commercial information."}</p><button disabled={status === "sending"}>{status === "sending" ? "Sending..." : reporting ? "Submit evidence" : "Send message"}<Send /></button></footer>
+              <footer><p>{reporting ? "A submission begins a review. It does not guarantee a published correction." : <>Please do not include confidential commercial information. Prefer email? <a href={`mailto:${contactEmail}`}>{contactEmail}</a></>}</p><button disabled={status === "sending"}>{status === "sending" ? "Sending..." : reporting ? "Submit evidence" : "Send message"}<Send /></button></footer>
               {status === "error" && <p className={styles.error} role="alert">This could not be sent. Please check the fields and try again.</p>}
             </form>
           )}

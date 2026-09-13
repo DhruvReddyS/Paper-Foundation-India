@@ -2,18 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { cloudinaryConfigured, uploadAsset } from "@/lib/cloudinary";
 import { connectDB } from "@/lib/db";
 import { Media } from "@/lib/models/Media";
-import { requireAdmin } from "@/lib/api-auth";
+import { currentAdmin, requireEditor } from "@/lib/api-auth";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
-  const denied = await requireAdmin(); if (denied) return denied;
+  const denied = await requireEditor(); if (denied) return denied;
   if (!cloudinaryConfigured()) return NextResponse.json({ error: "Cloudinary is not configured" }, { status: 503 });
   const data = await request.formData();
   const file = data.get("file");
   if (!(file instanceof File)) return NextResponse.json({ error: "Choose a file to upload" }, { status: 400 });
   if (file.size > 20 * 1024 * 1024) return NextResponse.json({ error: "Files must be 20 MB or smaller" }, { status: 413 });
+  const allowed = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml", "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]);
+  if (!allowed.has(file.type)) return NextResponse.json({ error: "Use JPG, PNG, WebP, GIF, SVG, PDF, DOC or DOCX files" }, { status: 415 });
   const result = await uploadAsset(file, String(data.get("folder") || "paper-foundation"));
+  const admin = await currentAdmin();
   const metadata = {
     publicId: result.public_id,
     assetId: result.asset_id,
@@ -29,6 +32,7 @@ export async function POST(request: NextRequest) {
     caption: String(data.get("caption") || ""),
     folder: result.asset_folder ?? result.folder ?? "paper-foundation",
     tags: String(data.get("tags") || "").split(",").map(tag => tag.trim()).filter(Boolean),
+    uploadedBy: admin?.email || admin?.name,
   };
   if (process.env.MONGODB_URI) {
     await connectDB();

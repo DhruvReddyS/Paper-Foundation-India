@@ -14,6 +14,7 @@ interface MythEditorProps {
     status: string;
     coverImage?: string;
     revisionNote?: string;
+    verdict?: "myth" | "fact" | "context";
   };
   onSave?: (data: Record<string, unknown>) => void;
   className?: string;
@@ -32,6 +33,7 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
     status: initialData?.status || 'draft',
     coverImage: initialData?.coverImage || '',
     revisionNote: initialData?.revisionNote || '',
+    verdict: initialData?.verdict || 'context',
   });
 
   useEffect(() => {
@@ -122,6 +124,12 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
           </select>
         </div>
         <div>
+          <label className="block text-sm font-medium text-stone-700 mb-1">Verdict</label>
+          <select value={form.verdict} onChange={(e) => setForm({ ...form, verdict: e.target.value as typeof form.verdict })} className={inputClass}>
+            <option value="myth">Myth</option><option value="fact">Fact</option><option value="context">Needs context</option>
+          </select>
+        </div>
+        <div>
           <label className="block text-sm font-medium text-stone-700 mb-1">Status</label>
           <select
             value={form.status}
@@ -129,7 +137,9 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
             className={inputClass}
           >
             <option value="draft">Draft</option>
+            <option value="review">Review</option>
             <option value="published">Published</option>
+            <option value="archived">Archived</option>
           </select>
         </div>
       </div>
@@ -155,7 +165,7 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
           value={form.sources}
           onChange={(e) => setForm({ ...form, sources: e.target.value })}
           rows={3}
-          placeholder="FAO Report 2023&#10;IPPTA Journal"
+          placeholder="https://example.org/report&#10;https://example.org/data"
           className={inputClass}
         />
       </div>
@@ -163,12 +173,14 @@ export default function MythEditor({ initialData, onSave, className = '' }: Myth
       <div className="flex items-center gap-3 justify-end pt-2">
         <button
           type="button"
+          disabled={!onSave}
           className="rounded-lg border border-stone-300 px-5 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
         >
           Saved locally
         </button>
         <button
           type="button"
+          disabled={!onSave}
           onClick={handleSubmit}
           className="rounded-lg bg-[#1a3c2a] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#245038] transition-colors"
         >

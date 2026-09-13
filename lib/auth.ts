@@ -17,7 +17,7 @@ export function adminPreviewEnabled() {
 
 const loginSchema = z.object({
   username: z.string().trim().toLowerCase().min(3).max(80),
-  password: z.string().min(8).max(160),
+  password: z.string().min(10).max(160),
 });
 
 async function bootstrapOwner(username: string, password: string) {

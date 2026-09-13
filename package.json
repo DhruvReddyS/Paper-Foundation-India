@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "cms:check": "tsx scripts/check-cms.ts",
+    "test": "tsx --test tests/**/*.test.ts",
+    "verify": "npm run lint && npm run test && npm run build"
   },
   "dependencies": {
     "@react-three/fiber": "^9.6.1",

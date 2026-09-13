@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api-auth";
+import { requireEditor } from "@/lib/api-auth";
+import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { gmailConfigured, sendGmail } from "@/lib/gmail";
 import { Campaign } from "@/lib/models/Campaign";
 import { Subscriber } from "@/lib/models/Subscriber";
+import { validDocumentId } from "@/lib/validators/id";
 
 export const runtime = "nodejs";
+const sendSchema = z.object({ id: z.string().min(1), testEmail: z.string().email().optional() });
 
 export async function POST(request: NextRequest) {
-  const denied = await requireAdmin(); if (denied) return denied;
+  const denied = await requireEditor(); if (denied) return denied;
   if (!gmailConfigured()) return NextResponse.json({ error: "Connect the official Gmail account first" }, { status: 503 });
-  const { id, testEmail } = await request.json();
-  if (!id) return NextResponse.json({ error: "Missing campaign" }, { status: 400 });
+  const parsed = sendSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success || !validDocumentId(parsed.data.id)) return NextResponse.json({ error: "Choose a valid campaign and test email" }, { status: 400 });
+  const { id, testEmail } = parsed.data;
   await connectDB();
   const campaign = await Campaign.findById(id);
   if (!campaign) return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
+  if (campaign.status === "sent") return NextResponse.json({ error: "This campaign has already been sent" }, { status: 409 });
+  if (campaign.status === "paused" && !testEmail) return NextResponse.json({ error: "Resume this campaign before sending" }, { status: 409 });
 
   if (testEmail) {
     await sendGmail({ to: String(testEmail), name: "Test reader", subject: `[TEST] ${campaign.subject}`, previewText: campaign.previewText, body: campaign.body });

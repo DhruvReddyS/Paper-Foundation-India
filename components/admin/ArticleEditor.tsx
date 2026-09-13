@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
 
 interface ArticleEditorProps {
@@ -15,18 +15,21 @@ interface ArticleEditorProps {
     coverImage?: string;
     readingMinutes?: number;
     revisionNote?: string;
+    format?: string;
+    tags?: string[];
+    sources?: { label: string; url: string }[];
   };
   onSave?: (data: Record<string, unknown>) => void;
   className?: string;
 }
 
 const categories = [
-  'Sustainability',
-  'Innovation',
-  'Recycling',
-  'Industry',
-  'Environment',
+  'Forestry',
+  'Recovery',
+  'Method',
+  'Production',
   'Education',
+  'Use',
 ];
 
 const toolbarButtons = [
@@ -50,7 +53,8 @@ export default function ArticleEditor({
   const [form, setForm] = useState({
     title: initialData?.title || '',
     slug: initialData?.slug || '',
-    category: initialData?.category || 'Sustainability',
+    category: initialData?.category || 'Method',
+    format: initialData?.format || 'Core lesson',
     excerpt: initialData?.excerpt || '',
     body: initialData?.body || '',
     status: initialData?.status || 'draft',
@@ -58,8 +62,11 @@ export default function ArticleEditor({
     coverImage: initialData?.coverImage || '',
     readingMinutes: initialData?.readingMinutes || 6,
     revisionNote: initialData?.revisionNote || '',
+    tags: initialData?.tags?.join(', ') || '',
+    sources: initialData?.sources?.map(source => `${source.label} | ${source.url}`).join('\n') || '',
   });
   const draftKey = `pfi:article-draft:${initialData?.slug || 'new'}`;
+  const initialSnapshot = useRef(JSON.stringify(form));
   const wordCount = useMemo(() => form.body.trim() ? form.body.trim().split(/\s+/).length : 0, [form.body]);
   const suggestedMinutes = Math.max(1, Math.ceil(wordCount / 220));
   const readiness = useMemo(() => [
@@ -86,10 +93,13 @@ export default function ArticleEditor({
   }, [draftKey, form]);
 
   useEffect(() => {
-    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); };
+    const warn = (event: BeforeUnloadEvent) => {
+      if (JSON.stringify(form) === initialSnapshot.current) return;
+      event.preventDefault();
+    };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
-  }, []);
+  }, [form]);
 
   const handleTitleChange = (title: string) => {
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -125,7 +135,7 @@ export default function ArticleEditor({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-stone-700 mb-1">Cover asset URL</label>
           <input
@@ -135,6 +145,10 @@ export default function ArticleEditor({
             placeholder="Paste a URL copied from Media"
             className="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a3c2a]/30"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-stone-700 mb-1">Format</label>
+          <input value={form.format} onChange={(e) => setForm({ ...form, format: e.target.value })} className="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none" />
         </div>
         <div>
           <label className="block text-sm font-medium text-stone-700 mb-1">Reading time</label>
@@ -147,6 +161,19 @@ export default function ArticleEditor({
             className="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a3c2a]/30"
           />
           {wordCount > 0 && <button type="button" className="admin-editor-suggestion" onClick={() => setForm(current => ({ ...current, readingMinutes: suggestedMinutes }))}><Sparkles /> Use {suggestedMinutes} min from word count</button>}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-stone-700 mb-1">Tags</label>
+          <input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="forestry, recovery, India" className="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none" />
+          <small className="text-xs text-stone-500">Separate tags with commas.</small>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-stone-700 mb-1">Sources</label>
+          <textarea rows={4} value={form.sources} onChange={(e) => setForm({ ...form, sources: e.target.value })} placeholder="Source name | https://example.org/report" className="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none" />
+          <small className="text-xs text-stone-500">One source per line: label | URL.</small>
         </div>
       </div>
 
@@ -244,16 +271,18 @@ export default function ArticleEditor({
       <div className="flex items-center gap-3 justify-end">
         <button
           type="button"
-          onClick={() => onSave?.({ ...form, status: 'draft' })}
+          disabled={!onSave}
+          onClick={() => onSave?.({ ...form, status: 'draft', tags: form.tags.split(',').map(tag => tag.trim()).filter(Boolean), sources: parseSources(form.sources) })}
           className="rounded-lg border border-stone-300 px-5 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50 transition-colors"
         >
           Save Draft
         </button>
         <button
           type="button"
+          disabled={!onSave}
           onClick={() => {
             window.localStorage.removeItem(draftKey);
-            onSave?.(form);
+            onSave?.({ ...form, tags: form.tags.split(',').map(tag => tag.trim()).filter(Boolean), sources: parseSources(form.sources) });
           }}
           className="rounded-lg bg-[#1a3c2a] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#245038] transition-colors"
         >
@@ -262,4 +291,12 @@ export default function ArticleEditor({
       </div>
     </div>
   );
+}
+
+function parseSources(value: string) {
+  return value.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
+    const separator = line.indexOf('|');
+    if (separator !== -1) return { label: line.slice(0, separator).trim(), url: line.slice(separator + 1).trim() };
+    try { return { label: new URL(line).hostname, url: line }; } catch { return { label: "Source", url: line }; }
+  });
 }

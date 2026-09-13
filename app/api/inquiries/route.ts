@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Inquiry } from "@/lib/models/Inquiry";
 import { inquirySchema } from "@/lib/validators/inquiry";
-import { requireAdmin } from "@/lib/api-auth";
+import { requireAdmin, requireEditor } from "@/lib/api-auth";
+import { z } from "zod";
+import { validDocumentId } from "@/lib/validators/id";
+
+const updateSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(["new", "reviewing", "resolved", "archived"]).optional(),
+  internalNotes: z.string().max(5000).optional(),
+});
 
 export async function GET(request: NextRequest) {
   const denied = await requireAdmin(); if (denied) return denied;
@@ -26,11 +34,12 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const denied = await requireAdmin(); if (denied) return denied;
+  const denied = await requireEditor(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ error: "Database is not configured" }, { status: 503 });
-  const payload = await request.json();
-  if (!payload.id) return NextResponse.json({ error: "Missing inquiry id" }, { status: 400 });
+  const parsed = updateSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success || !validDocumentId(parsed.data.id)) return NextResponse.json({ error: "Invalid inquiry update", issues: parsed.success ? undefined : parsed.error.flatten() }, { status: 400 });
   await connectDB();
-  const item = await Inquiry.findByIdAndUpdate(payload.id, { status: payload.status, internalNotes: payload.internalNotes }, { new: true, runValidators: true }).lean();
+  const { id, ...update } = parsed.data;
+  const item = await Inquiry.findByIdAndUpdate(id, update, { new: true, runValidators: true }).lean();
   return item ? NextResponse.json({ item }) : NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
 }

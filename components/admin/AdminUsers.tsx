@@ -75,7 +75,7 @@ export default function AdminUsers() {
 
   return <div className="admin-users-page">
     <header className="admin-workspace-heading"><div><p>Access and responsibility</p><h1>Administrators</h1></div><span className="admin-users-count"><UsersRound /> {users.length} accounts</span></header>
-    <section className="admin-users-intro"><ShieldCheck /><div><strong>Simple access, proper safeguards.</strong><p>Owners manage accounts. Editors and analysts can use the website workspace. Passwords are encrypted and never shown here.</p></div></section>
+    <section className="admin-users-intro"><ShieldCheck /><div><strong>Simple access, proper safeguards.</strong><p>Owners manage accounts. Editors can publish; analysts have read-only access. Passwords are salted and hashed and are never shown here.</p></div></section>
     {(notice || error) && <div className={`admin-users-notice ${error ? "is-error" : ""}`}>{error ? <X /> : <Check />} {error || notice}</div>}
     <div className="admin-users-layout">
       <section className="admin-users-list">

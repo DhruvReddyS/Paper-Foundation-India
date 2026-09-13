@@ -3,7 +3,7 @@ import { z } from "zod";
 import { gameCatalog } from "@/components/games/gameCatalog";
 import { connectDB } from "@/lib/db";
 import { GameConfig } from "@/lib/models/GameConfig";
-import { requireAdmin } from "@/lib/api-auth";
+import { currentAdmin, requireEditor } from "@/lib/api-auth";
 
 const schema = z.object({
   gameId: z.string().min(1),
@@ -23,23 +23,24 @@ const schema = z.object({
 export async function GET() {
   if (!process.env.MONGODB_URI) return NextResponse.json({ items: gameCatalog.map((game, order) => ({ ...game, gameId: game.id, enabled: true, order, instructions: [], content: {} })), source: "catalog" });
   await connectDB();
-  const stored = await GameConfig.find().sort({ order: 1 }).lean();
+  const stored = await GameConfig.find().sort({ order: 1 }).select("-revisionNote -lastEditedBy").lean();
   if (!stored.length) return NextResponse.json({ items: gameCatalog.map((game, order) => ({ ...game, gameId: game.id, enabled: true, order, instructions: [], content: {} })), source: "catalog" });
   return NextResponse.json({ items: stored, source: "cms" });
 }
 
 export async function PUT(request: NextRequest) {
-  const denied = await requireAdmin(); if (denied) return denied;
+  const denied = await requireEditor(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ error: "Database is not configured" }, { status: 503 });
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid game configuration", issues: parsed.error.flatten() }, { status: 400 });
   await connectDB();
-  const item = await GameConfig.findOneAndUpdate({ gameId: parsed.data.gameId }, { $set: parsed.data, $inc: { revision: 1 } }, { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true }).lean();
+  const admin = await currentAdmin();
+  const item = await GameConfig.findOneAndUpdate({ gameId: parsed.data.gameId }, { $set: { ...parsed.data, lastEditedBy: admin?.email || admin?.name }, $inc: { revision: 1 } }, { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true }).lean();
   return NextResponse.json({ item });
 }
 
 export async function PATCH(request: NextRequest) {
-  const denied = await requireAdmin(); if (denied) return denied;
+  const denied = await requireEditor(); if (denied) return denied;
   if (!process.env.MONGODB_URI) return NextResponse.json({ error: "Database is not configured" }, { status: 503 });
   const payload = await request.json();
   if (!Array.isArray(payload.order)) return NextResponse.json({ error: "Invalid order" }, { status: 400 });

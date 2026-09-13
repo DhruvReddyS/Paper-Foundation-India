@@ -126,13 +126,13 @@ Admin submits username + password
   -> bcrypt.compare(password, hash)
   -> JWT session contains adminId and role
   -> middleware.ts protects /admin/*
-  -> requireAdmin() protects API mutations
+  -> requireEditor() protects API mutations
   -> ownerSession() additionally protects /api/admin/users
 ```
 
-`middleware.ts` runs before admin routes. It redirects unauthenticated users to `/admin/login`. The API has a second protection layer: `requireAdmin()` calls `canManageContent()` from `lib/auth.ts`. This is important because UI route protection alone is insufficient; somebody could call an API endpoint directly.
+`middleware.ts` runs before admin routes. It redirects unauthenticated users to `/admin/login`. The API has a second protection layer: `requireAdmin()` protects authenticated reads, while `requireEditor()` blocks analyst accounts from mutations. Both use `currentAdmin()`, which re-checks the active account and current role in MongoDB. This is important because UI route protection alone is insufficient; somebody could call an API endpoint directly.
 
-Roles are `owner`, `editor`, and `analyst`. The current code uses role-specific enforcement only for user administration: `ownerSession()` requires `role === "owner"`. Other content mutations use the broader `requireAdmin()` check. In an interview, say this is a basic RBAC foundation and a next improvement is a permission matrix for editor versus analyst routes.
+Roles are `owner`, `editor`, and `analyst`. Owners manage users and all CMS modules, editors manage content and operations, and analysts have read-only access. A next improvement would be granular permission scopes within those roles for larger teams.
 
 ### Request-response lifecycle: article list example
 

@@ -1,2 +1,6 @@
-import React from 'react';
-export default function AdminArticleEditor() { return <div>Article Editor</div>; }
+import { redirect } from "next/navigation";
+
+export default async function AdminArticleEditor({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  redirect(`/admin/articles?edit=${encodeURIComponent(id)}`);
+}
