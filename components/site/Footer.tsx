@@ -45,7 +45,7 @@ export default function Footer() {
     <div className={styles.bottom}>
       <p>© {new Date().getFullYear()} {brand} {country}</p>
       <p>{statement}</p>
-      <nav aria-label="Footer utility links"><Link href="/contact">Contact <ArrowUpRight /></Link><Link href="/admin/login"><LockKeyhole /> Admin portal</Link></nav>
+      <nav aria-label="Footer utility links"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/contact">Contact <ArrowUpRight /></Link><Link href="/admin/login"><LockKeyhole /> Admin portal</Link></nav>
     </div>
   </footer>;
 }

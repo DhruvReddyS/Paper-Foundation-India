@@ -9,19 +9,22 @@ import { recordAuditEvent } from "@/lib/content-history";
 
 export const dynamic = "force-dynamic";
 
+const strongPassword = z.string().min(12, "Use at least 12 characters").max(160).refine(value => /[a-z]/.test(value) && /[A-Z]/.test(value) && /\d/.test(value), "Include uppercase, lowercase and a number");
+
 const createSchema = z.object({
   username: z.string().trim().toLowerCase().min(3).max(80),
   name: z.string().trim().min(2).max(80),
-  password: z.string().min(10).max(160),
+  password: strongPassword,
   role: z.enum(["owner", "editor", "analyst"]),
 });
 
 const updateSchema = z.object({
   id: z.string().min(1),
   name: z.string().trim().min(2).max(80).optional(),
-  password: z.string().min(10).max(160).optional(),
+  password: strongPassword.optional(),
   role: z.enum(["owner", "editor", "analyst"]).optional(),
   active: z.boolean().optional(),
+  resetMfa: z.boolean().optional(),
 });
 
 async function ownerSession() {
@@ -64,7 +67,7 @@ export async function PATCH(request: NextRequest) {
   const parsed = updateSchema.safeParse(await request.json());
   if (!parsed.success || !validDocumentId(parsed.data.id)) return NextResponse.json({ error: parsed.success ? "Invalid administrator ID" : parsed.error.issues[0]?.message ?? "Invalid update" }, { status: 400 });
   await connectDB();
-  const target = await AdminUser.findById(parsed.data.id).select("+sessionVersion");
+  const target = await AdminUser.findById(parsed.data.id).select("+sessionVersion +passwordHash +failedAttempts +lockedUntil +mfaSecretEncrypted +pendingMfaSecretEncrypted +recoveryCodeHashes");
   if (!target) return NextResponse.json({ error: "Administrator not found" }, { status: 404 });
   if (String(target._id) === owner.id && parsed.data.active === false) return NextResponse.json({ error: "You cannot disable your own account" }, { status: 400 });
   if (target.role === "owner" && parsed.data.role && parsed.data.role !== "owner" && await AdminUser.countDocuments({ role: "owner", active: true }) <= 1) {
@@ -79,8 +82,15 @@ export async function PATCH(request: NextRequest) {
     target.lockedUntil = null;
     target.sessionVersion = (target.sessionVersion ?? 1) + 1;
   }
+  if (parsed.data.resetMfa) {
+    target.mfaEnabled = false;
+    target.mfaSecretEncrypted = "";
+    target.pendingMfaSecretEncrypted = "";
+    target.recoveryCodeHashes = [];
+    target.sessionVersion = (target.sessionVersion ?? 1) + 1;
+  }
   await target.save();
-  await recordAuditEvent({ actor: owner, action: parsed.data.password ? "administrator.credentials_reset" : "administrator.update", resourceType: "administrator", resourceId: String(target._id), resourceLabel: target.name, changedFields: Object.keys(parsed.data).filter(key => key !== "id" && key !== "password").concat(parsed.data.password ? ["credentials"] : []) });
+  await recordAuditEvent({ actor: owner, action: parsed.data.resetMfa ? "administrator.mfa_reset" : parsed.data.password ? "administrator.credentials_reset" : "administrator.update", resourceType: "administrator", resourceId: String(target._id), resourceLabel: target.name, changedFields: Object.keys(parsed.data).filter(key => key !== "id" && key !== "password").concat(parsed.data.password ? ["credentials"] : []) });
   return NextResponse.json({ user: target });
 }
 

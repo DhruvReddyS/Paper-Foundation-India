@@ -8,8 +8,9 @@ import crypto from "node:crypto";
 import { confirmationTokenHash, gmailConfigured, sendSubscriptionConfirmation } from "@/lib/gmail";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { recordAuditEvent } from "@/lib/content-history";
+import { publicSubmissionIsSpam } from "@/lib/public-submission";
 
-const schema = z.object({ email: z.string().email(), name: z.string().max(120).optional(), source: z.string().max(80).optional(), tags: z.array(z.string()).optional(), topics: z.array(z.string().trim().min(1).max(60)).max(20).optional(), frequency: z.enum(["weekly", "monthly", "important-only"]).optional(), language: z.string().trim().min(2).max(12).optional() });
+const schema = z.object({ email: z.string().email(), consent: z.literal(true), name: z.string().max(120).optional(), source: z.string().max(80).optional(), tags: z.array(z.string()).optional(), topics: z.array(z.string().trim().min(1).max(60)).max(20).optional(), frequency: z.enum(["weekly", "monthly", "important-only"]).optional(), language: z.string().trim().min(2).max(12).optional() });
 const updateSchema = z.object({ id: z.string().min(1), status: z.enum(["pending", "active", "unsubscribed", "bounced", "complained"]).optional(), tags: z.array(z.string().trim().min(1).max(60)).max(30).optional(), notes: z.string().max(3000).optional(), name: z.string().max(120).optional(), preferences: z.object({ topics: z.array(z.string().max(60)).max(20).optional(), frequency: z.enum(["weekly", "monthly", "important-only"]).optional(), language: z.string().min(2).max(12).optional() }).optional() });
 
 export async function GET(request: NextRequest) {
@@ -23,8 +24,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const limited = await enforceRateLimit(request, "newsletter-subscribe", 5, 60 * 60_000); if (limited) return limited;
-  const parsed = schema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return NextResponse.json({ error: "Enter a valid email address" }, { status: 400 });
+  const payload = await request.json().catch(() => null);
+  if (payload && publicSubmissionIsSpam(payload)) return NextResponse.json({ accepted: true, confirmationRequired: true }, { status: 202 });
+  const parsed = schema.safeParse(payload);
+  if (!parsed.success) return NextResponse.json({ error: payload?.consent !== true ? "Confirm newsletter consent to continue" : "Enter a valid email address" }, { status: 400 });
   if (!process.env.MONGODB_URI) return NextResponse.json({ accepted: true, persisted: false }, { status: 202 });
   if (!gmailConfigured()) return NextResponse.json({ error: "Newsletter confirmation email is not configured" }, { status: 503 });
   await connectDB();

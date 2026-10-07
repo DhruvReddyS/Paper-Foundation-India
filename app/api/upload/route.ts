@@ -3,6 +3,7 @@ import { cloudinaryConfigured, uploadAsset } from "@/lib/cloudinary";
 import { connectDB } from "@/lib/db";
 import { Media } from "@/lib/models/Media";
 import { currentAdmin, requireEditor } from "@/lib/api-auth";
+import { validateUploadFile } from "@/lib/file-security";
 
 export const runtime = "nodejs";
 
@@ -13,8 +14,9 @@ export async function POST(request: NextRequest) {
   const file = data.get("file");
   if (!(file instanceof File)) return NextResponse.json({ error: "Choose a file to upload" }, { status: 400 });
   if (file.size > 20 * 1024 * 1024) return NextResponse.json({ error: "Files must be 20 MB or smaller" }, { status: 413 });
-  const allowed = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml", "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]);
-  if (!allowed.has(file.type)) return NextResponse.json({ error: "Use JPG, PNG, WebP, GIF, SVG, PDF, DOC or DOCX files" }, { status: 415 });
+  const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"] as const;
+  const validation = await validateUploadFile(file, allowed);
+  if (!validation.safe) return NextResponse.json({ error: validation.error }, { status: 415 });
   const result = await uploadAsset(file, String(data.get("folder") || "paper-foundation"));
   const admin = await currentAdmin();
   const metadata = {

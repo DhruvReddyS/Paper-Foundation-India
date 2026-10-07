@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, KeyRound, LoaderCircle, Plus, Shield, ShieldCheck, Trash2, UserRound, UsersRound, X } from "lucide-react";
+import { Check, KeyRound, LoaderCircle, Plus, Shield, ShieldCheck, ShieldOff, Trash2, UserRound, UsersRound, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 type Role = "owner" | "editor" | "analyst";
@@ -10,6 +10,7 @@ type Admin = {
   name: string;
   role: Role;
   active: boolean;
+  mfaEnabled?: boolean;
   lastLoginAt?: string;
   createdAt: string;
 };
@@ -49,7 +50,7 @@ export default function AdminUsers() {
     await load();
   }
 
-  async function update(id: string, update: Partial<Admin> & { password?: string }) {
+  async function update(id: string, update: Partial<Admin> & { password?: string; resetMfa?: boolean }) {
     setError(""); setNotice("");
     const response = await fetch("/api/admin/users", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, ...update }) });
     const data = await response.json();
@@ -59,7 +60,7 @@ export default function AdminUsers() {
   }
 
   async function resetPassword(user: Admin) {
-    const password = window.prompt(`Set a new password for ${user.name}. Use at least 10 characters.`);
+    const password = window.prompt(`Set a new password for ${user.name}. Use at least 12 characters with uppercase, lowercase and a number.`);
     if (!password) return;
     await update(user._id, { password });
   }
@@ -71,6 +72,11 @@ export default function AdminUsers() {
     if (!response.ok) { setError(data.error || "Could not remove administrator"); return; }
     setNotice("Administrator removed.");
     await load();
+  }
+
+  async function resetMfa(user: Admin) {
+    if (!window.confirm(`Reset two-factor authentication for ${user.name}? Their existing sessions and recovery codes will stop working.`)) return;
+    await update(user._id, { resetMfa: true });
   }
 
   return <div className="admin-users-page">
@@ -86,6 +92,7 @@ export default function AdminUsers() {
           <label><span>Role</span><select value={user.role} onChange={event => void update(user._id, { role: event.target.value as Role })}><option value="owner">Owner</option><option value="editor">Editor</option><option value="analyst">Analyst</option></select></label>
           <button className={`admin-user-state ${user.active ? "is-active" : ""}`} onClick={() => void update(user._id, { active: !user.active })}>{user.active ? "Active" : "Disabled"}</button>
           <button className="admin-user-icon" onClick={() => void resetPassword(user)} title="Reset password"><KeyRound /></button>
+          <button className="admin-user-icon" onClick={() => void resetMfa(user)} title={user.mfaEnabled ? "Reset two-factor authentication" : "Two-factor authentication is not enabled"} disabled={!user.mfaEnabled || user._id === currentId}><ShieldOff /></button>
           <button className="admin-user-icon is-danger" onClick={() => void remove(user)} title="Remove administrator" disabled={user._id === currentId}><Trash2 /></button>
         </article>)}
       </section>
@@ -93,7 +100,7 @@ export default function AdminUsers() {
         <header><span><Plus /></span><div><strong>Add an administrator</strong><small>Access works immediately after creation</small></div></header>
         <label><span>Full name</span><div><UserRound /><input value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} placeholder="Editorial team member" required minLength={2} /></div></label>
         <label><span>User ID</span><div><Shield /><input value={form.username} onChange={event => setForm({ ...form, username: event.target.value.toLowerCase().replace(/\s+/g, "") })} placeholder="name@paperfoundation.in" required minLength={3} /></div></label>
-        <label><span>Temporary password</span><div><KeyRound /><input type="password" value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} placeholder="Minimum 10 characters" required minLength={10} /></div></label>
+        <label><span>Temporary password</span><div><KeyRound /><input type="password" value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} placeholder="12+ chars, upper/lower/number" required minLength={12} /></div></label>
         <label><span>Access level</span><select value={form.role} onChange={event => setForm({ ...form, role: event.target.value as Role })}><option value="editor">Editor · workspace access</option><option value="analyst">Analyst · workspace access</option><option value="owner">Owner · accounts and workspace</option></select></label>
         <button className="admin-action" disabled={saving}>{saving ? <LoaderCircle className="is-spinning" /> : <Plus />} {saving ? "Creating account..." : "Create administrator"}</button>
       </form>

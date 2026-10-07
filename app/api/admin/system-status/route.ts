@@ -14,6 +14,7 @@ export async function GET() {
   let databaseReady = false;
   let databaseMessage = "MONGODB_URI is missing";
   let hasAdministrator = false;
+  let hasMfaOwner = false;
   if (has("MONGODB_URI")) {
     try {
       const connection = await connectDB();
@@ -21,6 +22,7 @@ export async function GET() {
       databaseReady = true;
       databaseMessage = "Connection verified";
       hasAdministrator = Boolean(await AdminUser.exists({ active: true }));
+      hasMfaOwner = Boolean(await AdminUser.exists({ active: true, role: "owner", mfaEnabled: true }));
     } catch (error) {
       databaseMessage = error instanceof Error ? error.message.replace(/mongodb(?:\+srv)?:\/\/[^\s]+/gi, "MongoDB connection") : "Connection failed";
     }
@@ -33,6 +35,7 @@ export async function GET() {
     { id: "database", label: "Content database", provider: "MongoDB Atlas", required: true, ready: databaseReady, message: databaseMessage, keys: ["MONGODB_URI"] },
     { id: "media", label: "Media library", provider: "Cloudinary", required: true, ready: has("CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"), keys: ["CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"] },
     { id: "admin", label: "Admin authentication", provider: "MongoDB credentials", required: true, ready: databaseReady && has("NEXTAUTH_SECRET") && (hasAdministrator || bootstrapReady), message: hasAdministrator ? "Active administrator found" : bootstrapReady ? "Bootstrap account ready" : "Add bootstrap credentials for the first owner", keys: ["NEXTAUTH_SECRET", "ADMIN_BOOTSTRAP_USERNAME", "ADMIN_BOOTSTRAP_PASSWORD"] },
+    { id: "mfa", label: "Owner two-factor authentication", provider: "TOTP authenticator", required: false, ready: hasMfaOwner, message: hasMfaOwner ? "Protected owner found" : "Enable from Security centre after first login", keys: [] },
     { id: "campaigns", label: "Subscriber campaigns", provider: "Gmail API", required: true, ready: has("GMAIL_SENDER_EMAIL", "GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REFRESH_TOKEN"), keys: ["GMAIL_SENDER_EMAIL", "GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REFRESH_TOKEN"] },
     { id: "automation", label: "Campaign automation", provider: "Secure scheduler", required: true, ready: has("CRON_SECRET"), message: has("CRON_SECRET") ? "Worker endpoint secured" : "Add a random scheduler secret", keys: ["CRON_SECRET"] },
     { id: "site", label: "Public site address", provider: "Website", required: true, ready: has("NEXT_PUBLIC_SITE_URL", "NEXTAUTH_URL") && secureUrls, message: secureUrls ? "Public URLs configured" : "Production URLs must use HTTPS", keys: ["NEXT_PUBLIC_SITE_URL", "NEXTAUTH_URL"] },

@@ -4,7 +4,7 @@ The admin portal uses a user ID and password. Accounts are stored in MongoDB and
 
 ## First owner account
 
-Add these values to `.env.local` for local development and to Vercel Project Settings for deployment:
+Add these values to `.env.local` for local development and to the GoDaddy Node.js Hosting Settings for deployment:
 
 ```env
 MONGODB_URI=
@@ -16,13 +16,13 @@ ADMIN_BOOTSTRAP_PASSWORD=
 ADMIN_PREVIEW_MODE=false
 ```
 
-Use a long, unique password of at least 10 characters. The first successful login creates the owner account in MongoDB only when the `admin_users` collection is empty. After that, changing the bootstrap variables does not alter existing accounts.
+Use a unique password of at least 12 characters containing uppercase, lowercase and a number. The first successful login creates the owner account in MongoDB only when the `admin_users` collection is empty. After that, changing the bootstrap variables does not alter existing accounts.
 
-Open `/admin/login`, sign in with the bootstrap credentials, then use `/admin/users` to add, disable, remove or reset other administrator accounts.
+Open `/admin/login`, sign in with the bootstrap credentials, enable two-factor authentication in `/admin/security`, then use `/admin/users` to add, disable, remove or reset other administrator accounts.
 
 ## Production safety
 
-Set `ADMIN_PREVIEW_MODE=false` in Vercel. Production never permits preview bypass, even if this value is accidentally set to true.
+Set `ADMIN_PREVIEW_MODE=false` in GoDaddy. Production never permits preview bypass, even if this value is accidentally set to true.
 
 Use the exact production address for both URL values:
 

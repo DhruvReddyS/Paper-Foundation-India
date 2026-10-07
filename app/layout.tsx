@@ -26,6 +26,7 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://paperfoundation.in"),
   title: {
     default: "Paper Foundation India",
     template: "%s | Paper Foundation India",
@@ -47,6 +48,7 @@ export const metadata: Metadata = {
     locale: "en_IN",
     siteName: "Paper Foundation India",
   },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({

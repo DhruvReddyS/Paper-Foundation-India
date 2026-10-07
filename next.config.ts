@@ -40,6 +40,9 @@ const nextConfig: NextConfig = {
       headers: [
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "X-Frame-Options", value: "DENY" },
+        { key: "X-DNS-Prefetch-Control", value: "off" },
+        { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+        { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         { key: "Content-Security-Policy", value: contentSecurityPolicy },
@@ -47,6 +50,9 @@ const nextConfig: NextConfig = {
       ],
     }, {
       source: "/admin/:path*",
+      headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0" }],
+    }, {
+      source: "/api/admin/:path*",
       headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0" }],
     }];
   },

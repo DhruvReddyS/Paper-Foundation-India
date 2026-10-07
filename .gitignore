@@ -11,3 +11,4 @@ env.txt
 *.tsbuildinfo
 app 21-59-10-823/
 tmp/
+.release/

@@ -11,6 +11,7 @@ export default function InitiativeForm() {
   const [uploadName, setUploadName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const formStartedAt = useRef(Date.now());
 
   function nextStep(button: HTMLButtonElement) {
     const form = button.form;
@@ -28,21 +29,28 @@ export default function InitiativeForm() {
     event.preventDefault();
     setStatus("sending");
     setErrorMessage("");
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const details = Object.fromEntries(form.entries());
     try {
-      let attachmentUrl = "";
-      let attachmentName = "";
       if (method === "pdf") {
         const file = fileRef.current?.files?.[0];
         if (!file) throw new Error("Choose your completed and signed PDF.");
         const upload = new FormData();
         upload.set("file", file);
+        upload.set("name", String(details.name || ""));
+        upload.set("email", String(details.email || ""));
+        upload.set("_website", String(details._website || ""));
+        upload.set("formStartedAt", String(formStartedAt.current));
         const uploadResponse = await fetch("/api/membership-upload", { method: "POST", body: upload });
         const uploadResult = await uploadResponse.json();
         if (!uploadResponse.ok) throw new Error(uploadResult.error || "The PDF could not be uploaded.");
-        attachmentUrl = uploadResult.url;
-        attachmentName = uploadResult.name;
+        setStatus("sent");
+        setStep(1);
+        setUploadName("");
+        formElement.reset();
+        formStartedAt.current = Date.now();
+        return;
       }
       const response = await fetch("/api/inquiries", {
         method: "POST",
@@ -51,19 +59,18 @@ export default function InitiativeForm() {
           type: "Membership Application",
           name: details.name,
           email: details.email,
-          subject: method === "pdf" ? "Signed membership PDF" : "Join Paper Foundation India",
-          message: method === "pdf"
-            ? "A completed and signed membership application PDF was uploaded through the public membership desk."
-            : `Mobile: ${details.mobile}\nOrganisation: ${details.organisation || "Not provided"}\nDesignation: ${details.designation || "Not provided"}\nProfession: ${details.profession}\nAddress: ${details.address}\nAssociation with paper: ${details.paperAssociation}\nContribution: ${details.otherDetails || "Not provided"}`,
-          attachmentUrl,
-          attachmentName,
+          subject: "Join Paper Foundation India",
+          message: `Mobile: ${details.mobile}\nOrganisation: ${details.organisation || "Not provided"}\nDesignation: ${details.designation || "Not provided"}\nProfession: ${details.profession}\nAddress: ${details.address}\nAssociation with paper: ${details.paperAssociation}\nContribution: ${details.otherDetails || "Not provided"}`,
+          _website: details._website,
+          formStartedAt: formStartedAt.current,
         }),
       });
       if (!response.ok) throw new Error("The application could not be recorded.");
       setStatus("sent");
       setStep(1);
       setUploadName("");
-      event.currentTarget.reset();
+      formElement.reset();
+      formStartedAt.current = Date.now();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "The application could not be sent.");
       setStatus("error");
@@ -87,6 +94,7 @@ export default function InitiativeForm() {
             <div className={styles.success}><Check /><small>APPLICATION RECEIVED</small><h2>Your membership application is with the team.</h2><p>Thank you for adding your perspective to the Foundation.</p><button onClick={() => setStatus("idle")}>Submit another</button></div>
           ) : (
             <form onSubmit={submit}>
+              <input aria-hidden="true" tabIndex={-1} autoComplete="off" name="_website" style={{ display: "none" }} />
               <header><div><Users /><span>{method === "pdf" ? "Signed PDF application" : step === 1 ? "Your essentials" : "Your perspective"}</span></div><small>No membership fee</small></header>
               <div className={styles.methodPicker} aria-label="Choose an application method">
                 <button type="button" className={method === "online" ? styles.activeMethod : ""} onClick={() => { setMethod("online"); setStep(1); setStatus("idle"); }}>

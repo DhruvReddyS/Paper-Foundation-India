@@ -11,6 +11,7 @@ const setupLinks: Record<string, string> = {
   database: "https://cloud.mongodb.com/",
   media: "https://console.cloudinary.com/",
   admin: "/admin/users",
+  mfa: "/admin/security",
   campaigns: "https://console.cloud.google.com/apis/credentials",
   automation: "/admin/campaigns",
   analytics: "https://analytics.google.com/",
@@ -59,7 +60,7 @@ export default function AdminSettings() {
         <header><div><i>{service.ready ? <Check /> : <Wrench />}</i><span><strong>{service.label}</strong><small>{service.provider}{service.message ? ` · ${service.message}` : ""}</small></span></div><em>{service.ready ? "Connected" : service.required ? "Setup needed" : "Optional"}</em></header>
         <div>{service.keys.map(key => <button key={key} onClick={() => void copy(key)} title={`Copy ${key}`}><code>{key}</code>{copied === key ? <Check /> : <Copy />}</button>)}</div>
         <footer>
-          {setupLinks[service.id].startsWith("/") ? <Link href={setupLinks[service.id]}>{service.id === "admin" ? "Manage administrators" : service.id === "automation" ? "Open campaign operations" : "Open website"} <ChevronRight /></Link> : <a href={setupLinks[service.id]} target="_blank" rel="noreferrer">Open {service.provider} <ExternalLink /></a>}
+          {setupLinks[service.id].startsWith("/") ? <Link href={setupLinks[service.id]}>{service.id === "admin" ? "Manage administrators" : service.id === "mfa" ? "Open Security centre" : service.id === "automation" ? "Open campaign operations" : "Open website"} <ChevronRight /></Link> : <a href={setupLinks[service.id]} target="_blank" rel="noreferrer">Open {service.provider} <ExternalLink /></a>}
         </footer>
       </article>)}
     </section>

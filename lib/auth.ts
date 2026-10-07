@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { AdminUser } from "@/lib/models/AdminUser";
+import { decryptMfaSecret, normalizeRecoveryCode, verifyTotp } from "@/lib/mfa";
 
 export function adminAuthConfigured() {
   return Boolean(process.env.MONGODB_URI && process.env.NEXTAUTH_SECRET);
@@ -17,13 +18,18 @@ export function adminPreviewEnabled() {
 
 const loginSchema = z.object({
   username: z.string().trim().toLowerCase().min(3).max(80),
-  password: z.string().min(10).max(160),
+  // Existing administrators may have credentials created under the previous
+  // policy. Enforce the 12-character rule on creation/reset without locking
+  // those accounts out before an owner can rotate them.
+  password: z.string().min(1).max(160),
+  otp: z.string().trim().max(32).optional(),
 });
 
 async function bootstrapOwner(username: string, password: string) {
   const bootstrapUsername = process.env.ADMIN_BOOTSTRAP_USERNAME?.trim().toLowerCase();
   const bootstrapPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD;
   if (!bootstrapUsername || !bootstrapPassword || username !== bootstrapUsername || password !== bootstrapPassword) return null;
+  if (bootstrapPassword.length < 12 || !/[a-z]/.test(bootstrapPassword) || !/[A-Z]/.test(bootstrapPassword) || !/\d/.test(bootstrapPassword)) return null;
   if (await AdminUser.exists({})) return null;
   return AdminUser.create({
     username,
@@ -41,13 +47,14 @@ export const authOptions: NextAuthOptions = {
     credentials: {
       username: { label: "User ID", type: "text" },
       password: { label: "Password", type: "password" },
+      otp: { label: "Authenticator or recovery code", type: "text" },
     },
     async authorize(credentials) {
       const parsed = loginSchema.safeParse(credentials);
       if (!parsed.success || !adminAuthConfigured()) return null;
       await connectDB();
       const { username, password } = parsed.data;
-      let admin = await AdminUser.findOne({ username }).select("+passwordHash +failedAttempts +lockedUntil +sessionVersion");
+      let admin = await AdminUser.findOne({ username }).select("+passwordHash +failedAttempts +lockedUntil +sessionVersion +mfaSecretEncrypted +recoveryCodeHashes");
       if (!admin) admin = await bootstrapOwner(username, password);
       if (!admin || !admin.active) return null;
       if (admin.lockedUntil && admin.lockedUntil.getTime() > Date.now()) throw new Error("ACCOUNT_LOCKED");
@@ -59,6 +66,28 @@ export const authOptions: NextAuthOptions = {
         admin.lockedUntil = attempts >= 5 ? new Date(Date.now() + 15 * 60 * 1000) : null;
         await admin.save();
         return null;
+      }
+
+      if (admin.mfaEnabled) {
+        const otp = parsed.data.otp ?? "";
+        let mfaValid = Boolean(otp && admin.mfaSecretEncrypted && verifyTotp(decryptMfaSecret(admin.mfaSecretEncrypted), otp));
+        if (!mfaValid && otp) {
+          const normalized = normalizeRecoveryCode(otp);
+          for (let index = 0; index < (admin.recoveryCodeHashes ?? []).length; index += 1) {
+            if (normalized && await bcrypt.compare(normalized, admin.recoveryCodeHashes[index])) {
+              admin.recoveryCodeHashes.splice(index, 1);
+              mfaValid = true;
+              break;
+            }
+          }
+        }
+        if (!mfaValid) {
+          const attempts = (admin.failedAttempts ?? 0) + 1;
+          admin.failedAttempts = attempts >= 5 ? 0 : attempts;
+          admin.lockedUntil = attempts >= 5 ? new Date(Date.now() + 15 * 60 * 1000) : null;
+          await admin.save();
+          throw new Error(otp ? "MFA_INVALID" : "MFA_REQUIRED");
+        }
       }
 
       admin.failedAttempts = 0;

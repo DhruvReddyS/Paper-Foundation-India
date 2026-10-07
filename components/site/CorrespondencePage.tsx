@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, CheckCircle2, CornerDownRight, FileSearch, Flag, Inbox, Mail, MessageCircle, ScanSearch, Send, ShieldCheck } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import styles from "./CorrespondencePage.module.css";
 import { usePublicSettings } from "./usePublicSettings";
 
@@ -14,11 +14,13 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [channel, setChannel] = useState("General Inquiry");
   const [messageLength, setMessageLength] = useState(0);
+  const formStartedAt = useRef(Date.now());
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("sending");
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     try {
       const response = await fetch("/api/inquiries", {
         method: "POST",
@@ -30,12 +32,15 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
           subject: reporting ? form.get("source") : form.get("subject"),
           message: form.get("message"),
           sourceUrl: form.get("sourceUrl"),
+          _website: form.get("_website"),
+          formStartedAt: formStartedAt.current,
         }),
       });
       if (!response.ok) throw new Error();
       setStatus("sent");
       setMessageLength(0);
-      event.currentTarget.reset();
+      formElement.reset();
+      formStartedAt.current = Date.now();
     } catch {
       setStatus("error");
     }
@@ -65,6 +70,7 @@ export default function CorrespondencePage({ mode }: { mode: Mode }) {
             <div className={styles.success}><Check /><small>RECEIVED</small><h2>{reporting ? "Evidence entered into review." : "Your signal reached the desk."}</h2><p>We will use your email if the team needs more context.</p><button onClick={() => setStatus("idle")}>Send another</button></div>
           ) : (
             <form onSubmit={submit}>
+              <input aria-hidden="true" tabIndex={-1} autoComplete="off" name="_website" style={{ display: "none" }} />
               <header><span>{reporting ? <Flag /> : <Mail />}{reporting ? "Evidence intake" : "Message composer"}</span><small>All fields marked * are required</small></header>
               <div className={styles.formGuide}>
                 {(reporting ? ["Copy the exact claim", "Add the original source", "Explain the missing context"] : ["Choose the right desk", "Add the essential detail", "Receive replies by email"]).map((item, index) => (

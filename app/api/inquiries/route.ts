@@ -7,6 +7,7 @@ import { z } from "zod";
 import { validDocumentId } from "@/lib/validators/id";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { recordAuditEvent } from "@/lib/content-history";
+import { publicSubmissionIsSpam } from "@/lib/public-submission";
 
 const updateSchema = z.object({
   id: z.string().min(1),
@@ -25,7 +26,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const limited = await enforceRateLimit(request, "public-inquiry", 8, 60 * 60_000); if (limited) return limited;
-  const parsed = inquirySchema.safeParse(await request.json().catch(() => null));
+  const payload = await request.json().catch(() => null);
+  if (payload && publicSubmissionIsSpam(payload)) return NextResponse.json({ accepted: true }, { status: 202 });
+  const parsed = inquirySchema.safeParse(payload);
   if (!parsed.success) return NextResponse.json({ error: "Invalid correspondence", issues: parsed.error.flatten() }, { status: 400 });
   if (!process.env.MONGODB_URI) {
     if (process.env.NODE_ENV !== "production") return NextResponse.json({ accepted: true, preview: true }, { status: 202 });

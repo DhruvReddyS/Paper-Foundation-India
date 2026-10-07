@@ -1,6 +1,6 @@
 # Paper Foundation India
 
-Public education website about paper, circularity, and India’s paper ecosystem.
+Production website and multi-user content management system for public education about paper, circularity, and India’s paper ecosystem.
 
 ## Start here
 
@@ -13,7 +13,15 @@ npm install
 npm run dev
 ```
 
-Newsroom and Corrections are not part of the current product scope.
+## Production capabilities
+
+- Role-based CMS for owners, editors and analysts
+- Draft, review, scheduling, publishing, immutable history and one-click rollback
+- Media, articles, myths, resources, glossary, games and public-site controls
+- Inquiry, membership and subscriber management with audit history
+- Double-opt-in newsletter, tagged audiences, test sends, scheduled campaigns, retries and unsubscribe suppression
+- Two-factor admin authentication, recovery codes, login lockout, rate limits and file-content validation
+- Owner backup export, health/status checks, SEO sitemap/robots/manifest, privacy notice and terms
 
 ## CMS operations
 
@@ -24,4 +32,7 @@ Newsroom and Corrections are not part of the current product scope.
 npm run verify
 npm run cms:check
 npm run seed
+npm run bundle:godaddy
 ```
+
+GoDaddy deployment instructions: [`DEPLOY_GODADDY.md`](DEPLOY_GODADDY.md)

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import Link from 'next/link';
 
 interface NewsletterSignupProps {
   className?: string;
@@ -14,22 +15,27 @@ export default function NewsletterSignup({
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [consent, setConsent] = useState(false);
+  const formStartedAt = useRef(Date.now());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    const form = new FormData(e.currentTarget as HTMLFormElement);
 
     try {
       const response = await fetch('/api/subscribers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'newsletter' }),
+        body: JSON.stringify({ email, source: 'newsletter', consent, _website: form.get('_website'), formStartedAt: formStartedAt.current }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Subscription could not be started.');
       setMessage(result.confirmationRequired === false ? 'You are already subscribed.' : 'Check your inbox and confirm within 24 hours.');
       setStatus('success');
       setEmail('');
+      setConsent(false);
+      formStartedAt.current = Date.now();
     } catch {
       setStatus('error');
     }
@@ -47,8 +53,9 @@ export default function NewsletterSignup({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`${variant === 'stacked' ? 'space-y-3' : 'flex gap-3'} ${className}`}
+      className={`${variant === 'stacked' ? 'space-y-3' : 'flex flex-wrap gap-3'} ${className}`}
     >
+      <input aria-hidden="true" tabIndex={-1} autoComplete="off" name="_website" style={{ display: 'none' }} />
       <input
         type="email"
         required
@@ -59,6 +66,7 @@ export default function NewsletterSignup({
           variant === 'stacked' ? 'w-full' : 'flex-1'
         }`}
       />
+      <label className="flex basis-full items-start gap-2 text-xs text-stone-600"><input type="checkbox" required checked={consent} onChange={event => setConsent(event.target.checked)} className="mt-0.5" /><span>I agree to receive updates and understand I can unsubscribe anytime. <Link className="underline" href="/privacy">Privacy notice</Link></span></label>
       <button
         type="submit"
         disabled={status === 'loading'}

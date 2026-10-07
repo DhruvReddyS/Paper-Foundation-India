@@ -37,7 +37,7 @@ async function seed() {
   const ownerUsername = process.env.ADMIN_BOOTSTRAP_USERNAME?.trim().toLowerCase();
   const ownerPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD;
   if (!(await AdminUser.exists({})) && ownerUsername && ownerPassword) {
-    if (ownerPassword.length < 10) throw new Error("ADMIN_BOOTSTRAP_PASSWORD must be at least 10 characters");
+    if (ownerPassword.length < 12 || !/[a-z]/.test(ownerPassword) || !/[A-Z]/.test(ownerPassword) || !/\d/.test(ownerPassword)) throw new Error("ADMIN_BOOTSTRAP_PASSWORD must be at least 12 characters and include uppercase, lowercase and a number");
     await AdminUser.create({ username: ownerUsername, name: "Foundation Owner", passwordHash: await bcrypt.hash(ownerPassword, 12), role: "owner", createdBy: "seed" });
   }
 

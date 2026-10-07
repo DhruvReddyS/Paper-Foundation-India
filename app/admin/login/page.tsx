@@ -30,7 +30,7 @@ export default function AdminLogin() {
           <AdminLoginAction preview={preview} />
           <div className="admin-login-modern-access">
             <ShieldCheck />
-            <span><strong>{preview ? "Local preview access" : "Restricted access"}</strong><small>{preview ? "Credential authentication activates when MongoDB and the admin secret are configured." : "Passwords are encrypted and repeated failed attempts are temporarily locked."}</small></span>
+            <span><strong>{preview ? "Local preview access" : "Restricted access"}</strong><small>{preview ? "Credential authentication activates when MongoDB and the admin secret are configured." : "Passwords are salted and hashed; repeated failed attempts are temporarily locked."}</small></span>
           </div>
         </div>
 
@@ -49,7 +49,7 @@ export default function AdminLogin() {
               </li>
             ))}
           </ul>
-          <footer><i /> {preview ? "Complete admin preview is active" : "Protected by encrypted credentials and secure sessions"}</footer>
+          <footer><i /> {preview ? "Complete admin preview is active" : "Protected by hashed credentials and secure sessions"}</footer>
         </div>
       </aside>
     </main>
