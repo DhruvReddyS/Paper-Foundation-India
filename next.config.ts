@@ -33,7 +33,12 @@ const nextConfig: NextConfig = {
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
-      ...(process.env.NODE_ENV === "production" ? ["upgrade-insecure-requests"] : []),
+      // Correct in production, but it makes a production build untestable over
+      // plain HTTP: Safari upgrades every subresource to HTTPS and the page
+      // renders with no CSS at all. Local browser testing sets this flag.
+      ...(process.env.NODE_ENV === "production" && process.env.ALLOW_INSECURE_LOCAL !== "1"
+        ? ["upgrade-insecure-requests"]
+        : []),
     ].join("; ");
     return [{
       source: "/:path*",

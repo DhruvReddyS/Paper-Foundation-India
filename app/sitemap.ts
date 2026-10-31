@@ -1,12 +1,14 @@
 import type { MetadataRoute } from "next";
 import { articleCatalog } from "@/content/articleCatalog";
+import { articleBodies } from "@/content/articleBodies";
 import { paperEverywhereObjects } from "@/content/paperEverywhere";
 import { gameCatalog } from "@/components/games/gameCatalog";
 import { siteOrigin } from "@/lib/seo";
 
-// Filled in when the CMS holds published bodies. The build cannot reach the
-// database, so nothing is listed from the static catalogue alone.
-const publishedArticleSlugs = new Set<string>();
+// Articles with written prose in the repository. The build cannot reach the
+// database, so this is the dependable signal at build time, and it matches
+// what the reader will serve even if the database is unavailable.
+const publishedArticleSlugs = new Set(Object.keys(articleBodies));
 
 type Entry = { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] };
 
@@ -50,7 +52,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // framework, is served noindex, and advertising it here would contradict
     // that. The hub pages above carry the unique titles and summaries.
     ...articleCatalog
-      .filter((article) => article.status === "published" && publishedArticleSlugs.has(article.slug))
+      .filter((article) => publishedArticleSlugs.has(article.slug))
       .map((article) => ({
         path: `/knowledge/${article.slug}`,
         priority: article.featured ? 0.8 : 0.7,

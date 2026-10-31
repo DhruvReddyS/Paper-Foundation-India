@@ -46,7 +46,9 @@ and the sitemap.
 
 ```bash
 npm run verify          # lint, types, unit tests, build
+npm run e2e:serve       # production server set up for local browser testing
 npm run test:e2e        # browser tests at 375, 768 and 1440 px
+npm run publish:content # article bodies and myth citations into the CMS
 npm run preflight       # deployment configuration safety
 npm run cms:check       # database and integration status
 npm run seed            # idempotent content seed

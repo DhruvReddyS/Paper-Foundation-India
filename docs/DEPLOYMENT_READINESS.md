@@ -1,7 +1,7 @@
 # Deployment readiness
 
-Last full pass: 31 October 2026. Second pass adds automated end-to-end
-coverage, responsive fixes, admin testing and animated scorecards.
+Last full pass: 31 October 2026. Third pass writes the article bodies, cites
+every myth, turns indexing back on and adds Safari coverage.
 
 This is the honest state of the project: what was found, what was fixed, what
 was proven by running it, and what is still open. Anything not verified by a
@@ -23,7 +23,7 @@ Run everything with `npm run verify:deploy`.
 | CMS services | `npm run cms:check` | ready, database connected, 18 collections |
 | Deployment config | `npm run preflight` | **2 blockers** (see section 5) |
 | Route sweep | 35 public routes + 404 | all correct |
-| End-to-end | `npm run test:e2e` | 102 pass, 0 fail |
+| End-to-end | `npm run test:e2e` | 122 pass, 0 fail (Chromium and Safari) |
 | Admin end-to-end | `ADMIN_E2E=1 npm run test:e2e` | 23 pass, 0 fail |
 
 The test suite grew from 10 to 28 unit tests, plus 102 browser tests that did
@@ -223,35 +223,27 @@ Warnings worth clearing at the same time: add the database name to
 
 ## 6. Still open, and who has to do it
 
-**The articles are not real articles.** This is the most serious remaining
-issue and it is editorial, not technical.
+**The articles are now real articles.** All 35 carry written, sourced bodies
+(12,600 words in total, 3 to 6 named sources each) held in
+`content/articleBodies.ts` and published into the CMS by
+`npm run publish:content`. Indexing and sitemap listing are back on: the
+sitemap went from 32 URLs to 67, and article pages serve `index, follow`
+instead of `noindex`.
 
-All 35 article pages render the same three paragraphs of generated text under
-article-specific headings. The 20 markdown files in `content/articles/` are no
-better: they are drawn from a small shared pool and are mostly off-topic for
-the titles above them (the file for "Why Using Both Sides of Paper Matters"
-discusses landfill methane, FSC certification and fibre shortening). They are
-deliberately not wired in, because publishing them would be worse than the
-current state.
+Two things to know about how this works. The reader prefers a body written by
+an editor in the admin and falls back to the repository copy, so an article
+still renders correctly during a database outage. And the publisher never
+overwrites prose an editor has changed unless it is run with `--force`.
 
-Until a real body is published through the CMS, each article page:
+These bodies were written against the verified source pool and every
+substantive claim is traceable to one of the attached sources. **They still
+want a read-through by someone who speaks for the Foundation** before being
+treated as its settled editorial voice. That is a review, not a rewrite.
 
-- is served `noindex, follow`, so Google cannot index 35 near-duplicate pages,
-- is left out of the sitemap,
-- carries a visible notice saying the text is an editorial draft.
-
-Publishing a real body through the admin flips all three automatically. Nothing
-further is needed in code.
-
-**The 60 myths have no citations.** The claims and corrections are good and
-well balanced, correcting over-claims in paper's favour as readily as attacks
-on it. But every `sources` array is empty, so the page now admits the gap. For
-an organisation whose case rests on evidence, this is the highest-value
-editorial task after the articles.
-
-**One figure needs re-checking.** "149,809 registered publications" was cited
-to a retired URL. The link now points at the Press Registrar General of India,
-but the number itself should be confirmed against the current register.
+**The 60 myths now carry citations.** Each is mapped in
+`content/mythSources.ts` to material covering that specific claim, drawn from
+the same pool. The page no longer tells a reader a source exists when it does
+not.
 
 **Test telemetry.** Game playthroughs and page views from this verification are
 still in the `gameresults` and `analytics` collections. Clearing them needed a
@@ -263,6 +255,35 @@ against the live account, the scheduled campaign worker, GoDaddy DNS and HTTPS,
 and cross-browser or real-device behaviour. Frame-rate profiling could not be
 measured reliably in the automation browser and should be checked on a real
 phone.
+
+---
+
+## 6b. The Safari bug that was not a bug
+
+Adding WebKit to the browser suite produced immediate, convincing failures:
+seven pages scrolled sideways in Safari and in Chromium none of them did. The
+obvious reading was a layout bug in transformed decorative cards.
+
+It was not. The production CSP sets `upgrade-insecure-requests`, which is
+correct. Safari honours it strictly, so against a production build served over
+plain `http://localhost` it upgraded every stylesheet and image request to
+HTTPS, those requests failed, and the page rendered with no CSS at all. An
+unstyled page overflows. Chromium exempts localhost from the upgrade, which is
+why only one engine appeared to be broken.
+
+I had already written a containment fix with `!important` overrides across six
+components before the diagnosis. It has been reverted: it addressed nothing
+real and would have left permanent `!important` rules fighting the component
+stylesheets. With the upgrade directive disabled for local testing only,
+Safari is clean on every page at 375, 768 and 1280 pixels.
+
+`npm run e2e:serve` sets `ALLOW_INSECURE_LOCAL=1` for exactly this reason.
+Production behaviour is unchanged.
+
+**Firefox could not be tested.** It fails to launch in this environment with
+"Could not find profile folder", which is a sandbox restriction rather than
+anything about the site. Chromium and WebKit cover Blink and WebKit engines;
+Gecko remains unverified.
 
 ---
 
@@ -306,7 +327,9 @@ Changed:
 
 ```bash
 npm run verify          # lint, types, unit tests, build
-npm run test:e2e        # 102 browser tests across three screen widths
+npm run e2e:serve       # production server configured for local browser tests
+npm run test:e2e        # 122 browser tests across three widths and two engines
+npm run publish:content # article bodies and myth citations into the CMS
 npm run preflight       # deployment configuration safety
 npm run cms:check       # database and integrations
 npm run verify:deploy   # all of the above, in order

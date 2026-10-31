@@ -990,3 +990,37 @@
 @media (max-width: 560px) {
   .share-row-primary button { flex: 1 1 100%; justify-content: center; }
 }
+
+/* Source list under an article, so a reader can inspect the evidence without
+   leaving the page they are on. */
+.article-source-list {
+  width: min(760px, calc(100% - 2.4rem));
+  margin: 2rem auto 0;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(29, 44, 34, .22);
+}
+
+.article-source-list h3 {
+  margin-bottom: .8rem;
+  color: #8b7a5f;
+  font: 650 .68rem/1 var(--font-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.article-source-list ol {
+  display: grid;
+  gap: .5rem;
+  padding-left: 1.3rem;
+}
+
+.article-source-list li { color: #5d675c; font-size: .92rem; line-height: 1.5; }
+
+.article-source-list a {
+  color: #2d6842;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+  overflow-wrap: anywhere;
+}
+
+.article-source-list a:hover { color: #1d4c2e; }

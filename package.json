@@ -15,7 +15,11 @@
     "preflight": "tsx scripts/preflight.ts",
     "typecheck": "tsc --noEmit",
     "verify:deploy": "npm run verify && npm run preflight && npm run cms:check",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "publish:content": "tsx scripts/publish-content.ts",
+    "e2e:build": "ALLOW_INSECURE_LOCAL=1 next build",
+    "e2e:serve": "ALLOW_INSECURE_LOCAL=1 NODE_ENV=production PORT=3100 node server.mjs",
+    "test:e2e:all": "playwright test --project=chromium --project=firefox --project=webkit"
   },
   "engines": {
     "node": "22.x",

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { articleCatalog, articleCoverImage, type ArticleCatalogItem } from "@/content/articleCatalog";
+import { articleBodies } from "@/content/articleBodies";
 import ShareRow from "@/components/site/ShareRow";
 import StructuredData from "@/components/site/StructuredData";
 import { absoluteUrl, articleSchema, breadcrumbSchema, pageMetadata } from "@/lib/seo";
@@ -127,13 +128,26 @@ type ReaderItem = ArticleCatalogItem & { body?: string; coverImage?: string };
 const MINIMUM_PUBLISHABLE_BODY = 400;
 
 /**
- * True only when an editor has published real prose through the CMS. The
- * fallback reader below composes a structured editorial framework from the
- * catalogue, which is useful scaffolding but is not the finished article and
- * must not be presented, indexed or shared as if it were.
+ * The published prose for an article, preferring what an editor has written in
+ * the CMS and falling back to the body held in the repository. The fallback
+ * matters during a database outage: the reader still gets the real article
+ * rather than scaffolding.
+ */
+function publishedBody(item: ReaderItem) {
+  const fromCms = typeof item.body === "string" ? item.body.trim() : "";
+  if (fromCms.length >= MINIMUM_PUBLISHABLE_BODY) return fromCms;
+  const local = articleBodies[item.slug]?.body?.trim() ?? "";
+  return local.length >= MINIMUM_PUBLISHABLE_BODY ? local : "";
+}
+
+/**
+ * A page is only indexable once it carries real prose. Where it does not, the
+ * reader below composes a structured editorial framework from the catalogue,
+ * which is useful scaffolding but is not the finished article and must not be
+ * presented, indexed or shared as if it were.
  */
 function hasPublishedBody(item: ReaderItem) {
-  return typeof item.body === "string" && item.body.trim().length >= MINIMUM_PUBLISHABLE_BODY;
+  return publishedBody(item).length > 0;
 }
 type CmsArticle = {
   order?: number;
@@ -182,7 +196,8 @@ export default async function ArticleReaderPage({ params }: { params: Promise<{ 
   const note = categoryNotes[safeCategory];
   const next = articleCatalog[item.id % articleCatalog.length];
   const generated = generatedBody(item);
-  const published = hasPublishedBody(item);
+  const body = publishedBody(item);
+  const published = body.length > 0;
 
   return <article className="article-reader">
     <StructuredData
@@ -241,7 +256,7 @@ export default async function ArticleReaderPage({ params }: { params: Promise<{ 
         <section id="question"><span>01 · Begin</span><h2>{note.question}</h2><p className="article-dropcap">{item.summary} The useful starting point is not a verdict about a material in isolation, but a clearly bounded question about a real product and system.</p></section>
         <blockquote><Quote /><p>Good paper literacy keeps source, manufacture, purpose and recovery in the same sentence.</p></blockquote>
         <section id="article-body"><span>02 · Full article</span><h2>Read through {note.lens}.</h2>
-          {item.body ? <ArticleBody body={item.body} /> : generated.map((section, index) => <div className="article-generated-section" key={section.heading}>
+          {published ? <ArticleBody body={body} /> : generated.map((section, index) => <div className="article-generated-section" key={section.heading}>
             {index === 2 && <ArticleInterlude number={index} note={readingTools[safeCategory][index - 1]} />}
             <h3>{String(index + 1).padStart(2, "0")} · {section.heading}</h3>
             {section.paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
@@ -253,6 +268,18 @@ export default async function ArticleReaderPage({ params }: { params: Promise<{ 
           <div className="article-evidence-card"><small>Evidence habit</small><strong>Prefer a named source and visible method over a confident, context-free number.</strong></div>
         </section>
         <section id="method"><span>03 · Inspect</span><h2>Four checks travel with every article.</h2><ol><li><strong>Claim:</strong> What exactly is being asserted?</li><li><strong>Boundary:</strong> Which product, place, time and use are included?</li><li><strong>Source:</strong> Can the evidence and method be inspected?</li><li><strong>Correction:</strong> What would change the conclusion?</li></ol></section>
+        {published && (articleBodies[item.slug]?.sources.length ?? 0) > 0 && (
+          <section className="article-source-list">
+            <h3>Sources</h3>
+            <ol>
+              {articleBodies[item.slug].sources.map((source) => (
+                <li key={source.url}>
+                  <a href={source.url} target="_blank" rel="noreferrer">{source.label}</a>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
         <section id="sources"><span>04 · Sources &amp; status</span><h2>{item.status === "published" ? "Sources stay attached to the conclusion." : "This reading remains under editorial review."}</h2><p>{item.status === "published" ? "Named sources, dates and boundaries allow a reader to inspect the evidence and return when new information changes the conclusion." : "The long-form source is being checked for evidence, scope and India-specific context before it is treated as a final public reference."}</p></section>
       </article>
       <aside className="article-side-note"><span>Editorial state</span><strong>{item.status === "published" ? "Published reference." : "Evidence review in progress."}</strong><p>Claims remain open to correction when stronger or newer evidence becomes available.</p></aside>
