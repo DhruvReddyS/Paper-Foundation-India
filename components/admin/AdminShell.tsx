@@ -6,6 +6,7 @@ import {
   Users, UserCog, X, LogOut, MailPlus, ShieldCheck,
 } from "@/components/paper-ui/icons";
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -48,7 +49,7 @@ export default function AdminShell({ children, preview = false, admin }: { child
 
   return <AdminAccessContext.Provider value={access}><div className={`admin-root ${compact ? "is-compact" : ""}`}>
     <aside className={`admin-sidebar ${open ? "is-open" : ""}`}>
-      <header><Link href="/admin"><span>PF</span><div><strong>Paper Foundation</strong><small>Editorial control room</small></div></Link><button onClick={() => setOpen(false)} aria-label="Close navigation"><X /></button></header>
+      <header><Link href="/admin"><span className="admin-brand-mark"><Image src="/images/brand/paper-foundation-nav-logo.png" alt="" width={34} height={42} priority /></span><div><strong>Paper Foundation</strong><small>Editorial control room</small></div></Link><button onClick={() => setOpen(false)} aria-label="Close navigation"><X /></button></header>
       <nav>
         {visibleGroups.map(group => <section key={group.label}><p>{group.label}</p>{group.items.map(item => {
           const Icon = item.icon;

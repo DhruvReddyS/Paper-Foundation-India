@@ -9,3 +9,9 @@
 @media(max-width:850px){.reader .spread{transform:none}.evidenceSeal{top:55%}}
 .caseCounter{align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.55);text-align:center}.caseCounter span{font-family:var(--font-mono);font-size:.42rem;letter-spacing:.12em;text-transform:uppercase;color:#d4a271}.caseCounter strong{margin-top:.25rem;font-family:var(--font-serif);font-size:.9rem}.controls{grid-template-columns:60px 1fr 60px}
 @media(max-width:620px){.controls{grid-template-columns:48px 1fr 48px}.caseCounter strong{font-size:.78rem}}
+
+/* A standalone section link is a primary navigation target, so it gets a
+   comfortable tap height on touch screens. The type size is unchanged. */
+@media (max-width: 899px) {
+  .section > a { min-height: 44px; }
+}

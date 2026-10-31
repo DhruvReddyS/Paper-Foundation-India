@@ -2,3 +2,15 @@
 @media(max-width:950px){.heading,.experience{grid-template-columns:1fr}.mapPanel{border-right:0;border-bottom:1px solid rgba(255,255,255,.18)}.story{min-height:650px}}
 @media(max-width:620px){.section{padding-inline:16px}.heading h2{font-size:clamp(4.2rem,18vw,6.2rem)}.mapPanel{min-height:570px;padding:.8rem}.map{min-height:430px}.map>img{padding:1rem}.mapPanel>article{grid-template-columns:1fr}.mapPanel>article>span{grid-row:auto}.story{min-height:760px;padding:2rem 1rem}.quickFacts{grid-template-columns:1fr}.quickFacts article{min-height:90px;border-right:0;border-bottom:1px solid #c8bba8}.ticker{overflow:hidden}}
 @media(prefers-reduced-motion:reduce){.map button{transition:none}}
+
+/* The map pins were 30px, just under a comfortable tap. They grow on touch
+   screens only, so the desktop map keeps its finer scale. */
+@media (max-width: 899px) {
+  .map button { width: 38px; height: 38px; }
+}
+
+/* A standalone section link is a primary navigation target, so it gets a
+   comfortable tap height on touch screens. The type size is unchanged. */
+@media (max-width: 899px) {
+  .story a { min-height: 44px; }
+}

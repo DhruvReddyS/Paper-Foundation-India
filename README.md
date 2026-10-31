@@ -45,7 +45,8 @@ and the sitemap.
 - Production release and recovery: [`docs/CMS_PRODUCTION_RUNBOOK.md`](docs/CMS_PRODUCTION_RUNBOOK.md)
 
 ```bash
-npm run verify          # lint, types, tests, build
+npm run verify          # lint, types, unit tests, build
+npm run test:e2e        # browser tests at 375, 768 and 1440 px
 npm run preflight       # deployment configuration safety
 npm run cms:check       # database and integration status
 npm run seed            # idempotent content seed

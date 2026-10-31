@@ -11,3 +11,9 @@
 @media(max-width:900px){.shelf{grid-template-columns:1fr 1fr}.promptCard{grid-column:1/-1}}
 @media(max-width:620px){.shelf{grid-template-columns:1fr}.promptCard{grid-column:auto;min-height:135px}}
 @media(min-width:1000px) and (min-height:760px){.section{min-height:calc(100svh - 72px);padding-block:2.6rem}.heading h2{font-size:clamp(3.1rem,4.5vw,4.9rem)}.bento{margin-top:1.35rem}.article{min-height:192px}.lead{min-height:400px}.lead .art{min-height:165px}.shelf{min-height:112px;margin-top:.65rem}.promptCard,.shelf>a{min-height:112px;padding-block:.85rem}}
+
+/* A standalone section link is a primary navigation target, so it gets a
+   comfortable tap height on touch screens. The type size is unchanged. */
+@media (max-width: 899px) {
+  .heading a { min-height: 44px; }
+}

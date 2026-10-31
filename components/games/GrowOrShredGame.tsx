@@ -9,10 +9,17 @@ import { quizQuestions, type QuizQuestion } from "./gameData";
 
 type Phase = "intro" | "play" | "result";
 
+/** Questions dealt per round, drawn fresh from the full pool each time. */
+const ROUND_SIZE = 8;
+
+function dealRound(pool: readonly QuizQuestion[]) {
+  return shuffleItems(pool).slice(0, Math.min(ROUND_SIZE, pool.length));
+}
+
 export default function GrowOrShredGame() {
   const configuration = useGameConfiguration("grow-or-shred");
   const [phase, setPhase] = useState<Phase>("intro");
-  const [questions, setQuestions] = useState<QuizQuestion[]>(() => shuffleItems(quizQuestions));
+  const [questions, setQuestions] = useState<QuizQuestion[]>(() => dealRound(quizQuestions));
   // One record of what has been answered, rather than a cursor plus a running
   // score. React batches synchronous clicks, so any handler that reads state
   // and then increments it can run twice on a double tap and count twice. A
@@ -22,7 +29,7 @@ export default function GrowOrShredGame() {
 
   useEffect(() => {
     const configured = configuration?.content?.questions;
-    if (phase === "intro" && Array.isArray(configured) && configured.length) setQuestions(shuffleItems(configured as QuizQuestion[]));
+    if (phase === "intro" && Array.isArray(configured) && configured.length) setQuestions(dealRound(configured as QuizQuestion[]));
   }, [configuration, phase]);
 
   const index = Math.min(Math.max(0, round.answers.length - (round.revealed ? 1 : 0)), Math.max(0, questions.length - 1));
@@ -75,7 +82,7 @@ export default function GrowOrShredGame() {
     setPhase("intro");
     setRound({ answers: [], revealed: false });
     const configured = configuration?.content?.questions;
-    setQuestions(shuffleItems(Array.isArray(configured) && configured.length ? configured as QuizQuestion[] : quizQuestions));
+    setQuestions(dealRound(Array.isArray(configured) && configured.length ? configured as QuizQuestion[] : quizQuestions));
     resetTimer();
   }
 
@@ -96,7 +103,7 @@ export default function GrowOrShredGame() {
           rules={[
             "Choose one answer for each paper, recycling or forestry question.",
             "Read the evidence reveal, every answer explains why and links to a source.",
-            "Build a streak to unlock denser leaves, flowers and a stronger final tree.",
+            "Answer correctly in a row and the tree grows denser leaves and a stronger canopy.",
           ]}
           onStart={() => setPhase("play")}
         />

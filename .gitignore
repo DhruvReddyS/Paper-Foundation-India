@@ -12,3 +12,5 @@ env.txt
 app 21-59-10-823/
 tmp/
 .release/
+test-results/
+playwright-report/

@@ -202,4 +202,6 @@ export const VolumeX = make(<><path d="M10.9 4.6 6.2 8.7H2.9v6.6h3.3l4.7 4.1z" /
  */
 export const Sparkles = make(<><circle cx="12" cy="12" r="5.4" /><path d="M12 2.9v5" /><path d="M12 16.1v5" /><path d="M2.9 12h5" /><path d="M16.1 12h5" /></>);
 
+export const Film = make(<><path d="M3.6 4.6h16.8v14.8H3.6z" /><path d="M8.1 4.7v14.6" /><path d="M15.9 4.7v14.6" /><path d="M3.7 12h16.6" /><path d="M3.7 8.3h4.3" /><path d="M3.7 15.7h4.3" /><path d="M16 8.3h4.3" /><path d="M16 15.7h4.3" /></>);
+
 export const Plus2 = Plus;

@@ -107,3 +107,58 @@
 
 /* Security centre */
 .admin-security-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.admin-security-card{min-height:260px;display:flex;flex-direction:column;align-items:flex-start;border:1px solid var(--admin-line);padding:1.4rem;background:#fbfaf6}.admin-security-card>header{display:flex;align-items:center;gap:.8rem}.admin-security-card>header>svg{width:28px;color:#a26f4c}.admin-security-card header div{display:grid;gap:.2rem}.admin-security-card header strong{font:550 1rem/1 var(--font-serif)}.admin-security-card header span{color:#6f7971;font:.42rem/1 var(--font-mono);text-transform:uppercase}.admin-security-card>p{margin:1.2rem 0;color:#687169;font-size:.54rem;line-height:1.65}.admin-security-card>.admin-button,.admin-security-card>a{margin-top:auto}.admin-security-action{width:100%;display:grid;grid-template-columns:1fr auto;gap:.5rem;margin-top:auto}.admin-security-action small{grid-column:1/-1;color:#687169}.admin-security-action input,.admin-mfa-setup input{height:40px;border:1px solid #d8d3ca;padding:0 .7rem;background:#fdfaf4;font-size:.54rem}.admin-security-action button{padding:0 .8rem;color:#8f3f35;border:1px solid #d7b5af;background:#f8e9e6;font-size:.5rem;font-weight:700}.admin-mfa-setup{display:grid;grid-template-columns:320px 1fr;gap:2rem;margin-top:1rem;border:1px solid var(--admin-line);padding:1.5rem;background:#fdfaf4}.admin-mfa-setup>div:first-child{display:grid;place-items:center;background:#f0ede6}.admin-mfa-setup>div:last-child{display:flex;flex-direction:column;align-items:flex-start;gap:.75rem}.admin-mfa-setup p,.admin-recovery-codes header p{color:#9d6746;font:650 .4rem/1 var(--font-mono);letter-spacing:.12em}.admin-mfa-setup h2,.admin-recovery-codes h2{font:550 1.5rem/1 var(--font-serif)}.admin-mfa-setup code{max-width:100%;overflow-wrap:anywhere;border:1px solid #dfd9ce;padding:.7rem;background:#f6f3ec;font:.5rem/1.5 var(--font-mono)}.admin-mfa-setup>div>button:not(.admin-button){display:flex;align-items:center;gap:.35rem;color:#376047;font-size:.48rem}.admin-mfa-setup svg{width:14px}.admin-mfa-setup label{display:grid;gap:.35rem;color:#687169;font-size:.48rem}.admin-recovery-codes{margin-top:1rem;border:1px solid #d5b891;padding:1.5rem;background:#f1e3cd}.admin-recovery-codes>header{display:flex;align-items:end;justify-content:space-between}.admin-recovery-codes header div{display:grid;gap:.45rem}.admin-recovery-codes header button{display:flex;align-items:center;gap:.35rem;font-size:.48rem;font-weight:700}.admin-recovery-codes header svg{width:14px}.admin-recovery-codes>div{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin:1.2rem 0}.admin-recovery-codes code{border:1px solid #d4b991;padding:.65rem;background:#fdfaf4;font:.5rem/1 var(--font-mono);text-align:center}.admin-recovery-codes>p{color:#7a6b58;font-size:.48rem}@media(max-width:800px){.admin-security-grid,.admin-mfa-setup{grid-template-columns:1fr}.admin-recovery-codes>div{grid-template-columns:1fr 1fr}}
+
+/* ===========================================================================
+   Admin brand mark
+   The sidebar carried the letters "PF" while every public surface uses the
+   foundation's own mark. It now shows the same logo, on the paper-coloured
+   plate the rest of the admin chrome uses.
+   ========================================================================= */
+.admin-sidebar > header > a > span.admin-brand-mark {
+  display: grid;
+  place-items: center;
+  padding: .3rem;
+  background: #f3ecdf;
+  overflow: hidden;
+}
+
+.admin-sidebar > header > a > span.admin-brand-mark img {
+  width: auto;
+  height: 100%;
+  max-height: 38px;
+  object-fit: contain;
+}
+
+/* ===========================================================================
+   Admin tap targets
+   The navigation toggles were 20px square and the dashboard shortcuts as
+   little as 12px tall, which is unusable on a phone. Sizes below follow the
+   same approach as the public site: padding and a minimum box, with the type
+   and the layout rhythm unchanged.
+   ========================================================================= */
+.admin-menu,
+.admin-sidebar > header > button {
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+}
+
+@media (max-width: 760px) {
+  /* Dashboard shortcut links and card actions. */
+  .admin-content a,
+  .admin-content button {
+    min-height: 40px;
+  }
+
+  .admin-content a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Links that fill a card row should stay full width, not shrink to content. */
+  .admin-data-row a,
+  .admin-card a {
+    width: 100%;
+  }
+}

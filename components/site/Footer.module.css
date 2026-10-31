@@ -5,3 +5,32 @@
 @media(max-width:850px){.signal{grid-template-columns:1fr 1fr}.signal span{min-height:58px;border-bottom:1px solid rgba(255,255,255,.1)}.callout{align-items:flex-start;flex-direction:column;justify-content:flex-end}.directory{grid-template-columns:1fr 1fr}.brand{grid-column:1/-1}}
 @media(max-width:580px){.footer{padding-inline:18px}.signal{grid-template-columns:1fr}.signal span{justify-content:flex-start;padding-left:.6rem;border-right:0}.callout{min-height:520px;padding:4rem 0}.callout h2{font-size:clamp(4rem,18vw,6rem)}.callout>a{width:100%;justify-content:space-between}.directory{grid-template-columns:1fr}.brand{grid-column:auto}.directory nav{padding-top:1.2rem;border-top:1px solid rgba(255,255,255,.1)}.bottom{grid-template-columns:1fr;justify-items:start;padding:1rem 0}.bottom p:nth-child(2){text-align:left}.bottom nav{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.callout>a,.directory nav>a{transition:none}}
+
+/* ===========================================================================
+   Tap targets
+   The directory and legal links were 11 to 22 pixels tall, which is well under
+   a comfortable thumb on a phone. Padding gives them height without changing
+   the type size or the spacing of the design.
+   ========================================================================= */
+.directory nav > a {
+  min-height: 44px;
+  padding-block: .55rem;
+}
+
+.bottom a {
+  min-height: 40px;
+  padding-block: .5rem;
+}
+
+@media (min-width: 900px) {
+  /* A pointer does not need the extra height, so the desktop rhythm is kept. */
+  .directory nav > a { min-height: 34px; padding-block: .25rem; }
+  .bottom a { min-height: 0; padding-block: 0; }
+}
+
+/* "Terms" is only a few characters wide, so height alone is not enough. */
+.bottom a { min-width: 44px; justify-content: center; }
+
+@media (min-width: 900px) {
+  .bottom a { min-width: 0; justify-content: flex-start; }
+}

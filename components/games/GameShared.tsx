@@ -411,6 +411,9 @@ export function ResultPanel({
           buildImage={() =>
             buildScoreCanvas({ gameId, game, score, outOf, badge, message, durationSeconds, metrics })
           }
+          buildAnimation={() =>
+            buildScoreAnimation({ gameId, game, score, outOf, badge, message, durationSeconds, metrics })
+          }
           imageName={`${gameId}-paper-iq.png`}
           className="game-result-share"
         />
@@ -503,13 +506,21 @@ const scoreThemes: Record<GameId, { background: string; panel: string; accent: s
   "paper-word-search": { background: "#ddd6b8", panel: "#253a31", accent: "#dbb26c", ink: "#fff9e8" },
 };
 
-async function buildScoreCanvas(options: CanvasOptions) {
+/**
+ * Renders the scorecard at a point in its reveal.
+ *
+ * `progress` runs 0 to 1: the score counts up, the badge stamps in and the
+ * rule draws across. At 1 the frame is identical to the still card, so the
+ * animation and the PNG cannot drift apart.
+ */
+async function drawScoreFrame(
+  ctx: CanvasRenderingContext2D,
+  options: CanvasOptions,
+  progress: number,
+  logo: HTMLImageElement | null
+) {
   const theme = scoreThemes[options.gameId];
-  const canvas = document.createElement("canvas");
-  canvas.width = 1080;
-  canvas.height = 1080;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return canvas;
+  const eased = 1 - Math.pow(1 - Math.max(0, Math.min(1, progress)), 3);
 
   ctx.fillStyle = theme.background;
   ctx.fillRect(0, 0, 1080, 1080);
@@ -527,45 +538,164 @@ async function buildScoreCanvas(options: CanvasOptions) {
   if (supportsLetterSpacing) ctx.letterSpacing = "3px";
   ctx.fillText("PAPER FOUNDATION INDIA  /  GAME RESULT", 118, 148);
   if (supportsLetterSpacing) ctx.letterSpacing = "0px";
+
   ctx.fillStyle = theme.ink;
   ctx.font = "600 72px Georgia";
   ctx.fillText(options.game, 118, 268, 840);
-  // The score is drawn at a fixed size, so a four-figure total would collide
-  // with a hard-coded divider. The divider is placed after the measured width,
-  // and the score shrinks if it would otherwise run under the artwork.
-  const scoreText = String(options.score);
+
+  // The score counts up rather than appearing finished.
+  const shown = Math.round(options.score * eased);
+  const scoreText = String(shown);
   let scoreSize = 218;
   ctx.font = `700 ${scoreSize}px Georgia`;
-  while (ctx.measureText(scoreText).width > 430 && scoreSize > 120) {
+  while (ctx.measureText(String(options.score)).width > 430 && scoreSize > 120) {
     scoreSize -= 10;
     ctx.font = `700 ${scoreSize}px Georgia`;
   }
+  ctx.font = `700 ${scoreSize}px Georgia`;
   const scoreWidth = ctx.measureText(scoreText).width;
   ctx.fillStyle = theme.accent;
   ctx.fillText(scoreText, 112, 555);
   ctx.fillStyle = theme.ink;
   ctx.font = "500 50px Arial";
   ctx.fillText(`/ ${options.outOf}`, 112 + scoreWidth + 26, 545);
-  ctx.font = "700 50px Georgia";
-  ctx.fillText(options.badge, 118, 672, 820);
-  ctx.font = "400 30px Arial";
-  wrapCanvasText(ctx, options.message, 118, 732, 800, 40);
 
+  // The badge stamps on near the end, slightly rotated, like a real stamp.
+  if (eased > 0.55) {
+    const stampIn = Math.min(1, (eased - 0.55) / 0.35);
+    ctx.save();
+    ctx.translate(118, 672);
+    ctx.rotate((1 - stampIn) * -0.08);
+    ctx.scale(1 + (1 - stampIn) * 0.12, 1 + (1 - stampIn) * 0.12);
+    ctx.globalAlpha = stampIn;
+    ctx.fillStyle = theme.ink;
+    ctx.font = "700 50px Georgia";
+    ctx.fillText(options.badge, 0, 0, 820);
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  if (eased > 0.7) {
+    ctx.globalAlpha = Math.min(1, (eased - 0.7) / 0.3);
+    ctx.fillStyle = theme.ink;
+    ctx.font = "400 30px Arial";
+    wrapCanvasText(ctx, options.message, 118, 732, 800, 40);
+    ctx.globalAlpha = 1;
+  }
+
+  // The footer rule draws itself across.
   ctx.strokeStyle = `${theme.accent}77`;
   ctx.beginPath();
   ctx.moveTo(118, 905);
-  ctx.lineTo(962, 905);
+  ctx.lineTo(118 + (962 - 118) * eased, 905);
   ctx.stroke();
-  ctx.fillStyle = theme.accent;
-  ctx.font = "600 24px Arial";
-  const canvasPercent = options.outOf > 0 ? Math.round((options.score / options.outOf) * 100) : 0;
-  ctx.fillText(`${canvasPercent}%  ·  ${formatTime(options.durationSeconds)}`, 118, 953);
-  ctx.fillStyle = theme.ink;
-  ctx.textAlign = "right";
-  ctx.fillText("paperfoundation.in", 962, 953);
-  ctx.textAlign = "left";
 
-  await drawLogo(ctx);
+  if (eased > 0.85) {
+    ctx.globalAlpha = Math.min(1, (eased - 0.85) / 0.15);
+    const canvasPercent = options.outOf > 0 ? Math.round((options.score / options.outOf) * 100) : 0;
+    ctx.fillStyle = theme.accent;
+    ctx.font = "600 24px Arial";
+    ctx.fillText(`${canvasPercent}%  ·  ${formatTime(options.durationSeconds)}`, 118, 953);
+    ctx.fillStyle = theme.ink;
+    ctx.textAlign = "right";
+    ctx.fillText("paperfoundation.in", 962, 953);
+    ctx.textAlign = "left";
+    ctx.globalAlpha = 1;
+  }
+
+  if (logo?.naturalWidth) {
+    ctx.save();
+    ctx.globalAlpha = 0.9 * eased;
+    ctx.drawImage(logo, 882, 104, 72, 72);
+    ctx.restore();
+  }
+}
+
+async function loadLogo() {
+  const image = new Image();
+  image.src = "/images/brand/paper-foundation-nav-logo.png";
+  await new Promise<void>((resolve) => {
+    image.onload = () => resolve();
+    image.onerror = () => resolve();
+  });
+  return image.naturalWidth ? image : null;
+}
+
+/**
+ * Records the reveal as a video file for sharing.
+ *
+ * Uses MediaRecorder, which every current browser has, picking MP4 where the
+ * browser can produce it because that is what messaging apps accept most
+ * readily. Returns null when recording is unavailable, and the caller falls
+ * back to the still PNG.
+ */
+export async function buildScoreAnimation(options: CanvasOptions, seconds = 3.2) {
+  if (typeof window === "undefined" || typeof MediaRecorder === "undefined") return null;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080;
+  canvas.height = 1080;
+  const ctx = canvas.getContext("2d");
+  if (!ctx || typeof canvas.captureStream !== "function") return null;
+
+  const candidates = [
+    "video/mp4;codecs=avc1",
+    "video/mp4",
+    "video/webm;codecs=vp9",
+    "video/webm;codecs=vp8",
+    "video/webm",
+  ];
+  const mimeType = candidates.find((type) => MediaRecorder.isTypeSupported?.(type));
+  if (!mimeType) return null;
+
+  const logo = await loadLogo();
+  const stream = canvas.captureStream(30);
+  const chunks: BlobPart[] = [];
+
+  let recorder: MediaRecorder;
+  try {
+    recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 6_000_000 });
+  } catch {
+    return null;
+  }
+  recorder.ondataavailable = (event) => {
+    if (event.data.size) chunks.push(event.data);
+  };
+
+  const finished = new Promise<Blob>((resolve) => {
+    recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
+  });
+
+  recorder.start();
+  const startedAt = performance.now();
+  await new Promise<void>((resolve) => {
+    function frame(now: number) {
+      const elapsed = (now - startedAt) / 1000;
+      // Hold on the finished card for the last part, so a looping preview
+      // rests on the score rather than snapping back.
+      const progress = Math.min(1, elapsed / (seconds * 0.72));
+      void drawScoreFrame(ctx!, options, progress, logo);
+      if (elapsed < seconds) requestAnimationFrame(frame);
+      else resolve();
+    }
+    requestAnimationFrame(frame);
+  });
+  recorder.stop();
+  stream.getTracks().forEach((track) => track.stop());
+
+  const blob = await finished;
+  if (!blob.size) return null;
+  return { blob, extension: mimeType.startsWith("video/mp4") ? "mp4" : "webm" };
+}
+
+/** The still card is the final frame of the same artwork. */
+async function buildScoreCanvas(options: CanvasOptions) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080;
+  canvas.height = 1080;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+  await drawScoreFrame(ctx, options, 1, await loadLogo());
   return canvas;
 }
 
@@ -615,20 +745,6 @@ function drawPaperTexture(ctx: CanvasRenderingContext2D, ink: string) {
   ctx.restore();
 }
 
-async function drawLogo(ctx: CanvasRenderingContext2D) {
-  const image = new Image();
-  image.src = "/images/brand/paper-foundation-nav-logo.png";
-  await new Promise<void>((resolve) => {
-    image.onload = () => resolve();
-    image.onerror = () => resolve();
-  });
-  if (image.naturalWidth) {
-    ctx.save();
-    ctx.globalAlpha = 0.9;
-    ctx.drawImage(image, 882, 104, 72, 72);
-    ctx.restore();
-  }
-}
 
 function wrapCanvasText(
   ctx: CanvasRenderingContext2D,

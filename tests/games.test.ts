@@ -16,7 +16,7 @@ test("every catalogued game has a definition, a route and share tags", () => {
 });
 
 test("quiz questions are answerable and cite a source", () => {
-  assert.ok(quizQuestions.length >= 8, `only ${quizQuestions.length} questions`);
+  assert.ok(quizQuestions.length >= 16, `only ${quizQuestions.length} questions in the pool`);
   for (const question of quizQuestions) {
     assert.ok(question.answers.length >= 2, `"${question.question}" has too few answers`);
     assert.ok(
@@ -31,7 +31,7 @@ test("quiz questions are answerable and cite a source", () => {
 
 test("truth claims only use verdicts the press can stamp", () => {
   const allowed = new Set(["myth", "fact", "context"]);
-  assert.ok(truthClaims.length >= 6);
+  assert.ok(truthClaims.length >= 12, `only ${truthClaims.length} claims in the pool`);
   for (const claim of truthClaims) {
     assert.ok(allowed.has(claim.verdict), `"${claim.claim}" has verdict ${claim.verdict}`);
     assert.match(claim.source, /^https:\/\//, `"${claim.claim}" has no source link`);
@@ -68,6 +68,12 @@ test("no option is a prefix of a different product's name, which would be ambigu
       );
     }
   }
+});
+
+test("each pool is larger than a round, so replays are not repetitive", () => {
+  assert.ok(quizQuestions.length >= 8 * 2, "the quiz pool should be at least twice a round");
+  assert.ok(truthClaims.length >= 8 * 1.5, "the claim pool should comfortably exceed a round");
+  assert.ok(hiddenProducts.length > 5, "the object pool should exceed a round");
 });
 
 test("the mill sequence is a unique ordered set", () => {

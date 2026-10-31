@@ -8,10 +8,17 @@ import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameConfiguration, 
 import { playGameSound } from "./gameAudio";
 import { hiddenProducts, type HiddenProduct } from "./gameData";
 
+/** Objects dealt per round, drawn fresh from the full pool each time. */
+const ROUND_SIZE = 5;
+
+function dealRound(pool: readonly HiddenProduct[]) {
+  return shuffleItems(pool).slice(0, Math.min(ROUND_SIZE, pool.length));
+}
+
 export default function HiddenPaperGame() {
   const configuration = useGameConfiguration("hidden-paper");
   const [phase, setPhase] = useState<"intro" | "play" | "result">("intro");
-  const [products, setProducts] = useState<HiddenProduct[]>(() => shuffleItems(hiddenProducts));
+  const [products, setProducts] = useState<HiddenProduct[]>(() => dealRound(hiddenProducts));
   const [index, setIndex] = useState(0);
   const [clues, setClues] = useState(1);
   const [wrong, setWrong] = useState(0);
@@ -31,7 +38,7 @@ export default function HiddenPaperGame() {
   const availablePoints = Math.max(20, 120 - (clues - 1) * 20 - wrong * 15);
   useEffect(() => {
     const configured = configuration?.content?.products;
-    if (phase === "intro" && Array.isArray(configured) && configured.length) setProducts(shuffleItems(configured as HiddenProduct[]));
+    if (phase === "intro" && Array.isArray(configured) && configured.length) setProducts(dealRound(configured as HiddenProduct[]));
   }, [configuration, phase]);
 
   const normalize = (value: string) => value.toLocaleLowerCase().replace(/\s+/g, " ").trim();
@@ -75,7 +82,7 @@ export default function HiddenPaperGame() {
   }
 
   function reset() { const configured = configuration?.content?.products; advancedFrom.current = null; answeredAt.current = null;
-    setPhase("intro"); setIndex(0); setClues(1); setWrong(0); setSolved(false); setRevealed(false); setScore(0); setClueHistory([]); setSolvedCount(0); setProducts(shuffleItems(Array.isArray(configured) && configured.length ? configured as HiddenProduct[] : hiddenProducts)); resetTimer(); }
+    setPhase("intro"); setIndex(0); setClues(1); setWrong(0); setSolved(false); setRevealed(false); setScore(0); setClueHistory([]); setSolvedCount(0); setProducts(dealRound(Array.isArray(configured) && configured.length ? configured as HiddenProduct[] : hiddenProducts)); resetTimer(); }
   const averageClues = clueHistory.length ? clueHistory.reduce((a, b) => a + b, 0) / clueHistory.length : 0;
   const identifiedEverything = solvedCount === products.length;
   const badge = identifiedEverything && averageClues <= 1.8
@@ -86,7 +93,7 @@ export default function HiddenPaperGame() {
 
   return (
     <GameFrame gameId="hidden-paper" immersive={phase !== "intro"} title="Hidden Paper" kicker="Game 04 · The clue hunt" elapsedSeconds={phase === "intro" ? undefined : seconds} progress={phase === "play" && products.length ? ((safeIndex + (solved || revealed ? 1 : 0)) / products.length) * 100 : undefined}>
-      {phase === "intro" && <GameIntro gameId="hidden-paper" eyebrow="Unexpected paper, hiding in plain sight" title="How soon can you see the paper?" description="Identify five products using the fewest clues possible. Begin with language, then unlock material behaviour and a clearer visual, but every clue costs points." rules={["Read the first cryptic clue and make a guess or request another clue.", "A wrong guess automatically reveals more information and lowers the available score.", "After solving, peel back the object to learn exactly why a paper component works there."]} onStart={() => setPhase("play")} />}
+      {phase === "intro" && <GameIntro gameId="hidden-paper" eyebrow="Unexpected paper, hiding in plain sight" title="How soon can you see the paper?" description={`Identify ${products.length} everyday products using as few clues as you can. Start with a riddle, then earn clearer hints about how the material behaves. Each extra clue costs points.`} rules={["Read the first cryptic clue and make a guess or request another clue.", "A wrong guess automatically reveals more information and lowers the available score.", "After solving, peel back the object to learn exactly why a paper component works there."]} onStart={() => setPhase("play")} />}
 
       {phase === "play" && product && (
         <section className="hidden-stage">

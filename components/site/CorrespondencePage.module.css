@@ -320,3 +320,13 @@
 .report .reference { border-color: #a9705f; }
 .report .nextSteps b { color: #a9705f; }
 .report .attachButton:hover { border-color: #984635; color: #984635; }
+
+/* The email links sat at 13px tall, below a usable tap target on a phone. */
+@media (max-width: 899px) {
+  .deskFacts a,
+  .formPanel footer p a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+}

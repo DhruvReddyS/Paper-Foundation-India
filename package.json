@@ -9,12 +9,13 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "seed": "tsx scripts/seed.ts",
     "cms:check": "tsx scripts/check-cms.ts",
-    "test": "tsx --test tests/**/*.test.ts",
+    "test": "tsx --test tests/*.test.ts",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build",
     "bundle:godaddy": "node scripts/package-godaddy.mjs",
     "preflight": "tsx scripts/preflight.ts",
     "typecheck": "tsc --noEmit",
-    "verify:deploy": "npm run verify && npm run preflight && npm run cms:check"
+    "verify:deploy": "npm run verify && npm run preflight && npm run cms:check",
+    "test:e2e": "playwright test"
   },
   "engines": {
     "node": "22.x",
@@ -38,6 +39,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@types/node": "^20.0.0",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.0.0",

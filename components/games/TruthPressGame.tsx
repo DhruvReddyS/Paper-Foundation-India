@@ -25,10 +25,17 @@ function normalizeClaims(items: readonly TruthClaim[]): TruthClaim[] {
   return items.map((item) => ({ ...item, verdict: toVerdict(item.verdict) }));
 }
 
+/** Claims dealt per round, drawn fresh from the full pool each time. */
+const ROUND_SIZE = 8;
+
+function dealRound(pool: readonly TruthClaim[]) {
+  return shuffleItems(normalizeClaims(pool)).slice(0, Math.min(ROUND_SIZE, pool.length));
+}
+
 export default function TruthPressGame() {
   const configuration = useGameConfiguration("truth-press");
   const [phase, setPhase] = useState<"intro" | "play" | "result">("intro");
-  const [claims, setClaims] = useState<TruthClaim[]>(() => shuffleItems(normalizeClaims(truthClaims)));
+  const [claims, setClaims] = useState<TruthClaim[]>(() => dealRound(truthClaims));
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<Verdict | null>(null);
   const [score, setScore] = useState(0);
@@ -47,7 +54,7 @@ export default function TruthPressGame() {
   useEffect(() => {
     const configured = configuration?.content?.claims;
     if (phase !== "intro" || !Array.isArray(configured) || !configured.length) return;
-    setClaims(shuffleItems(normalizeClaims(configured as TruthClaim[])));
+    setClaims(dealRound(configured as TruthClaim[]));
   }, [configuration, phase]);
 
   function stamp(verdict: Verdict) {
@@ -75,8 +82,8 @@ export default function TruthPressGame() {
   function reset() {
     const configured = configuration?.content?.claims;
     const source = Array.isArray(configured) && configured.length
-      ? normalizeClaims(configured as TruthClaim[])
-      : normalizeClaims(truthClaims);
+      ? (configured as TruthClaim[])
+      : truthClaims;
     advancedFrom.current = null;
     answeredAt.current = null;
     setPhase("intro");
@@ -85,7 +92,7 @@ export default function TruthPressGame() {
     setScore(0);
     setCorrect(0);
     setStamped([]);
-    setClaims(shuffleItems(source));
+    setClaims(dealRound(source));
     resetTimer();
   }
   // Thresholds follow the number of claims actually in play, so an editor

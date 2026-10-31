@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "Resources and Downloads",
   description:
-    "Curated research papers, reports, toolkits and reference documents about India's paper industry and material recovery.",
+    "Research papers, reports, toolkits and reference documents about India's paper industry and material recovery, each with its publisher named.",
   path: "/resources",
   keywords: ["paper industry reports India", "paper research downloads"],
 });

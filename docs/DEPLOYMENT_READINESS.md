@@ -1,6 +1,7 @@
 # Deployment readiness
 
-Last full pass: 31 October 2026.
+Last full pass: 31 October 2026. Second pass adds automated end-to-end
+coverage, responsive fixes, admin testing and animated scorecards.
 
 This is the honest state of the project: what was found, what was fixed, what
 was proven by running it, and what is still open. Anything not verified by a
@@ -22,8 +23,11 @@ Run everything with `npm run verify:deploy`.
 | CMS services | `npm run cms:check` | ready, database connected, 18 collections |
 | Deployment config | `npm run preflight` | **2 blockers** (see section 5) |
 | Route sweep | 35 public routes + 404 | all correct |
+| End-to-end | `npm run test:e2e` | 102 pass, 0 fail |
+| Admin end-to-end | `ADMIN_E2E=1 npm run test:e2e` | 23 pass, 0 fail |
 
-The test suite grew from 10 to 27 tests. The new ones cover share captions per
+The test suite grew from 10 to 28 unit tests, plus 102 browser tests that did
+not exist before. The new ones cover share captions per
 platform, game data integrity, SEO metadata and structured data, and database
 name resolution.
 
@@ -59,6 +63,49 @@ database, so the driver was connecting to Atlas's default `test` database. The
 cluster had collections in **both** `paperfoundation` and `test`. The
 application now resolves the database name explicitly and defaults to
 `paperfoundation`, and `preflight` warns whenever the URI omits it.
+
+---
+
+## 2b. End-to-end coverage
+
+Previously there was none. `npm run test:e2e` now runs 102 browser tests
+against a production build.
+
+**Every public page at three widths** (375, 768 and 1440). Each asserts the
+page does not scroll sideways, logs no console errors, renders real content
+and is not a crashed error boundary.
+
+**Games.** Each of the five is played to its result screen, and every control
+is clicked three times in rapid succession on purpose. That is how the
+original scoring faults appeared: a single click would have passed with the
+bugs present. The suite asserts no question is skipped or repeated, the score
+never exceeds its own maximum, and the result offers a badge, eight share
+targets and three primary actions.
+
+**Admin.** Seventeen routes must redirect an anonymous visitor to the login
+page, and the admin must carry a noindex tag. With `ADMIN_E2E=1` against the
+development preview, a further set signs in and checks every route loads,
+every sidebar link resolves, the dashboard reads live counts, the brand mark
+is the real logo, and a website setting can be edited, published, read back
+through the public API and restored.
+
+**Also covered:** tap-target sizes on phones, mobile navigation opening and
+closing, and that every image loads and carries an alt attribute.
+
+### Defects this found
+
+1. **Footer links were 11 to 22 pixels tall** on a phone, and the admin
+   navigation toggle was 20 pixels square. Both are well under a usable tap
+   target. Fixed with padding and minimum sizes; the type and the layout
+   rhythm are unchanged.
+2. **The Hidden Paper intro said "five products" when there were seven.** The
+   counts in game copy now come from the data, so they cannot drift again.
+3. **Dashboard shortcut links were 12 pixels tall** on a phone.
+
+Two apparent failures were my own test being wrong, not the site: a 404 page
+legitimately logs a failed-resource error for itself, and in development the
+Next.js overlay covers the corner the admin menu button sits in. Both
+assertions were corrected rather than the site changed.
 
 ---
 
@@ -131,6 +178,32 @@ The significant ones, in order of how much they mattered.
 
 ---
 
+## 4b. Game content and sharing
+
+**Pools are now larger than a round, so replays differ.** The quiz holds 20
+questions and deals 8; the press holds 16 claims and deals 8; Hidden Paper
+holds 7 objects and deals 5; the word search draws from 54 words. Before this
+every round played the entire set in the same order of difficulty, which made
+a second attempt feel like the first.
+
+Difficulty sits in the easy-to-medium band deliberately. Questions test things
+worth carrying away, such as what happens to fibre on each pass, why clean and
+dry matters, what a certification label does and does not claim, and why a
+greasy box is a problem. Every question and claim carries a source link.
+
+**Scorecards can now be shared as an animation.** The still PNG remains the
+default because every platform accepts it. Where the browser can record, a
+"Save animation" control produces an MP4 of the card revealing itself, the
+score counting up and the badge stamping on. Verified end to end: a real
+683 KB MP4 was produced and downloaded in a headless browser.
+
+Captions are written per platform, because one caption does not suit all: X
+counts a link as 23 characters, LinkedIn rewards a full paragraph, and
+Instagram cannot carry a clickable link at all, so its caption says where to
+go and the image is saved alongside it.
+
+---
+
 ## 5. Blockers before the domain goes live
 
 `npm run preflight` reports these and exits non-zero.
@@ -184,7 +257,8 @@ but the number itself should be confirmed against the current register.
 still in the `gameresults` and `analytics` collections. Clearing them needed a
 bulk delete, which was blocked; clear them from the admin Analytics page.
 
-**Not verified by me:** real email delivery through Gmail, Cloudinary uploads
+**Not verified by me:** Safari and Firefox specifically (the browser suite
+runs on Chromium), real email delivery through Gmail, Cloudinary uploads
 against the live account, the scheduled campaign worker, GoDaddy DNS and HTTPS,
 and cross-browser or real-device behaviour. Frame-rate profiling could not be
 measured reliably in the automation browser and should be checked on a real
@@ -231,7 +305,8 @@ Changed:
 ## 9. Commands
 
 ```bash
-npm run verify          # lint, types, tests, build
+npm run verify          # lint, types, unit tests, build
+npm run test:e2e        # 102 browser tests across three screen widths
 npm run preflight       # deployment configuration safety
 npm run cms:check       # database and integrations
 npm run verify:deploy   # all of the above, in order
