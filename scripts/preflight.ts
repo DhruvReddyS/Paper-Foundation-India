@@ -159,24 +159,64 @@ for (const key of ["NEXT_PUBLIC_SITE_URL", "NEXTAUTH_URL"]) {
   }
 }
 
-const blockers = findings.filter((f) => f.level === "blocker");
-const warnings = findings.filter((f) => f.level === "warning");
+/**
+ * Credentials can be present and still be dead. A Gmail refresh token expires
+ * if the OAuth app is left in testing status, if access is revoked, or after
+ * a long period unused, and nothing about the configuration shows that. The
+ * only way to know is to ask Google, so the check exchanges the token.
+ */
+async function checkGmailToken() {
+  const id = process.env.GMAIL_CLIENT_ID;
+  const secret = process.env.GMAIL_CLIENT_SECRET;
+  const refresh = process.env.GMAIL_REFRESH_TOKEN;
+  if (!id || !secret || !refresh) return;
 
-console.log("");
-console.log("Deployment preflight");
-console.log("====================");
-console.log("Checking .env, the file that gets deployed.\n");
-if (!findings.length) {
-  console.log("No issues found. This configuration is safe to deploy.");
-} else {
-  for (const group of [blockers, warnings]) {
-    for (const finding of group) {
-      console.log(`\n[${finding.level.toUpperCase()}] ${finding.message}`);
-      console.log(`           ${finding.fix}`);
-    }
+  try {
+    const response = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ client_id: id, client_secret: secret, refresh_token: refresh, grant_type: "refresh_token" }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    const result = (await response.json()) as { access_token?: string; error?: string; error_description?: string };
+    if (response.ok && result.access_token) return;
+
+    blocker(
+      `The Gmail refresh token is not accepted by Google (${result.error ?? response.status}).`,
+      "Newsletter confirmations and campaigns cannot send. Re-run the OAuth consent flow to issue a new refresh token, and publish the OAuth app rather than leaving it in testing, where tokens expire after seven days."
+    );
+  } catch (error) {
+    warning(
+      `The Gmail token could not be checked: ${error instanceof Error ? error.message : String(error)}.`,
+      "Run this again with network access before deploying."
+    );
   }
-  console.log(`\n${blockers.length} blocker(s), ${warnings.length} warning(s).`);
 }
-console.log("");
 
-process.exitCode = blockers.length ? 1 : 0;
+async function report() {
+  await checkGmailToken();
+
+  const blockers = findings.filter((f) => f.level === "blocker");
+  const warnings = findings.filter((f) => f.level === "warning");
+
+  console.log("");
+  console.log("Deployment preflight");
+  console.log("====================");
+  console.log("Checking .env, the file that gets deployed.\n");
+  if (!findings.length) {
+    console.log("No issues found. This configuration is safe to deploy.");
+  } else {
+    for (const group of [blockers, warnings]) {
+      for (const finding of group) {
+        console.log(`\n[${finding.level.toUpperCase()}] ${finding.message}`);
+        console.log(`           ${finding.fix}`);
+      }
+    }
+    console.log(`\n${blockers.length} blocker(s), ${warnings.length} warning(s).`);
+  }
+  console.log("");
+
+  process.exitCode = blockers.length ? 1 : 0;
+}
+
+void report();
