@@ -9,12 +9,44 @@
  *
  * Run with: npm run preflight
  */
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 import { loadEnvConfig } from "@next/env";
 import { databaseNameFromUri } from "../lib/db";
 
 loadEnvConfig(process.cwd());
 
 type Finding = { level: "blocker" | "warning"; message: string; fix: string };
+
+/**
+ * Next loads .env.local last, so it overrides .env. That is correct for
+ * development and confusing here: a .env that is already set up for
+ * production still reads as localhost on a developer's machine. Reading the
+ * files directly lets the report say which one a value came from, so a real
+ * misconfiguration is not confused with a local override.
+ */
+function readEnvFile(name: string): Record<string, string> {
+  const file = path.join(process.cwd(), name);
+  if (!existsSync(file)) return {};
+  const values: Record<string, string> = {};
+  for (const line of readFileSync(file, "utf8").split("\n")) {
+    const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)$/);
+    if (match) values[match[1]] = match[2].trim().replace(/^["']|["']$/g, "");
+  }
+  return values;
+}
+
+const deployed = readEnvFile(".env");
+const localOverrides = readEnvFile(".env.local");
+
+/** The value that will actually be live, which is the one in .env. */
+function deployedValue(key: string) {
+  return deployed[key] ?? process.env[key] ?? "";
+}
+
+function isLocalOnlyOverride(key: string) {
+  return Boolean(localOverrides[key]) && localOverrides[key] !== deployed[key];
+}
 
 const findings: Finding[] = [];
 
@@ -26,8 +58,8 @@ function warning(message: string, fix: string) {
   findings.push({ level: "warning", message, fix });
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-const authUrl = process.env.NEXTAUTH_URL ?? "";
+const siteUrl = deployedValue("NEXT_PUBLIC_SITE_URL");
+const authUrl = deployedValue("NEXTAUTH_URL");
 
 for (const [name, value] of Object.entries({ NEXT_PUBLIC_SITE_URL: siteUrl, NEXTAUTH_URL: authUrl })) {
   if (!value) {
@@ -117,12 +149,23 @@ if (!process.env.NEXT_PUBLIC_GA_ID) {
   warning("NEXT_PUBLIC_GA_ID is not set, so no analytics will be collected.", "Add the measurement ID, or leave it unset deliberately.");
 }
 
+for (const key of ["NEXT_PUBLIC_SITE_URL", "NEXTAUTH_URL"]) {
+  if (isLocalOnlyOverride(key)) {
+    findings.push({
+      level: "warning",
+      message: `.env.local overrides ${key} with ${localOverrides[key]} on this machine.`,
+      fix: "That is correct for local development. Just make sure .env.local is not copied to the server, or it will override the live value there too.",
+    });
+  }
+}
+
 const blockers = findings.filter((f) => f.level === "blocker");
 const warnings = findings.filter((f) => f.level === "warning");
 
 console.log("");
 console.log("Deployment preflight");
 console.log("====================");
+console.log("Checking .env, the file that gets deployed.\n");
 if (!findings.length) {
   console.log("No issues found. This configuration is safe to deploy.");
 } else {
