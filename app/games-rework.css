@@ -3450,3 +3450,49 @@
 @media (max-width: 760px) {
   .game-rework .game-result-share .share-row-primary button { flex: 1 1 100%; }
 }
+
+/* ===========================================================================
+   Result card footer
+   The footer was absolutely positioned while the message above it stayed in
+   normal flow, so a longer message ran underneath it. Message length varies
+   with the game and the score, so reserving a fixed amount of space only
+   moves the problem. Putting the footer back in flow and pushing it down
+   with auto margin means the two can never collide at any width.
+   ========================================================================= */
+.game-rework .game-result-card-preview footer {
+  position: static;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.game-rework .game-result-card-preview .game-result-message {
+  margin-bottom: 1.2rem;
+}
+
+/* ===========================================================================
+   Result card on a phone
+   The compact layout hid the badge, the message and the per-game recap to
+   save vertical space. The badge is the whole payoff of finishing and it is
+   two or three words, and the recap is where the learning actually lands:
+   the claim-by-claim ledger in the press, the clue counts in Hidden Paper.
+   Both are shown again on phones. The long message stays hidden there, since
+   it repeats what the score and badge already say.
+   ========================================================================= */
+.game-rework.game-page-immersive .game-result-card-preview .game-result-stamp {
+  display: inline-block;
+  margin: 0 0 .7rem;
+  padding: .3rem .6rem;
+  font-size: .62rem;
+}
+
+.game-rework .game-result-extra {
+  display: block;
+  max-height: 42svh;
+  overflow-y: auto;
+  margin-bottom: .6rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 761px) {
+  .game-rework .game-result-extra { max-height: none; overflow-y: visible; }
+}

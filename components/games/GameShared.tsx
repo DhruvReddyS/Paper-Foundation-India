@@ -15,7 +15,10 @@ import ShareRow from "@/components/site/ShareRow";
 import { getGameDefinition, type GameId } from "./gameCatalog";
 import { isGameSoundEnabled, setGameSoundEnabled } from "./gameAudio";
 
-const SITE_URL = "https://paperfoundation.in";
+// A shared result should always point at the live site, never at whatever
+// host the page happens to be served from. This reads the same configured
+// origin the SEO layer uses, so the domain is defined in one place.
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://paperfoundation.in").replace(/\/$/, "");
 
 type MetricValue = string | number | boolean;
 

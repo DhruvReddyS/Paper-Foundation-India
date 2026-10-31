@@ -142,7 +142,18 @@ test.describe("games play to completion", () => {
 
     const result = await readResult(page);
     assertSaneResult(result, "Paper Mill Shuffle");
-    expect(result.score, "a perfect first attempt should score full marks").toBe(result.outOf);
+
+    // Scoring is 800, less 70 for each check after the first, less 10 for
+    // every 15 seconds taken, floored at 300. Solving it on the first check
+    // means no attempt penalty, so the score must equal the time-adjusted
+    // maximum exactly. Asserting the formula catches a regression in either
+    // term, which a simple "score is high" check would not.
+    const elapsed = await page
+      .locator(".game-result-summary span", { hasText: /Time played/i })
+      .innerText();
+    const [minutes, seconds] = elapsed.match(/(\d+):(\d+)/)!.slice(1).map(Number);
+    const expected = Math.max(300, 800 - Math.floor((minutes * 60 + seconds) / 15) * 10);
+    expect(result.score, "a first-attempt solve should carry no attempt penalty").toBe(expected);
     expect(errors).toEqual([]);
   });
 
@@ -232,6 +243,48 @@ test.describe("games play to completion", () => {
     assertSaneResult(result, "Fibre Word Search");
     expect(errors).toEqual([]);
   });
+});
+
+test.describe("the result card", () => {
+  for (const width of [375, 768, 1440]) {
+    test(`reads correctly at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await start(page, "/discover/mill-master");
+
+      const target = ["Sort fibre", "Make pulp", "Clean pulp", "Refine fibres", "Form sheet", "Press water", "Dry sheet", "Finish reel"];
+      const read = () => page.locator(".mill-order-card .mill-order-copy strong").allInnerTexts();
+      for (let slot = 0; slot < target.length; slot += 1) {
+        for (let guard = 0; guard < 20; guard += 1) {
+          const order = (await read()).map((s) => s.trim());
+          const at = order.indexOf(target[slot]);
+          if (at === slot || at === -1) break;
+          await page.locator(".mill-order-card").nth(at).locator(".mill-order-move button").first().click();
+          await page.waitForTimeout(50);
+        }
+      }
+      await page.getByRole("button", { name: /check line/i }).click();
+      await expect(page.locator(".game-result-panel")).toBeVisible({ timeout: 20_000 });
+
+      // The message length changes with the game and the score, so this
+      // guards the card against a footer that collides with the text above it.
+      const gap = await page.evaluate(() => {
+        const card = document.querySelector(".game-result-card-preview")!;
+        const message = card.querySelector(".game-result-message")!.getBoundingClientRect();
+        const footer = card.querySelector("footer")!.getBoundingClientRect();
+        return Math.round(message.bottom - footer.top);
+      });
+      expect(gap, `the message overlaps the card footer by ${gap}px`).toBeLessThanOrEqual(0);
+
+      // Everything a reader needs in order to share must be present. The
+      // score and the badge appear at every width; the longer message is
+      // deliberately dropped on a phone because it restates both of them.
+      await expect(page.locator(".game-result-card-preview h1")).toBeVisible();
+      await expect(page.locator(".game-result-stamp")).toBeVisible();
+      if (width >= 1024) await expect(page.locator(".game-result-message")).toBeVisible();
+      expect(await page.locator(".share-row-primary button").count()).toBeGreaterThanOrEqual(3);
+      expect(await page.locator(".share-row-platforms a, .share-row-platforms button").count()).toBe(8);
+    });
+  }
 });
 
 test.describe("games on a phone", () => {
