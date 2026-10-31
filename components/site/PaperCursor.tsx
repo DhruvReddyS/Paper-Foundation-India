@@ -12,6 +12,9 @@ export default function PaperCursor() {
   useEffect(() => {
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     if (!finePointer.matches) return;
+    // A trailing custom cursor is motion. Readers who ask for less of it keep
+    // the ordinary system pointer.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     document.documentElement.dataset.paperCursor = "on";
 

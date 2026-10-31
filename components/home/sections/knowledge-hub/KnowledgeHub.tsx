@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, BookMarked, Clock, Factory, Library, Recycle, Sparkles, Trees } from "lucide-react";
+import { ArrowRight, BookMarked, Clock, Factory, Library, Recycle, Sparkles, Trees } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./KnowledgeHub.module.css";

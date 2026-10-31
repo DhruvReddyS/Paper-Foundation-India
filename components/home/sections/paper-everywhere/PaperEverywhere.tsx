@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@/components/paper-ui/icons";
 import { motion, type MotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";

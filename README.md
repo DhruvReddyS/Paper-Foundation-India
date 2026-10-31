@@ -23,16 +23,34 @@ npm run dev
 - Two-factor admin authentication, recovery codes, login lockout, rate limits and file-content validation
 - Owner backup export, health/status checks, SEO sitemap/robots/manifest, privacy notice and terms
 
+## Before deploying
+
+Read [`docs/DEPLOYMENT_READINESS.md`](docs/DEPLOYMENT_READINESS.md) first. It
+records what has been verified by running it, what is still open, and the two
+configuration blockers that must be cleared before a public domain is pointed
+at this build.
+
+```bash
+npm run verify:deploy
+```
+
+That runs lint, types, tests and the build, then checks the deployment
+configuration and the live services. `npm run preflight` on its own catches the
+localhost URLs that would otherwise end up in canonical tags, Open Graph data
+and the sitemap.
+
 ## CMS operations
 
 - Local and production configuration: [`docs/ADMIN_SETUP.md`](docs/ADMIN_SETUP.md)
 - Production release and recovery: [`docs/CMS_PRODUCTION_RUNBOOK.md`](docs/CMS_PRODUCTION_RUNBOOK.md)
 
 ```bash
-npm run verify
-npm run cms:check
-npm run seed
+npm run verify          # lint, types, tests, build
+npm run preflight       # deployment configuration safety
+npm run cms:check       # database and integration status
+npm run seed            # idempotent content seed
 npm run bundle:godaddy
+node scripts/optimise-images.mjs --dry   # image weight report
 ```
 
 GoDaddy deployment instructions: [`DEPLOY_GODADDY.md`](DEPLOY_GODADDY.md)

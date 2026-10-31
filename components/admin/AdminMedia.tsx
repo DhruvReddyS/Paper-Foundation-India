@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Edit3, ImagePlus, RefreshCw, Save, Search, Trash2, UploadCloud, X } from "lucide-react";
+import { Check, Copy, Edit3, ImagePlus, RefreshCw, Save, Search, Trash2, UploadCloud, X } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useAdminAccess } from "./AdminShell";

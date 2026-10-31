@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, BookOpenCheck, Check, ChevronLeft, ChevronRight, FileSearch, HeartHandshake, Mail, MapPin, Minus, Plus, RefreshCw, Scale, SearchCheck, Sparkles, Users } from "lucide-react";
+import { ArrowRight, BookOpenCheck, Check, ChevronLeft, ChevronRight, FileSearch, HeartHandshake, Mail, MapPin, Minus, Plus, RefreshCw, Scale, SearchCheck, Sparkles, Users } from "@/components/paper-ui/icons";
 import { useState, type PointerEvent } from "react";
 
 const principles = [

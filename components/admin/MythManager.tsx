@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Edit3, FilePlus2, RefreshCw, Search, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit3, FilePlus2, RefreshCw, Search, Trash2 } from "@/components/paper-ui/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import MythEditor from "./MythEditor";
 import { useAdminAccess } from "./AdminShell";

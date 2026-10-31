@@ -3254,3 +3254,199 @@
     animation: none !important;
   }
 }
+
+/* ===========================================================================
+   Game corrections layer
+   Styling for the three-way verdict press, the Hidden Paper reveal route, the
+   per-claim result ledger and the word-search timeout card. Loaded after
+   globals.css so these rules win over the earlier two-stamp layout.
+   ========================================================================= */
+
+/* The press now stamps three verdicts. Colour follows meaning rather than
+   DOM position: refuted is iron-oxide red, conditional is ochre, supported is
+   forest green. */
+.stamp-options .stamp-myth { border-color: #8d3f2c; color: #8d3f2c; transform: rotate(-1.2deg); }
+.stamp-options .stamp-context { border-color: #8a6e18; color: #6f590f; transform: rotate(.6deg); }
+.stamp-options .stamp-fact { border-color: #2f5c3a; color: #2f5c3a; transform: rotate(-.5deg); }
+.stamp-options button span { font-size: inherit; }
+
+@media (max-width: 720px) {
+  .stamp-options { grid-template-columns: 1fr; }
+  .stamp-options button { transform: none; }
+}
+
+/* A player who exhausts every clue can still move on. The route is deliberately
+   quieter than the scoring actions above it. */
+.game-rework .reveal-answer-button,
+.reveal-answer-button {
+  width: 100%;
+  min-height: 44px;
+  margin-top: .55rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  border: 1px solid rgba(137, 63, 44, .45);
+  border-radius: 0;
+  color: #8d3f2c;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  background: transparent;
+}
+
+.reveal-answer-button span {
+  margin-left: auto;
+  margin-right: .9rem;
+  opacity: .66;
+}
+
+.reveal-answer-button:hover { background: rgba(137, 63, 44, .07); }
+
+/* Per-claim record of what the player stamped against what the evidence says. */
+.truth-result-ledger {
+  width: min(560px, 100%);
+  margin: 1.6rem auto 0;
+  display: grid;
+  gap: .5rem;
+  list-style: none;
+  text-align: left;
+}
+
+.truth-result-ledger li {
+  display: grid;
+  grid-template-columns: 2.2rem minmax(0, 1fr);
+  gap: .2rem .8rem;
+  padding: .7rem .85rem;
+  border-left: 2px solid currentColor;
+  background: rgba(244, 237, 224, .62);
+  color: #6f590f;
+}
+
+.truth-result-ledger li.is-correct { color: #2f5c3a; }
+.truth-result-ledger li.is-wrong { color: #8d3f2c; }
+
+.truth-result-ledger span {
+  grid-row: span 2;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  opacity: .7;
+}
+
+.truth-result-ledger p {
+  color: #3c3a33;
+  font-family: var(--font-serif);
+  font-size: .96rem;
+  line-height: 1.4;
+}
+
+.truth-result-ledger small {
+  font-family: var(--font-mono);
+  font-size: .64rem;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+/* The timeout result lists what stayed hidden, which is the teaching moment. */
+.word-result-missed {
+  width: min(520px, 100%);
+  margin: 1.4rem auto 0;
+  padding: 1rem 1.1rem;
+  border-top: 1px dashed rgba(60, 58, 51, .4);
+  border-bottom: 1px dashed rgba(60, 58, 51, .4);
+  text-align: left;
+}
+
+.word-result-missed header {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  margin-bottom: .7rem;
+  color: #6b6558;
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.word-result-missed header svg { width: 14px; height: 14px; }
+
+.word-result-missed ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  list-style: none;
+}
+
+.word-result-missed li {
+  padding: .3rem .6rem;
+  border: 1px solid rgba(60, 58, 51, .28);
+  color: #3c3a33;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .06em;
+}
+
+.word-result-missed ul:empty::after {
+  content: "Every word was found.";
+  color: #2f5c3a;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+}
+
+/* The clue grid was fixed at five columns while the catalogue held five
+   products. It now follows however many rounds were played. */
+.clue-result-grid {
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+}
+
+/* The share row inside a game result sits on a dark panel and is centred with
+   the rest of the card. */
+.game-rework .game-result-share {
+  margin-top: 1.3rem;
+  justify-items: center;
+}
+
+.game-rework .game-result-share .share-row-primary,
+.game-rework .game-result-share .share-row-platforms {
+  justify-content: center;
+}
+
+.game-rework .game-result-share .share-row-primary button {
+  border-radius: 0;
+  color: var(--game-ink);
+  border-color: color-mix(in srgb, var(--game-ink) 42%, transparent);
+  background: transparent;
+}
+
+.game-rework .game-result-share .share-row-primary .share-primary {
+  color: var(--game-paper);
+  background: var(--game-ink);
+  border-color: var(--game-ink);
+}
+
+.game-rework .game-result-share .share-row-primary button:hover:not(:disabled) {
+  color: var(--game-paper);
+  background: var(--game-ink);
+  border-color: var(--game-ink);
+}
+
+.game-rework .game-result-share .share-row-platforms a,
+.game-rework .game-result-share .share-row-platforms button {
+  border-radius: 0;
+  color: var(--game-ink);
+  border-color: color-mix(in srgb, var(--game-ink) 28%, transparent);
+}
+
+.game-rework .game-result-share .share-row-platforms a:hover,
+.game-rework .game-result-share .share-row-platforms button:hover:not(:disabled) {
+  border-color: var(--game-ink);
+  color: var(--game-ink);
+}
+
+.game-rework .game-result-share .share-row-note { color: var(--game-ink); opacity: .8; }
+
+@media (max-width: 760px) {
+  .game-rework .game-result-share .share-row-primary button { flex: 1 1 100%; }
+}

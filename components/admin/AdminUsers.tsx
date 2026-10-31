@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, KeyRound, LoaderCircle, Plus, Shield, ShieldCheck, ShieldOff, Trash2, UserRound, UsersRound, X } from "lucide-react";
+import { Check, KeyRound, LoaderCircle, Plus, Shield, ShieldCheck, ShieldOff, Trash2, UserRound, UsersRound, X } from "@/components/paper-ui/icons";
 import { useCallback, useEffect, useState } from "react";
 
 type Role = "owner" | "editor" | "analyst";

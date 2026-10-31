@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Clock, Feather, Layers3, Search, Sparkles, Sprout } from "lucide-react";
+import { ArrowRight, Clock, Feather, Layers3, Search, Sparkles, Sprout } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";

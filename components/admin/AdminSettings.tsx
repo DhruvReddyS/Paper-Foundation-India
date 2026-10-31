@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronRight, Copy, ExternalLink, HelpCircle, KeyRound, RefreshCw, ShieldCheck, Wrench } from "lucide-react";
+import { Check, ChevronRight, Copy, ExternalLink, HelpCircle, KeyRound, RefreshCw, ShieldCheck, Wrench } from "@/components/paper-ui/icons";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 

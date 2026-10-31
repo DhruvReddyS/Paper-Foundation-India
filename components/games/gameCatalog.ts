@@ -22,6 +22,8 @@ export type GameDefinition = {
   difficulty: string;
   skill: string;
   theme: "botanical" | "press" | "mill" | "detective" | "type";
+  /** Topical hashtags for a shared result, without the leading hash. */
+  shareTags: string[];
 };
 
 export const gameCatalog: GameDefinition[] = [
@@ -40,6 +42,7 @@ export const gameCatalog: GameDefinition[] = [
     difficulty: "Adaptive",
     skill: "Evidence recall",
     theme: "botanical",
+    shareTags: ["PaperIQ", "Recycling", "Forestry"],
   },
   {
     id: "truth-press",
@@ -56,6 +59,7 @@ export const gameCatalog: GameDefinition[] = [
     difficulty: "Considered",
     skill: "Claim verification",
     theme: "press",
+    shareTags: ["FactCheck", "PaperMyths", "MediaLiteracy"],
   },
   {
     id: "mill-master",
@@ -72,6 +76,7 @@ export const gameCatalog: GameDefinition[] = [
     difficulty: "Hands-on",
     skill: "Process sequencing",
     theme: "mill",
+    shareTags: ["Papermaking", "ProcessEngineering", "Manufacturing"],
   },
   {
     id: "hidden-paper",
@@ -88,6 +93,7 @@ export const gameCatalog: GameDefinition[] = [
     difficulty: "Observant",
     skill: "Material literacy",
     theme: "detective",
+    shareTags: ["MaterialScience", "EngineeredPaper", "DesignDetail"],
   },
   {
     id: "paper-word-search",
@@ -104,6 +110,7 @@ export const gameCatalog: GameDefinition[] = [
     difficulty: "Fast",
     skill: "Vocabulary",
     theme: "type",
+    shareTags: ["WordGame", "PaperVocabulary", "Learning"],
   },
 ];
 

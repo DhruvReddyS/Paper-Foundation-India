@@ -15,7 +15,7 @@ import {
   RotateCcw,
   X,
   ZoomIn,
-} from "lucide-react";
+} from "@/components/paper-ui/icons";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";

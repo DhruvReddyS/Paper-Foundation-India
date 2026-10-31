@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Eye, EyeOff, KeyRound, LoaderCircle, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, KeyRound, LoaderCircle, ShieldCheck, UserRound } from "@/components/paper-ui/icons";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";

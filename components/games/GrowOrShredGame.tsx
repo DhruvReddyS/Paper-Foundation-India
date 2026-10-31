@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Check, ExternalLink, Leaf, X } from "lucide-react";
+import { Check, ExternalLink, Leaf, X } from "@/components/paper-ui/icons";
 import { useEffect, useRef, useState } from "react";
 import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameConfiguration, useGameTimer } from "./GameShared";
 import { playGameSound } from "./gameAudio";
@@ -13,63 +13,80 @@ export default function GrowOrShredGame() {
   const configuration = useGameConfiguration("grow-or-shred");
   const [phase, setPhase] = useState<Phase>("intro");
   const [questions, setQuestions] = useState<QuizQuestion[]>(() => shuffleItems(quizQuestions));
-  const [index, setIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [streak, setStreak] = useState(0);
-  const [bestStreak, setBestStreak] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [correctAnswers, setCorrectAnswers] = useState(0);
+  // One record of what has been answered, rather than a cursor plus a running
+  // score. React batches synchronous clicks, so any handler that reads state
+  // and then increments it can run twice on a double tap and count twice. A
+  // single functional update over this record cannot: replaying it is a no-op.
+  const [round, setRound] = useState<{ answers: number[]; revealed: boolean }>({ answers: [], revealed: false });
   const { seconds, resetTimer } = useGameTimer(phase === "play");
-  const question = questions[index];
+
   useEffect(() => {
     const configured = configuration?.content?.questions;
     if (phase === "intro" && Array.isArray(configured) && configured.length) setQuestions(shuffleItems(configured as QuizQuestion[]));
   }, [configuration, phase]);
 
+  const index = Math.min(Math.max(0, round.answers.length - (round.revealed ? 1 : 0)), Math.max(0, questions.length - 1));
+  const question = questions[index];
+  const selected = round.revealed ? round.answers[round.answers.length - 1] ?? null : null;
+
+  // Everything below is derived, so it cannot drift out of step with the answers.
+  const graded = round.answers.map((choice, position) => choice === questions[position]?.correct);
+  const correctAnswers = graded.filter(Boolean).length;
+  const { score, bestStreak, streak } = graded.reduce(
+    (totals, isCorrect) => {
+      if (!isCorrect) return { ...totals, streak: 0 };
+      const nextStreak = totals.streak + 1;
+      return {
+        score: totals.score + 100 + Math.min(nextStreak * 10, 40),
+        streak: nextStreak,
+        bestStreak: Math.max(totals.bestStreak, nextStreak),
+      };
+    },
+    { score: 0, streak: 0, bestStreak: 0 }
+  );
+
   function answer(option: number) {
-    if (selected !== null) return;
-    setSelected(option);
-    if (option === question.correct) {
-      playGameSound("correct");
-      const nextStreak = streak + 1;
-      setScore((value) => value + 100 + Math.min(nextStreak * 10, 40));
-      setCorrectAnswers((value) => value + 1);
-      setStreak(nextStreak);
-      setBestStreak((value) => Math.max(value, nextStreak));
-    } else {
-      playGameSound("wrong");
-      setStreak(0);
-    }
+    setRound((current) => {
+      if (current.revealed) return current;
+      playGameSound(option === questions[current.answers.length]?.correct ? "correct" : "wrong");
+      return { answers: [...current.answers, option], revealed: true };
+    });
   }
 
   function next() {
-    if (index === questions.length - 1) {
+    setRound((current) => {
+      if (!current.revealed) return current;
+      if (current.answers.length >= questions.length) {
+        playGameSound("complete");
+        return { ...current, revealed: false };
+      }
+      return { ...current, revealed: false };
+    });
+  }
+
+  useEffect(() => {
+    if (phase === "play" && !round.revealed && round.answers.length >= questions.length && questions.length) {
       playGameSound("complete");
       setPhase("result");
     }
-    else {
-      setIndex((value) => value + 1);
-      setSelected(null);
-    }
-  }
+  }, [phase, round.answers.length, round.revealed, questions.length]);
 
   function reset() {
     setPhase("intro");
-    setIndex(0);
-    setScore(0);
-    setStreak(0);
-    setBestStreak(0);
-    setSelected(null);
-    setCorrectAnswers(0);
+    setRound({ answers: [], revealed: false });
     const configured = configuration?.content?.questions;
     setQuestions(shuffleItems(Array.isArray(configured) && configured.length ? configured as QuizQuestion[] : quizQuestions));
     resetTimer();
   }
 
-  const badge = correctAnswers >= 6 ? "Canopy Scholar" : correctAnswers >= 4 ? "Fibre Thinker" : "Curious Sapling";
+  const badge = correctAnswers >= Math.ceil(questions.length * 0.85)
+    ? "Canopy Scholar"
+    : correctAnswers >= Math.ceil(questions.length * 0.55)
+      ? "Fibre Thinker"
+      : "Curious Sapling";
 
   return (
-    <GameFrame gameId="grow-or-shred" immersive={phase !== "intro"} title="Grow or Shred" kicker="Game 01 · Paper IQ" elapsedSeconds={phase === "intro" ? undefined : seconds} progress={phase === "play" ? ((index + (selected === null ? 0 : 1)) / questions.length) * 100 : undefined}>
+    <GameFrame gameId="grow-or-shred" immersive={phase !== "intro"} title="Grow or Shred" kicker="Game 01 · Paper IQ" elapsedSeconds={phase === "intro" ? undefined : seconds} progress={phase === "play" && questions.length ? ((index + (selected === null ? 0 : 1)) / questions.length) * 100 : undefined}>
       {phase === "intro" && (
         <GameIntro
           gameId="grow-or-shred"
@@ -85,18 +102,17 @@ export default function GrowOrShredGame() {
         />
       )}
 
-      {phase === "play" && (
+      {phase === "play" && question && (
         <section className="quiz-stage">
           <div className="tree-panel">
-            <TreeVisual correct={correctAnswers} wrong={index + (selected !== null ? 1 : 0) - correctAnswers} streak={streak} />
+            <TreeVisual correct={correctAnswers} wrong={Math.max(0, index + (selected !== null ? 1 : 0) - correctAnswers)} streak={streak} />
             <div className="tree-score-strip">
               <span><strong>{score}</strong> points</span>
               <span><Leaf size={15} /> {streak} streak</span>
             </div>
           </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div key={index} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} className="question-panel">
+          <motion.div key={index} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} className="question-panel">
               <div className="question-number">Question {index + 1} of {questions.length}</div>
               <h1>{question.question}</h1>
               <div className="answer-grid">
@@ -106,7 +122,7 @@ export default function GrowOrShredGame() {
                   return (
                     <motion.button
                       whileHover={selected === null ? { x: 5 } : undefined}
-                      key={answerText}
+                      key={`${option}-${answerText}`}
                       onClick={() => answer(option)}
                       className={`${isCorrect ? "answer-correct" : ""} ${isWrong ? "answer-wrong" : ""}`}
                     >
@@ -126,13 +142,12 @@ export default function GrowOrShredGame() {
                     <p>{question.explanation}</p>
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <a href={question.source} target="_blank" rel="noreferrer">Source: {question.sourceLabel} <ExternalLink size={13} /></a>
-                      <button onClick={next} className="game-primary-button">{index === questions.length - 1 ? "See my tree" : "Next question"} →</button>
+                      <button onClick={next} className="game-primary-button">{round.answers.length >= questions.length ? "See my tree" : "Next question"} →</button>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
-          </AnimatePresence>
+          </motion.div>
         </section>
       )}
 

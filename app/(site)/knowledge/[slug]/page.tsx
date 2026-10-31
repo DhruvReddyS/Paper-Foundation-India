@@ -1,8 +1,11 @@
-import { ArrowLeft, ArrowRight, Clock, Quote, Share2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, Quote } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { articleCatalog, articleCoverImage, type ArticleCatalogItem } from "@/content/articleCatalog";
+import ShareRow from "@/components/site/ShareRow";
+import StructuredData from "@/components/site/StructuredData";
+import { absoluteUrl, articleSchema, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { connectDB } from "@/lib/db";
 import { Article } from "@/lib/models/Article";
 
@@ -57,7 +60,15 @@ const readingTools: Record<ArticleCatalogItem["category"], Array<{ label: string
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const article = await findArticle(slug);
-  return article ? { title: article.title, description: article.summary } : { title: "Article not found" };
+  if (!article) return { title: "Article not found", robots: { index: false, follow: true } };
+  return pageMetadata({
+    title: article.title,
+    description: article.summary,
+    path: `/knowledge/${article.slug}`,
+    image: article.coverImage || articleCoverImage(article),
+    type: "article",
+    noIndex: !hasPublishedBody(article),
+  });
 }
 
 const newArticleAngles: Record<string, string[]> = {
@@ -112,6 +123,18 @@ function generatedBody(item: ArticleCatalogItem) {
 }
 
 type ReaderItem = ArticleCatalogItem & { body?: string; coverImage?: string };
+
+const MINIMUM_PUBLISHABLE_BODY = 400;
+
+/**
+ * True only when an editor has published real prose through the CMS. The
+ * fallback reader below composes a structured editorial framework from the
+ * catalogue, which is useful scaffolding but is not the finished article and
+ * must not be presented, indexed or shared as if it were.
+ */
+function hasPublishedBody(item: ReaderItem) {
+  return typeof item.body === "string" && item.body.trim().length >= MINIMUM_PUBLISHABLE_BODY;
+}
 type CmsArticle = {
   order?: number;
   slug: string;
@@ -159,15 +182,56 @@ export default async function ArticleReaderPage({ params }: { params: Promise<{ 
   const note = categoryNotes[safeCategory];
   const next = articleCatalog[item.id % articleCatalog.length];
   const generated = generatedBody(item);
+  const published = hasPublishedBody(item);
 
   return <article className="article-reader">
+    <StructuredData
+      schema={[
+        ...(published
+          ? [
+              articleSchema({
+                title: item.title,
+                description: item.summary,
+                path: `/knowledge/${item.slug}`,
+                image: item.coverImage || articleCoverImage(item),
+                section: item.category,
+              }),
+            ]
+          : []),
+        breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Knowledge Studio", path: "/knowledge" },
+          { name: item.title, path: `/knowledge/${item.slug}` },
+        ]),
+      ]}
+    />
+    {!published && (
+      <aside className="article-draft-notice" role="note">
+        <p>Editorial draft</p>
+        <h2>This page carries the reading framework, not the finished article.</h2>
+        <p>
+          The desk has agreed the angle, the category lens and the sources to inspect. The full text
+          is still in editorial review and has not been published, so this page is not indexed and
+          should not be cited. The framework below shows how the finished piece will be argued.
+        </p>
+      </aside>
+    )}
     <div className="article-progress"><span /></div>
     <header className="article-reader-hero">
       <div className="article-reader-meta"><Link href="/knowledge"><ArrowLeft /> Knowledge hub</Link><span>{item.category} · Source draft {String(item.id).padStart(2, "0")}</span></div>
       <p className="home-micro-label">{item.format} · Reading time {item.time}</p>
       <h1>{item.title}</h1>
       <p className="article-reader-deck">{item.summary}</p>
-      <div className="article-byline"><span>Editorial Desk</span><span><Clock /> {item.time} read</span><button type="button"><Share2 /> Share</button></div>
+      <div className="article-byline"><span>Editorial Desk</span><span><Clock /> {item.time} read</span></div>
+      <ShareRow
+        subject={{
+          title: item.title,
+          summary: item.summary,
+          url: absoluteUrl(`/knowledge/${item.slug}`),
+          tags: [item.category, "Paper"],
+        }}
+        className="article-share-row"
+      />
       <div className="article-cover-image"><Image src={item.coverImage || articleCoverImage(item)} alt={`Cover image for ${item.title}`} fill priority sizes="(max-width: 900px) 94vw, 1200px" /><span>FIG. {String(item.id).padStart(2, "0")} · {item.category.toUpperCase()} / CONTEXT / SOURCE</span><strong>Read the claim with its system attached.</strong></div>
     </header>
 

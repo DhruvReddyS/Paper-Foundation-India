@@ -5,7 +5,7 @@ import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-moti
 import {
   ArrowDown,
   ArrowRight,
-} from "lucide-react";
+} from "@/components/paper-ui/icons";
 import { useEffect, useState, type PointerEvent } from "react";
 import { gameCatalog, type GameDefinition } from "./gameCatalog";
 
@@ -26,7 +26,17 @@ export default function GameHub() {
 
   useEffect(() => {
     try {
-      setHistory(JSON.parse(window.localStorage.getItem("pfi-game-history") || "[]"));
+      const stored = JSON.parse(window.localStorage.getItem("pfi-game-history") || "[]");
+      // Local storage is editable by anyone, so only well-formed rows count.
+      setHistory(
+        (Array.isArray(stored) ? stored : []).filter(
+          (item): item is HistoryResult =>
+            Boolean(item) &&
+            typeof item.gameId === "string" &&
+            Number.isFinite(Number(item.score)) &&
+            Number(item.outOf) > 0
+        )
+      );
     } catch {
       setHistory([]);
     }
@@ -59,7 +69,7 @@ export default function GameHub() {
 
   const played = new Set(history.map((item) => item.gameId)).size;
   const bestPercent = history.length
-    ? Math.max(...history.map((item) => Math.round((item.score / item.outOf) * 100)))
+    ? Math.min(100, Math.max(0, ...history.map((item) => Math.round((Number(item.score) / Number(item.outOf)) * 100))))
     : 0;
 
   return (
@@ -206,7 +216,7 @@ function GameCard({
       <Link href={game.href} aria-label={`Play ${game.title}`}>
         <header>
           <span>GAME {game.number}</span>
-          <small>{completed ? "PLAYED ✓" : game.duration}</small>
+          <small>{completed ? "PLAYED" : game.duration}</small>
         </header>
         <div className="games-new-card-art">
           <CardArt theme={game.theme} />

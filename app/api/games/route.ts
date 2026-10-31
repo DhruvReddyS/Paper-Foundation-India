@@ -14,7 +14,7 @@ const resultSchema = z
     score: z.number().int().nonnegative(),
     outOf: z.number().int().positive().max(100_000),
     durationSeconds: z.number().int().nonnegative().max(7_200),
-    metrics: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+    metrics: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
   })
   .refine((result) => result.score <= result.outOf, {
     message: "Score cannot exceed the maximum score.",

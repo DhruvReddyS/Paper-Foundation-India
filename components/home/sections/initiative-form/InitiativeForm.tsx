@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, FileCheck2, FileText, Flag, Send, Sparkles, UploadCloud, Users } from "lucide-react";
+import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, FileCheck2, FileText, Flag, Send, Sparkles, UploadCloud, Users } from "@/components/paper-ui/icons";
 import { FormEvent, useRef, useState } from "react";
 import styles from "./InitiativeForm.module.css";
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpenText, Search, X } from "lucide-react";
+import { BookOpenText, Search, X } from "@/components/paper-ui/icons";
 import { glossaryAlphabet as alphabet, glossaryData, glossaryTermCount as termCount } from "@/content/glossary";
 import styles from "./Glossary.module.css";
 type Term = { term: string; definition: string };

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronRight, Mail, Pause, Play, Plus, RefreshCw, Save, Send, Trash2, Users, X } from "lucide-react";
+import { Check, ChevronRight, Mail, Pause, Play, Plus, RefreshCw, Save, Send, Trash2, Users, X } from "@/components/paper-ui/icons";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useAdminAccess } from "./AdminShell";
 

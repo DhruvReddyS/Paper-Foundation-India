@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowRight, BookOpen, Factory, Recycle, Trees, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowRight, BookOpen, Factory, Recycle, Trees, type LucideIcon } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, type PointerEvent } from "react";

@@ -14,7 +14,7 @@ const eventSchema = z.object({
   contentId: z.string().max(200).optional(),
   sessionId: z.string().max(100).optional(),
   durationSeconds: z.number().min(0).max(86_400).optional(),
-  metadata: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+  metadata: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
 });
 
 export async function GET(request: NextRequest) {

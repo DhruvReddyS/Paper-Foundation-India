@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Droplets, Factory, Layers3, Recycle } from "lucide-react";
+import { ArrowRight, Droplets, Factory, Layers3, Recycle } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./JourneyPreview.module.css";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock3, History, RefreshCw, RotateCcw, Search, ShieldCheck } from "lucide-react";
+import { Clock3, History, RefreshCw, RotateCcw, Search, ShieldCheck } from "@/components/paper-ui/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAdminAccess } from "./AdminShell";
 

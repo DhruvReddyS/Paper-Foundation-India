@@ -1,10 +1,13 @@
 import ResourceGrid from "./sections/ResourceGrid";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Resources & Downloads | Paper Foundation India",
+export const metadata = pageMetadata({
+  title: "Resources and Downloads",
   description:
-    "Access curated research papers, reports, toolkits, and infographics about India's paper industry and sustainability.",
-};
+    "Curated research papers, reports, toolkits and reference documents about India's paper industry and material recovery.",
+  path: "/resources",
+  keywords: ["paper industry reports India", "paper research downloads"],
+});
 
 export default async function ResourcesPage({ searchParams }: { searchParams: Promise<{ search?: string }> }) {
   const { search = "" } = await searchParams;

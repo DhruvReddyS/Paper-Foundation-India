@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Sparkles } from '@/components/paper-ui/icons';
 
 interface ArticleEditorProps {
   initialData?: {

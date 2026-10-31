@@ -1,4 +1,4 @@
-import { Factory, Grid3X3, ScanSearch, Stamp, Trees, type LucideIcon } from "lucide-react";
+import { Factory, Grid3X3, ScanSearch, Stamp, Trees, type LucideIcon } from "@/components/paper-ui/icons";
 
 export type PlayableGame = {
   number: string;

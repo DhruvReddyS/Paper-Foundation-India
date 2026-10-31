@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Download, Edit3, FileDown, Plus, RefreshCw, Search, Send, Trash2 } from "lucide-react";
+import { Check, Download, Edit3, FileDown, Plus, RefreshCw, Search, Send, Trash2 } from "@/components/paper-ui/icons";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useAdminAccess } from "./AdminShell";
 

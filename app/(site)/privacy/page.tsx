@@ -1,8 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import styles from "../legal.module.css";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Privacy Notice", description: "How Paper Foundation India collects, uses, protects and deletes personal information." };
+export const metadata = pageMetadata({
+  title: "Privacy Notice",
+  description:
+    "How Paper Foundation India collects, uses, protects and deletes personal information submitted through this website.",
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   return <article className={styles.legal}><header><p>PUBLIC INFORMATION NOTICE</p><h1>Privacy notice</h1><span>Effective 7 October 2026</span></header><div className={styles.body}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, BookOpenCheck } from "lucide-react";
+import { ArrowUpRight, BookOpenCheck } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import type { PaperEverywhereObject } from "@/content/paperEverywhere";

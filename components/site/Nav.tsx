@@ -26,7 +26,7 @@ import {
   Users,
   X,
   type LucideIcon,
-} from "lucide-react";
+} from "@/components/paper-ui/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { GooeySearch } from "@/components/ui/gooey-search";
@@ -58,8 +58,8 @@ const navGroups: NavGroup[] = [
       { href: "/games", label: "Games Lab", description: "Begin with the complete games collection", icon: Gamepad2 },
       { href: "/discover/grow-or-shred", label: "Grow or Shred", description: "Test system-level choices", icon: Sprout },
       { href: "/discover/hidden-paper", label: "Hidden Paper", description: "Find fibre in unexpected places", icon: Search },
-      { href: "/discover/mill-master", label: "Mill Master", description: "Build the papermaking sequence", icon: PackageOpen },
-      { href: "/discover/truth-press", label: "Truth Press", description: "Evaluate familiar paper claims", icon: Stamp },
+      { href: "/discover/mill-master", label: "Paper Mill Shuffle", description: "Build the papermaking sequence", icon: PackageOpen },
+      { href: "/discover/truth-press", label: "The Truth Press", description: "Stamp claims myth, context or fact", icon: Stamp },
       { href: "/discover/paper-word-search", label: "Fibre Word Search", description: "Find ten paper words against the clock", icon: Grid3X3 },
     ],
   },

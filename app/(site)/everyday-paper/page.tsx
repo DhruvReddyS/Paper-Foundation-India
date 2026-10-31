@@ -1,20 +1,29 @@
-import { ArrowDown, ExternalLink, FileCheck2, MapPin, Scale } from "lucide-react";
+import { ArrowDown, ExternalLink, FileCheck2, MapPin, Scale } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import EverydayGrid from "./sections/EverydayGrid";
 import styles from "../paper-everywhere-pages.module.css";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata({
+  title: "Everyday Paper | Nine objects, examined",
+  description:
+    "Currency, cartons, tissue, newsprint, learning material and more: nine everyday paper objects examined for what the fibre actually has to do.",
+  path: "/everyday-paper",
+  keywords: ["everyday paper products", "paper in daily life", "paper objects India"],
+});
 
 const proofNotes = [
   {
     value: "24.8 crore",
     label: "students",
     scope: "India, UDISE+ 2023 to 2024",
-    href: "https://www.education.gov.in/sites/upload_files/mhrd/files/statistics-new/udise_report_nep_23_24.pdf",
+    href: "https://www.education.gov.in/statistics-new",
   },
   {
     value: "149,809",
     label: "registered publications",
     scope: "PRGI snapshot, 23 May 2026",
-    href: "https://egov.rni.nic.in/Webforms/ReportRegdPeriodityWise.aspx",
+    href: "https://prgi.gov.in/en",
   },
   {
     value: "9.59%",

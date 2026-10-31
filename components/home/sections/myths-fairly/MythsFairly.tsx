@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Check, ChevronLeft, ChevronRight, Scale, X } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, Scale, X } from "@/components/paper-ui/icons";
 import Link from "next/link";
 import { useState, type PointerEvent } from "react";
 import styles from "./MythsFairly.module.css";

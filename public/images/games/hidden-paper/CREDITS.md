@@ -8,4 +8,4 @@
 - Vintage paper cone tweeter: Wikimedia Commons, CC BY-SA 4.0.
 - Natural air filter: Wikimedia Commons, CC BY-SA 4.0.
 
-Only the first five images are currently used by the game.
+All seven images are used by the Hidden Paper game.

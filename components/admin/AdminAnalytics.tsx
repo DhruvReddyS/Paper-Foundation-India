@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, ArrowRight, BookOpenCheck, Clock3, Eye, Gamepad2, Lightbulb, MousePointer2, RefreshCw, Sparkles, Target } from "lucide-react";
+import { Activity, ArrowRight, BookOpenCheck, Clock3, Eye, Gamepad2, Lightbulb, MousePointer2, RefreshCw, Sparkles, Target } from "@/components/paper-ui/icons";
 import { useCallback, useEffect, useState } from "react";
 
 type Data = { configured: boolean; preview?: boolean; days?: number; totals: Record<string, number>; daily: { _id: string; views: number; interactions: number }[]; topContent: { _id: { type: string; id: string }; interactions: number; averageDuration: number }[] };

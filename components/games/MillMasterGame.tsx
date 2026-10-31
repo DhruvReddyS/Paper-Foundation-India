@@ -1,9 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
-import { ArrowDown, ArrowLeft, ArrowUp, Check, CheckCircle2, Droplets, Factory, Filter, GripVertical, PackageCheck, Play, Recycle, RotateCcw, Scissors, Sparkles, Waves, Wind, X } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Check, CheckCircle2, Droplets, Factory, Filter, GripVertical, PackageCheck, Play, Recycle, RotateCcw, Scissors, Sparkles, Waves, Wind, X } from "@/components/paper-ui/icons";
 import { useEffect, useMemo, useState, type ComponentType, type PointerEvent } from "react";
-import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameConfiguration } from "./GameShared";
+import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameConfiguration, useGameTimer } from "./GameShared";
 import { playGameSound } from "./gameAudio";
 import { millSteps } from "./gameData";
 
@@ -42,21 +42,23 @@ export default function MillMasterGame() {
   const [phase, setPhase] = useState<"intro" | "play" | "result">("intro");
   const [steps, setSteps] = useState<Step[]>(() => makeStartingOrder(correctSteps));
   const [attempts, setAttempts] = useState(0);
-  const [seconds, setSeconds] = useState(0);
   const [checked, setChecked] = useState(false);
   const [finalScore, setFinalScore] = useState(800);
-
-  useEffect(() => {
-    if (phase !== "play") return;
-    const timer = window.setInterval(() => setSeconds((value) => value + 1), 1000);
-    return () => window.clearInterval(timer);
-  }, [phase]);
+  const { seconds, resetTimer } = useGameTimer(phase === "play");
 
   useEffect(() => {
     if (phase === "intro") setSteps(makeStartingOrder(correctSteps));
   }, [correctSteps, phase]);
 
   const correctCount = useMemo(() => steps.filter((step, index) => correctSteps[index] === step).length, [correctSteps, steps]);
+  // A configuration change can swap the answer list while a round is running.
+  // Resynchronising here keeps the board and the answer the same length.
+  useEffect(() => {
+    if (steps.length !== correctSteps.length || steps.some((step) => !correctSteps.includes(step))) {
+      setSteps(makeStartingOrder(correctSteps));
+      setChecked(false);
+    }
+  }, [correctSteps, steps]);
 
   function reorder(next: Step[]) {
     playGameSound("select");
@@ -94,7 +96,7 @@ export default function MillMasterGame() {
     setPhase("intro");
     setSteps(makeStartingOrder(correctSteps));
     setAttempts(0);
-    setSeconds(0);
+    resetTimer();
     setChecked(false);
     setFinalScore(800);
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
@@ -115,9 +117,8 @@ export default function MillMasterGame() {
         />
       )}
 
-      <AnimatePresence mode="wait">
-        {phase === "play" && (
-          <motion.section key="mill-order" initial={{ opacity: 0, scale: .96, rotateX: 4 }} animate={{ opacity: 1, scale: 1, rotateX: 0 }} exit={{ opacity: 0, scale: 1.04, filter: "blur(10px)" }} className="mill-order-game">
+      {phase === "play" && (
+          <motion.section key="mill-order" initial={{ opacity: 0, scale: .96, rotateX: 4 }} animate={{ opacity: 1, scale: 1, rotateX: 0 }} className="mill-order-game">
             <div className="mill-game-layout">
               <aside className="mill-control-panel">
                 <p className="game-kicker">The line is stopped</p>
@@ -161,7 +162,6 @@ export default function MillMasterGame() {
             </div>
           </motion.section>
         )}
-      </AnimatePresence>
 
       {phase === "result" && (
         <ResultPanel gameId="mill-master" game="Paper Mill Shuffle" score={finalScore} outOf={800} badge={badge} message={`You rebuilt the complete papermaking line in ${attempts} ${attempts === 1 ? "check" : "checks"} and ${seconds} seconds.`} durationSeconds={seconds} metrics={{ attempts }} onReplay={reset}>

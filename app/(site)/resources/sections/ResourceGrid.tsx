@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpRight, BarChart3, BookOpen, FileText,
   GraduationCap, Library, Search, SlidersHorizontal, X,
-} from "lucide-react";
+} from "@/components/paper-ui/icons";
 import { resourceCatalog as resources } from "@/content/resources";
 import styles from "./Resources.module.css";
 

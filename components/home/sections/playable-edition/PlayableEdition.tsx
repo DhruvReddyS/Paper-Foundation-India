@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "@/components/paper-ui/icons";
 import Link from "next/link";
 import { useRef, useState, type PointerEvent } from "react";
 import { playableGames } from "./games";

@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, MailX } from "lucide-react";
+import { CheckCircle2, MailX } from "@/components/paper-ui/icons";
 import Link from "next/link";
 import { useState } from "react";
 

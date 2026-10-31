@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Check, ExternalLink, Eye, EyeOff, Info, LayoutTemplate, RefreshCw, RotateCcw, Save, Sparkles } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, ExternalLink, Eye, EyeOff, Info, LayoutTemplate, RefreshCw, RotateCcw, Save, Sparkles } from "@/components/paper-ui/icons";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useAdminAccess } from "./AdminShell";

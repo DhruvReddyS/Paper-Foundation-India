@@ -17,7 +17,7 @@ const schema = z.object({
   skill: z.string().default(""),
   enabled: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
-  content: z.record(z.unknown()).default({}),
+  content: z.record(z.string(), z.unknown()).default({}),
   revisionNote: z.string().max(500).optional(),
 });
 

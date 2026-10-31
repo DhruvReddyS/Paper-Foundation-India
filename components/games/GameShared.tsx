@@ -5,16 +5,13 @@ import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowLeft,
   Clock3,
-  Copy,
-  Download,
-  ExternalLink,
   Play,
   RotateCcw,
-  Share2,
   Volume2,
   VolumeX,
-} from "lucide-react";
+} from "@/components/paper-ui/icons";
 import { useCallback, useEffect, useRef, useState } from "react";
+import ShareRow from "@/components/site/ShareRow";
 import { getGameDefinition, type GameId } from "./gameCatalog";
 import { isGameSoundEnabled, setGameSoundEnabled } from "./gameAudio";
 
@@ -221,13 +218,36 @@ export type PublicGameConfiguration = {
   content?: Record<string, unknown>;
 };
 
+// GameFrame, GameIntro and each game all need the editorial configuration. One
+// in-flight request is shared between them so a single page view does not make
+// the same call three or four times over.
+let gameConfigurationRequest: Promise<PublicGameConfiguration[]> | null = null;
+
+export function loadGameConfigurations() {
+  gameConfigurationRequest ??= fetch("/api/game-config")
+    .then((response) => (response.ok ? response.json() : { items: [] }))
+    .then((data) => (Array.isArray(data.items) ? (data.items as PublicGameConfiguration[]) : []))
+    .catch(() => {
+      gameConfigurationRequest = null;
+      return [] as PublicGameConfiguration[];
+    });
+  return gameConfigurationRequest;
+}
+
 export function useGameConfiguration(gameId: GameId) {
   const [configuration, setConfiguration] = useState<PublicGameConfiguration | null>(null);
   useEffect(() => {
-    fetch("/api/game-config").then(response => response.json()).then(data => {
-      const item = data.items?.find((candidate: PublicGameConfiguration & { id?: string }) => (candidate.gameId || candidate.id) === gameId);
+    let active = true;
+    void loadGameConfigurations().then((items) => {
+      if (!active) return;
+      const item = items.find(
+        (candidate: PublicGameConfiguration & { id?: string }) => (candidate.gameId || candidate.id) === gameId
+      );
       if (item) setConfiguration(item);
-    }).catch(() => undefined);
+    });
+    return () => {
+      active = false;
+    };
   }, [gameId]);
   return configuration;
 }
@@ -258,6 +278,8 @@ export function ResultPanel({
   metrics = {},
   children,
   scoreArtwork,
+  resultLabel = "Your Paper IQ result",
+  replayLabel = "Play a new round",
   onReplay,
 }: {
   gameId: GameId;
@@ -270,40 +292,59 @@ export function ResultPanel({
   metrics?: Record<string, MetricValue>;
   children?: React.ReactNode;
   scoreArtwork?: React.ReactNode;
+  resultLabel?: string;
+  replayLabel?: string;
   onReplay: () => void;
 }) {
   const definition = getGameDefinition(gameId);
-  const [copied, setCopied] = useState(false);
-  const [sharing, setSharing] = useState(false);
   const [best, setBest] = useState<number | null>(null);
   const submitted = useRef(false);
-  const percent = Math.round((score / outOf) * 100);
+  const percent = outOf > 0 ? Math.round((score / outOf) * 100) : 0;
   const shareUrl = `${SITE_URL}${definition.href}`;
-  const shareText = `I scored ${score}/${outOf} in ${game} and earned “${badge}” from Paper Foundation India. Can you beat my Paper IQ?`;
+  // The games build this object inline, so a new identity arrives on every
+  // render. Serialising it keeps the recording effect to a single run.
+  const metricsKey = JSON.stringify(metrics);
 
   useEffect(() => {
-    const storageKey = `pfi-game-best:${gameId}`;
-    const previous = Number(window.localStorage.getItem(storageKey));
-    const nextBest = Number.isFinite(previous) && previous > score ? previous : score;
-    window.localStorage.setItem(storageKey, String(nextBest));
-    setBest(nextBest);
-
     if (submitted.current) return;
     submitted.current = true;
-    const sessionId = window.crypto.randomUUID();
-    const record = { sessionId, gameId, score, outOf, durationSeconds, metrics };
+
+    const storageKey = `pfi-game-best:${gameId}`;
+    let nextBest = score;
+    try {
+      const previous = Number(window.localStorage.getItem(storageKey));
+      nextBest = Number.isFinite(previous) && previous > score ? previous : score;
+      window.localStorage.setItem(storageKey, String(nextBest));
+    } catch {
+      // Private browsing can refuse storage. The result still displays.
+    }
+    setBest(nextBest);
+
+    const record = {
+      sessionId: window.crypto?.randomUUID?.() ?? `${gameId}-${Date.now()}`,
+      gameId,
+      score,
+      outOf,
+      durationSeconds,
+      metrics: JSON.parse(metricsKey) as Record<string, MetricValue>,
+    };
     const historyKey = "pfi-game-history";
     try {
-      const history = JSON.parse(window.localStorage.getItem(historyKey) || "[]") as unknown[];
+      const stored = JSON.parse(window.localStorage.getItem(historyKey) || "[]");
+      const history = Array.isArray(stored) ? stored : [];
       window.localStorage.setItem(
         historyKey,
         JSON.stringify([{ ...record, completedAt: new Date().toISOString() }, ...history].slice(0, 30))
       );
     } catch {
-      window.localStorage.setItem(
-        historyKey,
-        JSON.stringify([{ ...record, completedAt: new Date().toISOString() }])
-      );
+      try {
+        window.localStorage.setItem(
+          historyKey,
+          JSON.stringify([{ ...record, completedAt: new Date().toISOString() }])
+        );
+      } catch {
+        // Nothing further to do without storage.
+      }
     }
     void fetch("/api/games", {
       method: "POST",
@@ -311,74 +352,7 @@ export function ResultPanel({
       body: JSON.stringify(record),
       keepalive: true,
     }).catch(() => undefined);
-  }, [durationSeconds, gameId, metrics, outOf, score]);
-
-  const copyResult = useCallback(async () => {
-    try {
-      await navigator.clipboard?.writeText(`${shareText} ${shareUrl}`);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
-    } catch {
-      setCopied(false);
-    }
-  }, [shareText, shareUrl]);
-
-  async function nativeShare() {
-    if (sharing) return;
-    setSharing(true);
-    try {
-      const canvas = await buildScoreCanvas({
-        gameId,
-        game,
-        score,
-        outOf,
-        badge,
-        message,
-        durationSeconds,
-        metrics,
-      });
-      const blob = await canvasToBlob(canvas);
-      const file = new File([blob], `${gameId}-paper-iq.png`, { type: "image/png" });
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ title: `${game} result`, text: shareText, url: shareUrl, files: [file] });
-      } else if (navigator.share) {
-        await navigator.share({ title: `${game} result`, text: shareText, url: shareUrl });
-      } else {
-        await copyResult();
-        const link = document.createElement("a");
-        link.download = `${gameId}-paper-iq.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      }
-    } catch (error) {
-      if (!(error instanceof DOMException && error.name === "AbortError")) await copyResult();
-    } finally {
-      setSharing(false);
-    }
-  }
-
-  async function downloadCard() {
-    const canvas = await buildScoreCanvas({
-      gameId,
-      game,
-      score,
-      outOf,
-      badge,
-      message,
-      durationSeconds,
-      metrics,
-    });
-    const link = document.createElement("a");
-    link.download = `${gameId}-paper-iq.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  }
-
-  const social = {
-    linkedIn: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
-    whatsApp: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`,
-    x: `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-  };
+  }, [durationSeconds, gameId, metricsKey, outOf, score]);
 
   return (
     <motion.section
@@ -394,7 +368,7 @@ export function ResultPanel({
         <div className="game-result-mark" aria-hidden="true">
           {scoreArtwork ?? <GameMark gameId={gameId} animate={false} />}
         </div>
-        <p className="game-kicker">Your Paper IQ result</p>
+        <p className="game-kicker">{resultLabel}</p>
         <h1>
           {score}
           <span> / {outOf}</span>
@@ -426,30 +400,24 @@ export function ResultPanel({
 
         <div className="game-result-extra">{children}</div>
 
-        <div className="game-share-row">
-          <button onClick={nativeShare} disabled={sharing}>
-            <Share2 size={16} /> {sharing ? "Preparing…" : "Share image + caption"}
-          </button>
-          <button onClick={downloadCard}>
-            <Download size={16} /> Download PNG
-          </button>
-          <button onClick={copyResult}>
-            <Copy size={16} /> {copied ? "Copied" : "Copy caption + link"}
-          </button>
-          <a href={social.linkedIn} target="_blank" rel="noreferrer" aria-label="Share result link on LinkedIn">
-            LinkedIn <ExternalLink size={13} />
-          </a>
-          <a href={social.x} target="_blank" rel="noreferrer" aria-label="Share result link on X">
-            X <ExternalLink size={13} />
-          </a>
-          <a href={social.whatsApp} target="_blank" rel="noreferrer" aria-label="Share result link on WhatsApp">
-            WhatsApp <ExternalLink size={13} />
-          </a>
-        </div>
+        <ShareRow
+          subject={{
+            title: `${game} result`,
+            summary: message,
+            url: shareUrl,
+            tags: definition.shareTags,
+            scoreLine: `I scored ${score}/${outOf} in ${game} and earned “${badge}” from Paper Foundation India. Can you beat my Paper IQ?`,
+          }}
+          buildImage={() =>
+            buildScoreCanvas({ gameId, game, score, outOf, badge, message, durationSeconds, metrics })
+          }
+          imageName={`${gameId}-paper-iq.png`}
+          className="game-result-share"
+        />
 
         <div className="game-result-actions">
           <button onClick={onReplay} className="game-primary-button">
-            <RotateCcw size={16} /> Play a new round
+            <RotateCcw size={16} /> {replayLabel}
           </button>
           <Link href="/games" className="game-secondary-button">
             Explore all games
@@ -555,18 +523,29 @@ async function buildScoreCanvas(options: CanvasOptions) {
 
   ctx.fillStyle = theme.accent;
   ctx.font = "600 25px Arial";
-  ctx.letterSpacing = "3px";
+  const supportsLetterSpacing = "letterSpacing" in ctx;
+  if (supportsLetterSpacing) ctx.letterSpacing = "3px";
   ctx.fillText("PAPER FOUNDATION INDIA  /  GAME RESULT", 118, 148);
-  ctx.letterSpacing = "0px";
+  if (supportsLetterSpacing) ctx.letterSpacing = "0px";
   ctx.fillStyle = theme.ink;
   ctx.font = "600 72px Georgia";
   ctx.fillText(options.game, 118, 268, 840);
+  // The score is drawn at a fixed size, so a four-figure total would collide
+  // with a hard-coded divider. The divider is placed after the measured width,
+  // and the score shrinks if it would otherwise run under the artwork.
+  const scoreText = String(options.score);
+  let scoreSize = 218;
+  ctx.font = `700 ${scoreSize}px Georgia`;
+  while (ctx.measureText(scoreText).width > 430 && scoreSize > 120) {
+    scoreSize -= 10;
+    ctx.font = `700 ${scoreSize}px Georgia`;
+  }
+  const scoreWidth = ctx.measureText(scoreText).width;
   ctx.fillStyle = theme.accent;
-  ctx.font = "700 218px Georgia";
-  ctx.fillText(String(options.score), 112, 555);
+  ctx.fillText(scoreText, 112, 555);
   ctx.fillStyle = theme.ink;
   ctx.font = "500 50px Arial";
-  ctx.fillText(`/ ${options.outOf}`, 490, 545);
+  ctx.fillText(`/ ${options.outOf}`, 112 + scoreWidth + 26, 545);
   ctx.font = "700 50px Georgia";
   ctx.fillText(options.badge, 118, 672, 820);
   ctx.font = "400 30px Arial";
@@ -579,7 +558,8 @@ async function buildScoreCanvas(options: CanvasOptions) {
   ctx.stroke();
   ctx.fillStyle = theme.accent;
   ctx.font = "600 24px Arial";
-  ctx.fillText(`${Math.round((options.score / options.outOf) * 100)}%  ·  ${formatTime(options.durationSeconds)}`, 118, 953);
+  const canvasPercent = options.outOf > 0 ? Math.round((options.score / options.outOf) * 100) : 0;
+  ctx.fillText(`${canvasPercent}%  ·  ${formatTime(options.durationSeconds)}`, 118, 953);
   ctx.fillStyle = theme.ink;
   ctx.textAlign = "right";
   ctx.fillText("paperfoundation.in", 962, 953);
@@ -648,12 +628,6 @@ async function drawLogo(ctx: CanvasRenderingContext2D) {
     ctx.drawImage(image, 882, 104, 72, 72);
     ctx.restore();
   }
-}
-
-function canvasToBlob(canvas: HTMLCanvasElement) {
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Could not create scorecard image."))), "image/png");
-  });
 }
 
 function wrapCanvasText(

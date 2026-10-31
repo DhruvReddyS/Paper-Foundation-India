@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, ChevronDown, ChevronUp, Edit3, FilePlus2, RefreshCw, Search, Trash2 } from "lucide-react";
+import { BarChart3, ChevronDown, ChevronUp, Edit3, FilePlus2, RefreshCw, Search, Trash2 } from "@/components/paper-ui/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ArticleEditor from "./ArticleEditor";

@@ -1,4 +1,4 @@
-import { ArrowLeft, BarChart3, FileCheck2, LayoutDashboard, ShieldCheck } from "lucide-react";
+import { ArrowLeft, BarChart3, FileCheck2, LayoutDashboard, ShieldCheck } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { AdminLoginAction } from "@/components/admin/AdminLoginAction";

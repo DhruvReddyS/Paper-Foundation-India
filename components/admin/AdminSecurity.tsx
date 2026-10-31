@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Download, KeyRound, RefreshCw, ShieldCheck } from "lucide-react";
+import { Check, Copy, Download, KeyRound, RefreshCw, ShieldCheck } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useAdminAccess } from "./AdminShell";

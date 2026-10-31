@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, BookOpenCheck, CheckCircle2, Clock3, Database, Gamepad2, Inbox, LayoutDashboard, Lightbulb, MailPlus, RefreshCw, Target, TrendingUp, Users } from "lucide-react";
+import { ArrowUpRight, BookOpenCheck, CheckCircle2, Clock3, Database, Gamepad2, Inbox, LayoutDashboard, Lightbulb, MailPlus, RefreshCw, Target, TrendingUp, Users } from "@/components/paper-ui/icons";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 

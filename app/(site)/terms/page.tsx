@@ -1,8 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import styles from "../legal.module.css";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Website Terms", description: "Terms governing use of the Paper Foundation India website and educational material." };
+export const metadata = pageMetadata({
+  title: "Website Terms",
+  description:
+    "The terms governing use of the Paper Foundation India website, its educational material and its public submission desks.",
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return <article className={styles.legal}><header><p>WEBSITE USE</p><h1>Terms of use</h1><span>Effective 7 October 2026</span></header><div className={styles.body}>

@@ -10,8 +10,11 @@
     "seed": "tsx scripts/seed.ts",
     "cms:check": "tsx scripts/check-cms.ts",
     "test": "tsx --test tests/**/*.test.ts",
-    "verify": "npm run lint && npm run test && npm run build",
-    "bundle:godaddy": "node scripts/package-godaddy.mjs"
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "bundle:godaddy": "node scripts/package-godaddy.mjs",
+    "preflight": "tsx scripts/preflight.ts",
+    "typecheck": "tsc --noEmit",
+    "verify:deploy": "npm run verify && npm run preflight && npm run cms:check"
   },
   "engines": {
     "node": "22.x",
@@ -23,9 +26,8 @@
     "@tiptap/starter-kit": "^3.31.4",
     "bcryptjs": "^3.0.3",
     "framer-motion": "^11.0.0",
-    "lucide-react": "^1.27.0",
     "mongoose": "^8.24.1",
-    "next": "^15.5.24",
+    "next": "^15.5.28",
     "next-auth": "^4.24.15",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
@@ -33,7 +35,7 @@
     "recharts": "^2.10.0",
     "sharp": "^0.35.5",
     "three": "^0.184.0",
-    "zod": "^3.22.0"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

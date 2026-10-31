@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Factory, MapPin, Recycle, Trees } from "lucide-react";
+import { ArrowRight, Factory, MapPin, Recycle, Trees } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";

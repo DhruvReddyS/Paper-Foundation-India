@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowRight, CheckCircle2, ExternalLink, Recycle } from "lucide-react";
+import { ArrowDown, ArrowRight, CheckCircle2, ExternalLink, Recycle } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, type CSSProperties } from "react";

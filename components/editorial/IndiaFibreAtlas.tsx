@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Boxes, Factory, FileCheck2, MapPinned, Recycle, Search, Trees } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Boxes, Factory, FileCheck2, MapPinned, Recycle, Search, Trees } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";

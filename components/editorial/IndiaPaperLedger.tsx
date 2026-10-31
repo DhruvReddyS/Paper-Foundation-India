@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowUpRight, BriefcaseBusiness, Factory, PackageOpen, Recycle, Scale, Trees, UsersRound } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BriefcaseBusiness, Factory, PackageOpen, Recycle, Scale, Trees, UsersRound } from "@/components/paper-ui/icons";
 import Link from "next/link";
 import { indiaCurrentFacts, indiaEvidenceSources, indiaReferenceFibreMix, indiaTradeCategories, indiaTradeSeries, packagingDemand } from "@/content/indiaAdvocacyData";
 import styles from "./IndiaPaperLedger.module.css";

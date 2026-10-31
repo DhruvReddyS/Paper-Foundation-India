@@ -1,8 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { Check, Clock3, RotateCcw, Sparkles } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, Clock3, RotateCcw, Sparkles } from "@/components/paper-ui/icons";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import {
   formatTime,
   GameFrame,
@@ -97,7 +96,7 @@ export default function PaperWordSearchGame() {
     const clean = [...new Set(value.map((item) => String(item).toUpperCase().replace(/[^A-Z]/g, "")).filter((item) => item.length >= 3 && item.length <= SIZE))];
     return clean.length >= 3 ? clean : WORD_BANK;
   }, [configuration]);
-  const activeWordCount = Math.min(
+  const requestedWordCount = Math.min(
     activeWordBank.length,
     Math.max(3, Number(configuration?.content?.wordCount) || WORD_COUNT)
   );
@@ -112,24 +111,24 @@ export default function PaperWordSearchGame() {
   const dragActive = useRef(false);
   const dragOrigin = useRef<{ row: number; col: number } | null>(null);
   const dragStartedFresh = useRef(false);
+  const activeWordCount = puzzle.placements.length;
 
   useEffect(() => {
     if (phase !== "play") return;
-    const timer = window.setInterval(() => {
-      setSeconds((value) => {
-        if (value >= activeLimit - 1) {
-          window.setTimeout(() => setPhase("timeout"), 0);
-          return activeLimit;
-        }
-        return value + 1;
-      });
-    }, 1000);
+    const timer = window.setInterval(() => setSeconds((value) => Math.min(activeLimit, value + 1)), 1000);
     return () => window.clearInterval(timer);
   }, [activeLimit, phase]);
 
   useEffect(() => {
-    if (phase === "intro") setPuzzle(generatePuzzle(activeWordBank, activeWordCount));
-  }, [activeWordBank, activeWordCount, phase]);
+    if (phase === "play" && seconds >= activeLimit) {
+      playGameSound("complete");
+      setPhase("timeout");
+    }
+  }, [activeLimit, phase, seconds]);
+
+  useEffect(() => {
+    if (phase === "intro") setPuzzle(generatePuzzle(activeWordBank, requestedWordCount));
+  }, [activeWordBank, requestedWordCount, phase]);
 
   useEffect(() => {
     const releasePointer = () => {
@@ -149,9 +148,10 @@ export default function PaperWordSearchGame() {
   const selectedCells = useMemo(
     () =>
       new Set(
-        found.flatMap((word) =>
-          placementCells(puzzle.placements.find((placement) => placement.word === word)!)
-        )
+        found.flatMap((word) => {
+          const placement = puzzle.placements.find((candidate) => candidate.word === word);
+          return placement ? placementCells(placement) : [];
+        })
       ),
     [found, puzzle.placements]
   );
@@ -246,6 +246,28 @@ export default function PaperWordSearchGame() {
     setPreviewEnd({ row, col });
   }
 
+  function trackPointer(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!dragActive.current) return;
+    const target = document.elementFromPoint(event.clientX, event.clientY);
+    const cell = target?.closest<HTMLElement>("[data-cell]")?.dataset.cell;
+    if (!cell) return;
+    const [row, col] = cell.split("-").map(Number);
+    if (Number.isFinite(row) && Number.isFinite(col)) setPreviewEnd({ row, col });
+  }
+
+  function finishPointer(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!dragActive.current) return;
+    const target = document.elementFromPoint(event.clientX, event.clientY);
+    const cell = target?.closest<HTMLElement>("[data-cell]")?.dataset.cell;
+    if (!cell) {
+      dragActive.current = false;
+      dragOrigin.current = null;
+      return;
+    }
+    const [row, col] = cell.split("-").map(Number);
+    if (Number.isFinite(row) && Number.isFinite(col)) endSelection(row, col);
+  }
+
   function endSelection(row: number, col: number) {
     if (!dragActive.current) return;
     dragActive.current = false;
@@ -257,7 +279,7 @@ export default function PaperWordSearchGame() {
   }
 
   function newRound(nextPhase: "intro" | "play" = "intro") {
-    setPuzzle(generatePuzzle(activeWordBank, activeWordCount));
+    setPuzzle(generatePuzzle(activeWordBank, requestedWordCount));
     setStart(null);
     setPreviewEnd(null);
     setFound([]);
@@ -269,6 +291,14 @@ export default function PaperWordSearchGame() {
   const score = Math.max(200, 1000 - seconds * 2);
   const badge =
     seconds <= 90 ? "Fibre-Eyed Reader" : seconds <= 180 ? "Transcript Hunter" : "Patient Papermaker";
+  // A player who runs out of time still finished a round of work, so the
+  // timeout gets the same scorecard and share tools as a completed grid.
+  const timeoutScore = activeWordCount ? Math.round((found.length / activeWordCount) * 600) : 0;
+  const timeoutBadge = found.length >= Math.ceil(activeWordCount * 0.7)
+    ? "Transcript Hunter"
+    : found.length >= Math.ceil(activeWordCount * 0.4)
+      ? "Patient Papermaker"
+      : "Apprentice Compositor";
 
   return (
     <GameFrame
@@ -311,7 +341,13 @@ export default function PaperWordSearchGame() {
           <div className="word-workbench">
             <div className="word-board-wrap">
               <div className="word-registration"><span /><span /><span /><span /></div>
-              <div className="word-board" aria-label="Paper word-search grid">
+              <div
+                className="word-board"
+                aria-label="Paper word-search grid"
+                onPointerMove={trackPointer}
+                onPointerUp={finishPointer}
+                style={{ touchAction: "none" }}
+              >
                 {puzzle.letters.map((letter, index) => {
                   const row = Math.floor(index / SIZE);
                   const col = index % SIZE;
@@ -320,6 +356,8 @@ export default function PaperWordSearchGame() {
                   return (
                     <button
                       key={key}
+                      data-cell={key}
+                      type="button"
                       onPointerDown={() => beginSelection(row, col)}
                       onPointerEnter={() => continueSelection(row, col)}
                       onPointerUp={() => endSelection(row, col)}
@@ -368,23 +406,30 @@ export default function PaperWordSearchGame() {
         </section>
       )}
 
-      <AnimatePresence>
-        {phase === "timeout" && (
-          <motion.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="word-timeout"
-          >
-            <Clock3 />
-            <p className="game-kicker">The press stopped at 05:00</p>
-            <h1>{found.length} of {activeWordCount} words found.</h1>
-            <p>A fresh transcript is waiting. Keep the vocabulary; lose the old layout.</p>
-            <button className="game-primary-button" onClick={() => newRound("play")}>
-              Generate another grid
-            </button>
-          </motion.section>
-        )}
-      </AnimatePresence>
+      {phase === "timeout" && (
+        <ResultPanel
+          gameId="paper-word-search"
+          game="Fibre Word Search"
+          score={timeoutScore}
+          outOf={600}
+          badge={timeoutBadge}
+          resultLabel={`The press stopped at ${formatTime(activeLimit)}`}
+          replayLabel="Generate another grid"
+          message={`You found ${found.length} of ${activeWordCount} paper words before the clock ran out.`}
+          durationSeconds={seconds}
+          metrics={{ wordsFound: found.length, wordsHidden: activeWordCount, completed: false }}
+          onReplay={() => newRound("play")}
+        >
+          <div className="word-result-missed">
+            <header><Clock3 /><span>Words still hidden</span></header>
+            <ul>
+              {puzzle.placements
+                .filter((placement) => !found.includes(placement.word))
+                .map((placement) => <li key={placement.word}>{placement.word}</li>)}
+            </ul>
+          </div>
+        </ResultPanel>
+      )}
 
       {phase === "result" && (
         <ResultPanel
@@ -395,7 +440,7 @@ export default function PaperWordSearchGame() {
           badge={badge}
           message={`You found all ${activeWordCount} paper words in ${formatTime(seconds)} on a one-of-one generated grid.`}
           durationSeconds={seconds}
-          metrics={{ wordsFound: found.length }}
+          metrics={{ wordsFound: found.length, wordsHidden: activeWordCount, completed: true }}
           onReplay={() => newRound("intro")}
         >
           <div className="word-result-proof">
@@ -410,6 +455,7 @@ export default function PaperWordSearchGame() {
 }
 
 export function generatePuzzle(wordBank: string[] = WORD_BANK, wordCount: number = WORD_COUNT): Puzzle {
+  let best: Puzzle = { letters: [], placements: [] };
   for (let puzzleAttempt = 0; puzzleAttempt < 30; puzzleAttempt += 1) {
     const words = shuffleItems(wordBank)
       .slice(0, wordCount)
@@ -442,13 +488,17 @@ export function generatePuzzle(wordBank: string[] = WORD_BANK, wordCount: number
       if (!placed) break;
     }
 
-    if (placements.length === wordCount) {
-      return {
-        placements: shuffleItems(placements),
-        letters: grid.map((letter) => letter ?? FILLER[Math.floor(Math.random() * FILLER.length)]),
-      };
-    }
+    const fill = (): Puzzle => ({
+      placements: shuffleItems(placements),
+      letters: grid.map((letter) => letter ?? FILLER[Math.floor(Math.random() * FILLER.length)]),
+    });
+
+    if (placements.length === wordCount) return fill();
+    // Remember the densest attempt. A bank of long or awkward words may never
+    // fit the requested count in a 12x12 grid, and throwing would blank the
+    // page instead of handing the player a slightly smaller puzzle.
+    if (placements.length > best.placements.length) best = fill();
   }
 
-  throw new Error("Could not generate a complete word-search puzzle.");
+  return best;
 }

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { ArrowLeft, ArrowRight, ExternalLink, FileCheck2, MapPin, Recycle, ScanSearch } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, FileCheck2, MapPin, Recycle, ScanSearch } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPaperEverywhereObject, paperEverywhereObjects } from "@/content/paperEverywhere";
+import StructuredData from "@/components/site/StructuredData";
+import { articleSchema, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import styles from "./PaperObject.module.css";
 
 export function generateStaticParams() {
@@ -13,10 +15,14 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const item = getPaperEverywhereObject(slug);
-  return item ? {
+  if (!item) return { title: "Object not found", robots: { index: false, follow: true } };
+  return pageMetadata({
     title: `${item.title} | Paper Everywhere`,
     description: item.thesis,
-  } : {};
+    path: `/everyday-paper/${item.slug}`,
+    image: item.image,
+    type: "article",
+  });
 }
 
 export default async function PaperObjectPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -30,6 +36,22 @@ export default async function PaperObjectPage({ params }: { params: Promise<{ sl
 
   return (
     <main className={styles.page}>
+      <StructuredData
+        schema={[
+          articleSchema({
+            title: item.title,
+            description: item.thesis,
+            path: `/everyday-paper/${item.slug}`,
+            image: item.image,
+            section: item.category,
+          }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Everyday Paper", path: "/everyday-paper" },
+            { name: item.title, path: `/everyday-paper/${item.slug}` },
+          ]),
+        ]}
+      />
       <header className={styles.topbar}>
         <Link href="/everyday-paper"><ArrowLeft /> All object files</Link>
         <span>Paper Everywhere / {item.number} of {paperEverywhereObjects.length.toString().padStart(2, "0")}</span>

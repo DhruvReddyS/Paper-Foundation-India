@@ -730,3 +730,263 @@
     transform: none !important;
   }
 }
+
+/* ===========================================================================
+   Misfiled sheet (404)
+   A reader who lands here wants a route back in, so the page is built as an
+   index card rather than an apology.
+   ========================================================================= */
+.misfiled {
+  min-height: 72vh;
+  display: grid;
+  align-items: center;
+  padding: clamp(3rem, 9vh, 7rem) clamp(1.1rem, 5vw, 3rem);
+  color: #1d2c22;
+  background: #ece3d2;
+}
+
+.misfiled-standalone { min-height: 100vh; }
+
+.misfiled-shell {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+  padding: clamp(1.6rem, 4vw, 3.2rem);
+  border: 2px solid rgba(29, 44, 34, .32);
+  background:
+    repeating-linear-gradient(180deg, transparent 0 18px, rgba(29, 44, 34, .035) 18px 19px),
+    #f2ebdd;
+}
+
+.misfiled-stamp {
+  display: inline-block;
+  margin-bottom: 1.4rem;
+  padding: .4rem .7rem;
+  border: 2px solid #9d6746;
+  color: #9d6746;
+  font: 650 .68rem/1 var(--font-mono);
+  letter-spacing: .16em;
+  transform: rotate(-1.4deg);
+}
+
+.misfiled-head h1 {
+  margin: 0 0 1.1rem;
+  font: 600 clamp(2.9rem, 8vw, 5.4rem)/.92 var(--font-serif);
+  letter-spacing: -.035em;
+}
+
+.misfiled-head h1 em {
+  display: block;
+  color: #2d6842;
+  font-style: italic;
+}
+
+.misfiled-deck {
+  max-width: 54ch;
+  color: #5d675c;
+  font-size: clamp(.95rem, 1.6vw, 1.1rem);
+  line-height: 1.6;
+}
+
+.misfiled-index {
+  margin-top: clamp(2rem, 5vw, 3.2rem);
+  padding-top: 1.4rem;
+  border-top: 1px solid rgba(29, 44, 34, .28);
+}
+
+.misfiled-index-label {
+  margin-bottom: 1rem;
+  color: #8b7a5f;
+  font: 650 .62rem/1 var(--font-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.misfiled-index ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  gap: 0;
+  list-style: none;
+}
+
+.misfiled-index li { border-top: 1px solid rgba(29, 44, 34, .16); }
+
+.misfiled-index a {
+  display: grid;
+  grid-template-columns: 2.2rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: .2rem .7rem;
+  padding: .95rem .6rem .95rem 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.misfiled-index a:hover { background: rgba(45, 104, 66, .07); }
+.misfiled-index a:hover strong { color: #2d6842; }
+
+.misfiled-index b {
+  grid-row: span 2;
+  color: #9d6746;
+  font: 650 .72rem/1.6 var(--font-mono);
+}
+
+.misfiled-index strong { font-size: 1.04rem; font-weight: 600; }
+.misfiled-index small { color: #6d7569; font-size: .78rem; line-height: 1.45; }
+
+.misfiled-foot {
+  margin-top: clamp(1.8rem, 4vw, 2.6rem);
+  padding-top: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid rgba(29, 44, 34, .28);
+}
+
+.misfiled-home {
+  padding: .72rem 1.1rem;
+  color: #f2ebdd;
+  background: #2d6842;
+  font: 600 .82rem/1 var(--font-sans);
+  text-decoration: none;
+}
+
+.misfiled-home:hover { background: #1d4c2e; }
+
+.misfiled-foot span {
+  color: #8b7a5f;
+  font: 650 .62rem/1 var(--font-mono);
+  letter-spacing: .13em;
+}
+
+/* A draft must look like a draft. This sits above the reading framework on any
+   article whose finished text has not been published. */
+.article-draft-notice {
+  width: min(760px, calc(100% - 2.4rem));
+  margin: 1.6rem auto 0;
+  padding: 1.15rem 1.35rem;
+  border: 1px solid rgba(157, 103, 70, .5);
+  border-left: 4px solid #9d6746;
+  background: rgba(241, 231, 216, .72);
+}
+
+.article-draft-notice > p:first-child {
+  margin-bottom: .45rem;
+  color: #9d6746;
+  font: 650 .64rem/1 var(--font-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.article-draft-notice h2 {
+  margin: 0 0 .5rem;
+  font: 600 1.18rem/1.3 var(--font-serif);
+  letter-spacing: -.01em;
+}
+
+.article-draft-notice > p:last-child {
+  color: #5d675c;
+  font-size: .88rem;
+  line-height: 1.6;
+}
+
+/* ===========================================================================
+   Share row
+   One component serves a game result and an article, so the styling is
+   neutral and inherits its colour from whatever surface it sits on.
+   ========================================================================= */
+.share-row { display: grid; gap: .7rem; }
+
+.share-row-primary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+}
+
+.share-row-primary button {
+  display: inline-flex;
+  align-items: center;
+  gap: .42rem;
+  padding: .66rem .9rem;
+  border: 1px solid currentColor;
+  color: inherit;
+  background: transparent;
+  font: 600 .74rem/1 var(--font-sans);
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+}
+
+.share-row-primary button:hover:not(:disabled) {
+  color: #f4efe4;
+  background: #2d6842;
+  border-color: #2d6842;
+}
+
+.share-row-primary .share-primary {
+  color: #f4efe4;
+  background: #2d6842;
+  border-color: #2d6842;
+}
+
+.share-row-primary .share-primary:hover:not(:disabled) {
+  background: #1d4c2e;
+  border-color: #1d4c2e;
+}
+
+.share-row-primary button:disabled { cursor: progress; opacity: .6; }
+
+.share-row-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.share-row-platforms a,
+.share-row-platforms button {
+  display: inline-flex;
+  align-items: center;
+  padding: .42rem .62rem;
+  border: 1px solid rgba(128, 128, 128, .42);
+  color: inherit;
+  background: transparent;
+  font: 600 .64rem/1 var(--font-mono);
+  letter-spacing: .05em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .18s ease, color .18s ease;
+}
+
+.share-row-platforms a:hover,
+.share-row-platforms button:hover:not(:disabled) {
+  border-color: currentColor;
+  color: #2d6842;
+}
+
+.share-row-note {
+  min-height: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  color: #2d6842;
+  font: 600 .68rem/1.3 var(--font-sans);
+}
+
+/* On a game result the row sits on a dark panel. */
+.game-result-control-panel .share-row-note { color: inherit; }
+.game-result-control-panel .share-row-platforms a:hover,
+.game-result-control-panel .share-row-platforms button:hover:not(:disabled) { color: inherit; opacity: .78; }
+
+.article-share-row {
+  width: min(760px, calc(100% - 2.4rem));
+  margin: 1.1rem auto 0;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(29, 44, 34, .2);
+}
+
+@media (max-width: 560px) {
+  .share-row-primary button { flex: 1 1 100%; justify-content: center; }
+}

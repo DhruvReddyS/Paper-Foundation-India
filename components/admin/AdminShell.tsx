@@ -4,7 +4,7 @@ import {
   BarChart3, BookOpen, Boxes, ChevronLeft, FileText, FolderOpen,
   ClipboardCheck, Gamepad2, History, Image as ImageIcon, Inbox, LayoutDashboard, Menu, Search, Settings,
   Users, UserCog, X, LogOut, MailPlus, ShieldCheck,
-} from "lucide-react";
+} from "@/components/paper-ui/icons";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

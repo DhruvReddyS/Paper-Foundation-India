@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, BookOpen, Gamepad2, Leaf, LockKeyhole, MapPinned } from "lucide-react";
+import { ArrowUpRight, BookOpen, Gamepad2, Leaf, LockKeyhole, MapPinned } from "@/components/paper-ui/icons";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./Footer.module.css";

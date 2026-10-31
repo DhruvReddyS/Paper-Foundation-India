@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, ChevronUp, Edit3, Gamepad2, RefreshCw, Save, X } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Edit3, Gamepad2, RefreshCw, Save, X } from "@/components/paper-ui/icons";
 import { useCallback, useEffect, useState } from "react";
 import { useAdminAccess } from "./AdminShell";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Building2, Flag, Mail, Users } from "lucide-react";
+import { ArrowRight, Building2, Flag, Mail, Users } from "@/components/paper-ui/icons";
 import Link from "next/link";
 import styles from "./CommunityDesk.module.css";
 

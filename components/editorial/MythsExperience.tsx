@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Check, ExternalLink, Gamepad2, Search, ScanSearch, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ExternalLink, Gamepad2, Search, ScanSearch, Sparkles } from "@/components/paper-ui/icons";
 import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties, type PointerEvent } from "react";
 import handbookCards from "@/content/mythCatalog.json";
@@ -31,7 +31,9 @@ export default function MythsExperience({ initialSearch = "" }: { initialSearch?
         myth: String(item.claim),
         reality: String(item.correction),
         indiaContext: String(item.explanation),
-        evidence: Array.isArray(item.sources) ? item.sources.map(source => String((source as { label?: string }).label || "")).filter(Boolean).join(", ") : "Source record available",
+        evidence: (Array.isArray(item.sources)
+          ? item.sources.map(source => String((source as { label?: string }).label || "")).filter(Boolean).join(", ")
+          : "") || "Source citation pending editorial review",
         category: String(item.category || "Paper systems"),
         number: index + 1,
       }));
