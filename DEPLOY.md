@@ -36,8 +36,9 @@ campaigns are the only feature that waits on the scheduler.
 
 ## 2. Where to host it
 
-**Recommended: Vercel, with GoDaddy staying the registrar.** You keep the
-domain where it is and point DNS. Nothing is transferred.
+**Decided: Vercel, with GoDaddy staying the registrar.** You keep the domain
+where it is and point DNS. Nothing is transferred. The repository is set up
+for this: `vercel.json` is committed and the build needs no network.
 
 Vercel's free Hobby tier genuinely fits this site:
 
@@ -105,15 +106,24 @@ healthy while everything behind them is dead.
    the default region is in the United States, which adds a round trip to every
    server-rendered page.
 
-5. **Add the cron job.** Vercel ignores `server.mjs`, so the campaign worker
-   will not run unless you declare it. Create `vercel.json`:
+5. **The cron job is already configured.** `vercel.json` is in the repository
+   and declares it, because Vercel ignores `server.mjs` and with it the
+   60-second campaign timer that runs everywhere else:
 
    ```json
    { "crons": [{ "path": "/api/cron/campaigns", "schedule": "0 3 * * *" }] }
    ```
 
-   On Hobby, once a day is the maximum and a more frequent expression fails at
-   deploy time. On Pro you can go down to once a minute.
+   That is 03:00 UTC, about 08:30 in India. Once a day is the Hobby maximum,
+   and a more frequent expression fails at deploy time; Pro goes down to once
+   a minute.
+
+   You do not need to change the endpoint. Vercel sends the value of
+   `CRON_SECRET` as an `Authorization: Bearer …` header, which is exactly what
+   `/api/cron/campaigns` already checks, so setting that variable is the whole
+   of the setup. The route caps itself at 60 seconds; if a very large campaign
+   is cut off, database locking means the next run picks up where it stopped
+   rather than sending anything twice.
 
 6. **Connect the domain**: Vercel → Settings → Domains → add
    `paperfoundation.in`, then add the records it gives you in GoDaddy's DNS
