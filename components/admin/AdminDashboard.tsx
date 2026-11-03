@@ -2,24 +2,32 @@
 
 import { ArrowUpRight, BookOpenCheck, CheckCircle2, Clock3, Database, Gamepad2, Inbox, LayoutDashboard, Lightbulb, MailPlus, RefreshCw, Target, TrendingUp, Users } from "@/components/paper-ui/icons";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import type { OverviewReport } from "@/lib/overview-report";
 
-type Overview = {
-  configured: boolean;
-  preview?: boolean;
-  counts: { articles?: Record<string, number>; myths?: Record<string, number>; openInquiries?: number; subscribers?: number };
-  topArticles: { _id: string; views: number; completions: number; averageDuration: number }[];
-  games: { _id: string; plays: number; averageScore: number; averageDuration: number }[];
-  recentInquiries: { _id: string; name: string; type: string; subject: string; status: string; createdAt: string }[];
-};
 
-const empty: Overview = { configured: false, counts: {}, topArticles: [], games: [], recentInquiries: [] };
-
-export default function AdminDashboard() {
-  const [data, setData] = useState<Overview>(empty);
-  const [loading, setLoading] = useState(true);
-  const load = useCallback(async () => { setLoading(true); const response = await fetch("/api/admin/overview"); setData(await response.json()); setLoading(false); }, []);
-  useEffect(() => { void load(); }, [load]);
+export default function AdminDashboard({ initial }: { initial: OverviewReport }) {
+  // The first view arrives rendered from the server, so this never shows a
+  // confident zero for a figure it has not actually loaded. Refresh keeps the
+  // previous figures if it fails, rather than resetting them to nothing.
+  const [data, setData] = useState<OverviewReport>(initial);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/admin/overview");
+      if (!response.ok) throw new Error(`The server answered ${response.status}.`);
+      const report = (await response.json()) as OverviewReport;
+      if (!report?.counts) throw new Error("The reply did not contain a summary.");
+      setData(report);
+      setError("");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "The summary could not be refreshed.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
   const published = data.counts.articles?.published ?? 0;
   const drafts = (data.counts.articles?.draft ?? 0) + (data.counts.articles?.review ?? 0);
   const views = data.topArticles.reduce((sum, item) => sum + item.views, 0);
@@ -29,7 +37,8 @@ export default function AdminDashboard() {
   const gameScore = data.games.length ? Math.round(data.games.reduce((sum, game) => sum + game.averageScore, 0) / data.games.length) : 0;
   const day = new Intl.DateTimeFormat("en-IN", { weekday: "long" }).format(new Date());
   return <div className="admin-dashboard">
-    <header className="admin-page-heading"><div><p>{day} editorial briefing</p><h1>Good morning.<br /><em>Here is what matters now.</em></h1></div><div><button onClick={() => void load()}><RefreshCw className={loading ? "is-spinning" : ""} /> Refresh</button><Link href="/admin/articles">Create article <ArrowUpRight /></Link></div></header>
+    <header className="admin-page-heading"><div><p>{day} editorial briefing</p><h1>Good morning.<br /><em>Here is what matters now.</em></h1></div><div><button disabled={loading} onClick={() => void load()}><RefreshCw className={loading ? "is-spinning" : ""} /> Refresh</button><Link href="/admin/articles">Create article <ArrowUpRight /></Link></div></header>
+    {error && <p className="admin-analytics-error" role="alert">{error} The figures below are from the last successful load.</p>}
     {!data.configured && <div className="admin-setup-banner"><Database /><div><strong>Demonstration insights are active</strong><p>Explore every dashboard state now. Connect MongoDB when you want content, correspondence and analytics to persist.</p></div><span className="admin-preview-badge">DEMO DATA</span><Link href="/admin/settings">Setup centre</Link></div>}
     <section className="admin-stat-grid">
       <article><span><BookOpenCheck /> Published articles</span><strong>{published}</strong><small>{drafts} waiting in the editorial queue</small></article>
