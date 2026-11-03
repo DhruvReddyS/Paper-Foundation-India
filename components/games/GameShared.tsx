@@ -1001,8 +1001,34 @@ function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accen
       { from: [2, 1], to: [5, 4] },   // MILL, diagonal
     ];
     const struck = Math.round(share * solved.length);
-    const cx = (col: number) => 700 + col * 52;
-    const cy = (row: number) => 336 + row * 56;
+    // Sized to sit between the score and the sheet's right margin.
+    const cellW = 47;
+    const cellH = 56;
+    const gridLeft = 692;
+    const gridTop = 298;
+    const cx = (col: number) => gridLeft + col * cellW + 15;
+    const cy = (row: number) => gridTop + row * cellH + 38;
+
+    // The whole grid should read, not only the words that were found, so the
+    // unfound letters are muted rather than nearly invisible, and the cells
+    // are ruled so it is legible as a grid.
+    ctx.strokeStyle = `${deep}1f`;
+    ctx.lineWidth = 1.5;
+    for (let col = 0; col <= 6; col += 1) {
+      ctx.beginPath();
+      ctx.moveTo(gridLeft + col * cellW, gridTop);
+      ctx.lineTo(gridLeft + col * cellW, gridTop + 6 * cellH);
+      ctx.stroke();
+    }
+    for (let row = 0; row <= 6; row += 1) {
+      ctx.beginPath();
+      ctx.moveTo(gridLeft, gridTop + row * cellH);
+      ctx.lineTo(gridLeft + 6 * cellW, gridTop + row * cellH);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = `${deep}44`;
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(gridLeft, gridTop, 6 * cellW, 6 * cellH);
 
     ctx.font = `600 27px ${MONO}`;
     for (let row = 0; row < 6; row += 1) {
@@ -1016,7 +1042,7 @@ function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accen
           }
           return false;
         });
-        ctx.fillStyle = inSolved ? deep : `${deep}38`;
+        ctx.fillStyle = inSolved ? deep : `${deep}8c`;
         ctx.fillText(rows[row][col], cx(col), cy(row));
       }
     }
@@ -1027,8 +1053,8 @@ function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accen
     for (const { from, to } of solved.slice(0, struck)) {
       // Extend along the run's own direction. Offsetting both ends in x left
       // the vertical strike sitting beside its letters instead of over them.
-      const ax = cx(from[0]) + 9, ay = cy(from[1]) - 9;
-      const bx = cx(to[0]) + 9, by = cy(to[1]) - 9;
+      const ax = cx(from[0]) + 8, ay = cy(from[1]) - 9;
+      const bx = cx(to[0]) + 8, by = cy(to[1]) - 9;
       const span = Math.hypot(bx - ax, by - ay) || 1;
       const ux = (bx - ax) / span, uy = (by - ay) / span;
       ctx.beginPath();
