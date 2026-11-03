@@ -214,7 +214,13 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
       const baseX = width * .5;
       const baseY = height * .9;
       const scale = Math.min(width / 430, height / 475);
-      const depth = Math.max(1, Math.min(6, correct + 1));
+      // Derived from the share of answers got right, not a raw count, so the
+      // canopy reaches its fullest at a perfect round whatever the round
+      // length is. This was capped at six while the round asks eight
+      // questions, so the last two correct answers changed nothing.
+      const answered = Math.max(1, correct + wrong);
+      const correctRatio = Math.max(0, Math.min(1, correct / answered));
+      const depth = Math.max(1, Math.round(1 + correctRatio * 6));
 
       const sky = context.createLinearGradient(0, 0, 0, height);
       sky.addColorStop(0, "rgba(222,232,213,.88)");
@@ -341,9 +347,32 @@ function TreeVisual({ correct, wrong, streak, compact = false }: { correct: numb
               order + 1
             );
           }
-        } else if (remaining === 0 && correct > 0 && localGrowth > .82) {
+        }
+
+        // Leaves along the limb, not only at its tip. A tree whose foliage
+        // sits entirely at the ends reads as bare twigs, and the canopy never
+        // looked full however many answers were right.
+        if (remaining <= 2 && correct > 0 && localGrowth > .6) {
+          const alongCount = Math.round((1 + correctRatio * 3) * (remaining === 0 ? 1.4 : 1));
+          for (let along = 0; along < alongCount; along += 1) {
+            const t = .32 + (along + random() * .6) / (alongCount + .6) * .62;
+            const px = x + (endX - x) * t + bend * .22 * Math.sin(t * Math.PI);
+            const py = y + (endY - y) * t;
+            const spin = finalAngle + (random() - .5) * 1.5;
+            leaf(
+              px + Math.cos(spin) * 5 * scale,
+              py + Math.sin(spin) * 4 * scale,
+              spin,
+              (.34 + random() * .3) * scale,
+              order * 5 + along,
+              Math.min(1, (localGrowth - .6) * 3.2) * .9
+            );
+          }
+        }
+
+        if (remaining === 0 && correct > 0 && localGrowth > .82) {
           terminalIndex += 1;
-          const foliage = 3 + correct + (streak >= 3 ? 2 : 0);
+          const foliage = 3 + Math.round(correctRatio * 10) + (streak >= 3 ? 2 : 0);
           for (let item = 0; item < foliage; item += 1) {
             const theta = random() * Math.PI * 2;
             const radius = (8 + random() * 24) * scale;

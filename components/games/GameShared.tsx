@@ -18,7 +18,20 @@ import { isGameSoundEnabled, setGameSoundEnabled } from "./gameAudio";
 // A shared result should always point at the live site, never at whatever
 // host the page happens to be served from. This reads the same configured
 // origin the SEO layer uses, so the domain is defined in one place.
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://paperfoundation.in").replace(/\/$/, "");
+/**
+ * The address a shared card sends people to.
+ *
+ * NEXT_PUBLIC_SITE_URL is inlined when the bundle is built, so a build made
+ * on a machine that has .env.local would otherwise ship share links pointing
+ * at localhost. A share link is opened on somebody else's device by
+ * definition, so a local origin is never the right answer: fall back to the
+ * public domain rather than hand out a dead link.
+ */
+export const PUBLIC_SITE = "https://paperfoundation.in";
+const configuredSite = (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "");
+const SITE_URL = !configuredSite || /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])/i.test(configuredSite)
+  ? PUBLIC_SITE
+  : configuredSite;
 
 type MetricValue = string | number | boolean;
 
@@ -501,13 +514,87 @@ type CanvasOptions = {
   metrics: Record<string, MetricValue>;
 };
 
-const scoreThemes: Record<GameId, { background: string; panel: string; accent: string; ink: string }> = {
-  "grow-or-shred": { background: "#d8deca", panel: "#234d32", accent: "#c9a06f", ink: "#f6f1e6" },
-  "truth-press": { background: "#ead9c7", panel: "#874b35", accent: "#f0c58e", ink: "#fff8ed" },
-  "mill-master": { background: "#d7cfb4", panel: "#183e3c", accent: "#dfb85d", ink: "#f7f3df" },
-  "hidden-paper": { background: "#cad3c1", panel: "#263b31", accent: "#b9d1bd", ink: "#f5f1e8" },
-  "paper-word-search": { background: "#ddd6b8", panel: "#253a31", accent: "#dbb26c", ink: "#fff9e8" },
+/**
+ * The sheet is the same cream on every card so a shared result is instantly a
+ * Paper Foundation artefact; only the accent changes per game.
+ */
+const CARD = 1080;
+const SHEET = "#fbf7ef";
+const DESK = "#e7e0d2";
+const INK = "#1a2d21";
+const MUTED = "#6a746c";
+const SERIF = 'Fraunces, Georgia, serif';
+const SANS = '"DM Sans", Arial, sans-serif';
+const MONO = '"DM Mono", ui-monospace, monospace';
+
+const scoreThemes: Record<GameId, { accent: string; deep: string }> = {
+  "grow-or-shred": { accent: "#8c6627", deep: "#234d32" },
+  "truth-press": { accent: "#a04f2b", deep: "#7c4430" },
+  "mill-master": { accent: "#8d6a1c", deep: "#183e3c" },
+  "hidden-paper": { accent: "#4a7659", deep: "#263b31" },
+  "paper-word-search": { accent: "#8a5f24", deep: "#253a31" },
 };
+
+/**
+ * Canvas falls back to a system face without warning when a font has not been
+ * loaded at that exact size and weight, which is how this card came to be
+ * drawn in Georgia and Arial instead of the Foundation's own typefaces.
+ */
+async function ensureCardFonts() {
+  if (typeof document === "undefined" || !document.fonts) return;
+  const faces = [
+    "700 208px Fraunces", "600 68px Fraunces", "600 34px Fraunces",
+    '600 46px "DM Sans"', '500 30px "DM Sans"', '600 32px "DM Sans"',
+    '500 21px "DM Mono"', '600 21px "DM Mono"', '600 25px "DM Mono"',
+  ];
+  await Promise.all(faces.map((face) => document.fonts.load(face).catch(() => undefined)));
+}
+
+/** Laid and chain lines: the marks a mould leaves in a sheet of paper. */
+function drawSheet(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = DESK;
+  ctx.fillRect(0, 0, CARD, CARD);
+
+  ctx.save();
+  ctx.shadowColor = "rgba(42,32,17,0.3)";
+  ctx.shadowBlur = 46;
+  ctx.shadowOffsetY = 18;
+  ctx.fillStyle = SHEET;
+  ctx.fillRect(56, 52, CARD - 112, CARD - 112);
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(56, 52, CARD - 112, CARD - 112);
+  ctx.clip();
+  ctx.strokeStyle = "rgba(26,52,37,0.042)";
+  ctx.lineWidth = 1;
+  for (let y = 52; y < CARD - 60; y += 7) {
+    ctx.beginPath(); ctx.moveTo(56, y + 0.5); ctx.lineTo(CARD - 56, y + 0.5); ctx.stroke();
+  }
+  ctx.strokeStyle = "rgba(26,52,37,0.055)";
+  for (let x = 56; x < CARD - 56; x += 54) {
+    ctx.beginPath(); ctx.moveTo(x + 0.5, 52); ctx.lineTo(x + 0.5, CARD - 60); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Deckle: the soft, uneven edge of a handmade sheet.
+  ctx.fillStyle = SHEET;
+  for (let x = 56; x <= CARD - 56; x += 13) {
+    ctx.beginPath();
+    ctx.ellipse(x, CARD - 60, 7.5, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+
+/** The letterpress rule that heads a sheet of mill stationery. */
+function drawLetterpressRule(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, accent: string) {
+  ctx.fillStyle = INK;
+  ctx.fillRect(x, y, width, 3);
+  ctx.fillStyle = accent;
+  ctx.fillRect(x, y + 7, width, 1);
+}
 
 /**
  * Renders the scorecard at a point in its reveal.
@@ -515,6 +602,15 @@ const scoreThemes: Record<GameId, { background: string; panel: string; accent: s
  * `progress` runs 0 to 1: the score counts up, the badge stamps in and the
  * rule draws across. At 1 the frame is identical to the still card, so the
  * animation and the PNG cannot drift apart.
+ */
+/**
+ * The card is drawn as a mill test certificate for the sheet the player just
+ * made: a cream sheet with laid lines and a deckle edge, the Foundation's
+ * lockup and address at the head, the result set like a specimen reading, and
+ * a struck stamp for the badge.
+ *
+ * Every element is drawn at a point on `progress` so the animated share and
+ * the still PNG are the same artwork at different moments.
  */
 async function drawScoreFrame(
   ctx: CanvasRenderingContext2D,
@@ -524,93 +620,114 @@ async function drawScoreFrame(
 ) {
   const theme = scoreThemes[options.gameId];
   const eased = 1 - Math.pow(1 - Math.max(0, Math.min(1, progress)), 3);
+  const spacing = "letterSpacing" in ctx;
+  const setSpacing = (value: string) => {
+    if (spacing) (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = value;
+  };
 
-  ctx.fillStyle = theme.background;
-  ctx.fillRect(0, 0, 1080, 1080);
-  ctx.fillStyle = theme.panel;
-  ctx.fillRect(48, 48, 984, 984);
-  ctx.strokeStyle = `${theme.accent}88`;
-  ctx.lineWidth = 2;
-  ctx.strokeRect(76, 76, 928, 928);
-  drawPaperTexture(ctx, theme.ink);
-  drawGameCanvasMark(ctx, options.gameId, theme.accent, options.metrics);
+  drawSheet(ctx);
+  drawGameCanvasMark(ctx, options.gameId, theme.accent, theme.deep, options.metrics, eased, options.outOf > 0 ? Math.max(0, Math.min(1, options.score / options.outOf)) : 0);
 
-  ctx.fillStyle = theme.accent;
-  ctx.font = "600 25px Arial";
-  const supportsLetterSpacing = "letterSpacing" in ctx;
-  if (supportsLetterSpacing) ctx.letterSpacing = "3px";
-  ctx.fillText("PAPER FOUNDATION INDIA  /  GAME RESULT", 118, 148);
-  if (supportsLetterSpacing) ctx.letterSpacing = "0px";
-
-  ctx.fillStyle = theme.ink;
-  ctx.font = "600 72px Georgia";
-  ctx.fillText(options.game, 118, 268, 840);
-
-  // The score counts up rather than appearing finished.
-  const shown = Math.round(options.score * eased);
-  const scoreText = String(shown);
-  let scoreSize = 218;
-  ctx.font = `700 ${scoreSize}px Georgia`;
-  while (ctx.measureText(String(options.score)).width > 430 && scoreSize > 120) {
-    scoreSize -= 10;
-    ctx.font = `700 ${scoreSize}px Georgia`;
-  }
-  ctx.font = `700 ${scoreSize}px Georgia`;
-  const scoreWidth = ctx.measureText(scoreText).width;
-  ctx.fillStyle = theme.accent;
-  ctx.fillText(scoreText, 112, 555);
-  ctx.fillStyle = theme.ink;
-  ctx.font = "500 50px Arial";
-  ctx.fillText(`/ ${options.outOf}`, 112 + scoreWidth + 26, 545);
-
-  // The badge stamps on near the end, slightly rotated, like a real stamp.
-  if (eased > 0.55) {
-    const stampIn = Math.min(1, (eased - 0.55) / 0.35);
-    ctx.save();
-    ctx.translate(118, 672);
-    ctx.rotate((1 - stampIn) * -0.08);
-    ctx.scale(1 + (1 - stampIn) * 0.12, 1 + (1 - stampIn) * 0.12);
-    ctx.globalAlpha = stampIn;
-    ctx.fillStyle = theme.ink;
-    ctx.font = "700 50px Georgia";
-    ctx.fillText(options.badge, 0, 0, 820);
-    ctx.restore();
-    ctx.globalAlpha = 1;
-  }
-
-  if (eased > 0.7) {
-    ctx.globalAlpha = Math.min(1, (eased - 0.7) / 0.3);
-    ctx.fillStyle = theme.ink;
-    ctx.font = "400 30px Arial";
-    wrapCanvasText(ctx, options.message, 118, 732, 800, 40);
-    ctx.globalAlpha = 1;
-  }
-
-  // The footer rule draws itself across.
-  ctx.strokeStyle = `${theme.accent}77`;
-  ctx.beginPath();
-  ctx.moveTo(118, 905);
-  ctx.lineTo(118 + (962 - 118) * eased, 905);
-  ctx.stroke();
-
-  if (eased > 0.85) {
-    ctx.globalAlpha = Math.min(1, (eased - 0.85) / 0.15);
-    const canvasPercent = options.outOf > 0 ? Math.round((options.score / options.outOf) * 100) : 0;
-    ctx.fillStyle = theme.accent;
-    ctx.font = "600 24px Arial";
-    ctx.fillText(`${canvasPercent}%  ·  ${formatTime(options.durationSeconds)}`, 118, 953);
-    ctx.fillStyle = theme.ink;
-    ctx.textAlign = "right";
-    ctx.fillText("paperfoundation.in", 962, 953);
-    ctx.textAlign = "left";
-    ctx.globalAlpha = 1;
-  }
-
+  // Head: the lockup, then the address the card is advertising.
   if (logo?.naturalWidth) {
     ctx.save();
-    ctx.globalAlpha = 0.9 * eased;
-    ctx.drawImage(logo, 882, 104, 72, 72);
+    ctx.globalAlpha = Math.min(1, eased * 2.2);
+    ctx.drawImage(logo, 104, 104, 58, 68);
     ctx.restore();
+  }
+  ctx.fillStyle = INK;
+  ctx.font = `600 25px ${MONO}`;
+  setSpacing("2px");
+  ctx.fillText("PAPER FOUNDATION INDIA", 182, 133);
+  setSpacing("0px");
+  ctx.fillStyle = MUTED;
+  ctx.font = `500 23px ${SANS}`;
+  ctx.fillText("Evidence for how India really uses paper", 182, 170);
+
+  ctx.textAlign = "right";
+  ctx.fillStyle = MUTED;
+  ctx.font = `500 21px ${MONO}`;
+  setSpacing("2px");
+  ctx.fillText("CERTIFICATE OF RESULT", 976, 128);
+  ctx.fillText(`NO. ${String(Math.max(0, options.score)).padStart(4, "0")}`, 976, 162);
+  setSpacing("0px");
+  ctx.textAlign = "left";
+
+  drawLetterpressRule(ctx, 104, 206, (976 - 104) * eased, theme.accent);
+
+  // The specimen: which game, then the reading it produced.
+  ctx.fillStyle = MUTED;
+  ctx.font = `500 21px ${MONO}`;
+  setSpacing("2px");
+  ctx.fillText("SPECIMEN", 104, 268);
+  setSpacing("0px");
+
+  ctx.fillStyle = INK;
+  ctx.font = `600 68px ${SERIF}`;
+  ctx.fillText(options.game, 104, 336, 520);
+
+  const shown = Math.round(options.score * eased);
+  let scoreSize = 208;
+  ctx.font = `700 ${scoreSize}px ${SERIF}`;
+  while (ctx.measureText(String(options.score)).width > 420 && scoreSize > 110) {
+    scoreSize -= 10;
+    ctx.font = `700 ${scoreSize}px ${SERIF}`;
+  }
+  ctx.fillStyle = theme.deep;
+  ctx.fillText(String(shown), 104, 530);
+  const scoreWidth = ctx.measureText(String(shown)).width;
+  ctx.fillStyle = MUTED;
+  ctx.font = `500 46px ${SANS}`;
+  ctx.fillText(`/ ${options.outOf}`, 104 + scoreWidth + 24, 530);
+
+  // The badge is struck on near the end, like a real stamp meeting paper.
+  if (eased > 0.5) {
+    const struck = Math.min(1, (eased - 0.5) / 0.32);
+    ctx.save();
+    ctx.translate(104, 596);
+    ctx.rotate(-0.035 + (1 - struck) * 0.07);
+    ctx.scale(1 + (1 - struck) * 0.16, 1 + (1 - struck) * 0.16);
+    ctx.globalAlpha = struck * 0.92;
+    ctx.font = `600 25px ${MONO}`;
+    setSpacing("2px");
+    const label = options.badge.toUpperCase();
+    const width = Math.min(500, ctx.measureText(label).width + 48);
+    ctx.strokeStyle = theme.accent;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(0, 0, width, 62);
+    ctx.fillStyle = theme.accent;
+    ctx.fillText(label, 24, 40, width - 48);
+    setSpacing("0px");
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  if (eased > 0.68) {
+    ctx.globalAlpha = Math.min(1, (eased - 0.68) / 0.32);
+    ctx.fillStyle = INK;
+    ctx.font = `500 30px ${SANS}`;
+    wrapCanvasText(ctx, options.message, 104, 726, 500, 40);
+    ctx.globalAlpha = 1;
+  }
+
+  // Foot: the reading, and the address again so a cropped share still carries it.
+  ctx.fillStyle = `${theme.accent}66`;
+  ctx.fillRect(104, 912, (976 - 104) * eased, 1);
+
+  if (eased > 0.84) {
+    ctx.globalAlpha = Math.min(1, (eased - 0.84) / 0.16);
+    const percent = options.outOf > 0 ? Math.round((options.score / options.outOf) * 100) : 0;
+    ctx.fillStyle = MUTED;
+    ctx.font = `500 21px ${MONO}`;
+    setSpacing("1px");
+    ctx.fillText(`${percent}%  ·  ${formatTime(options.durationSeconds)}  ·  PLAY IT YOURSELF`, 104, 962);
+    setSpacing("0px");
+    ctx.textAlign = "right";
+    ctx.fillStyle = theme.deep;
+    ctx.font = `600 30px ${SANS}`;
+    ctx.fillText("paperfoundation.in", 976, 964);
+    ctx.textAlign = "left";
+    ctx.globalAlpha = 1;
   }
 }
 
@@ -651,6 +768,7 @@ export async function buildScoreAnimation(options: CanvasOptions, seconds = 3.2)
   const mimeType = candidates.find((type) => MediaRecorder.isTypeSupported?.(type));
   if (!mimeType) return null;
 
+  await ensureCardFonts();
   const logo = await loadLogo();
   const stream = canvas.captureStream(30);
   const chunks: BlobPart[] = [];
@@ -698,52 +816,199 @@ async function buildScoreCanvas(options: CanvasOptions) {
   canvas.height = 1080;
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
+  await ensureCardFonts();
   await drawScoreFrame(ctx, options, 1, await loadLogo());
   return canvas;
 }
 
-function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accent: string, metrics: Record<string, MetricValue>) {
+/**
+ * The artwork is the reason anyone looks twice at a shared card, so it is
+ * drawn large and it reflects the round that was actually played: the tree
+ * carries the leaves you earned, the mill line lights the stages you ordered,
+ * the grid strikes through the words you found.
+ *
+ * It occupies the right column, clear of the result text on the left.
+ */
+function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accent: string, deep: string, metrics: Record<string, MetricValue>, eased: number, scoreShare: number) {
+  const reveal = Math.max(0, Math.min(1, (eased - 0.18) / 0.62));
+  if (reveal <= 0) return;
   ctx.save();
-  ctx.translate(820, 320);
-  ctx.strokeStyle = `${accent}66`;
-  ctx.fillStyle = `${accent}33`;
-  ctx.lineWidth = 9;
-  if (gameId === "grow-or-shred") {
-    const growth = Math.max(1, Number(metrics.correctAnswers) || 1);
-    ctx.lineCap = "round";
-    ctx.beginPath(); ctx.moveTo(82, 230); ctx.bezierCurveTo(74, 177, 91, 112, 82, 38); ctx.stroke();
-    const limbs = [[80,178,25,124],[84,162,141,106],[81,130,41,72],[85,113,128,54],[82,88,64,32],[84,72,106,18]];
-    limbs.slice(0, growth).forEach(([x1, y1, x2, y2], index) => {
-      ctx.lineWidth = Math.max(3, 8 - index * .7);
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.quadraticCurveTo((x1+x2)/2 + (index % 2 ? 8 : -8),(y1+y2)/2, x2, y2); ctx.stroke();
-      ctx.fillStyle = accent;
-      for (let leafIndex = 0; leafIndex < 5; leafIndex += 1) {
-        ctx.beginPath();
-        ctx.ellipse(x2 + (leafIndex - 2) * 7, y2 + Math.abs(leafIndex - 2) * 3, 5, 11, (leafIndex - 2) * .35, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    });
-  } else if (gameId === "truth-press") {
-    ctx.rotate(-0.12); ctx.strokeRect(0, 30, 190, 120); ctx.font = "700 31px Arial"; ctx.fillStyle = accent; ctx.fillText("VERIFIED", 17, 102);
-  } else if (gameId === "mill-master") {
-    ctx.beginPath(); ctx.moveTo(0, 180); ctx.lineTo(0, 70); ctx.lineTo(55, 110); ctx.lineTo(55, 65); ctx.lineTo(115, 110); ctx.lineTo(115, 45); ctx.lineTo(190, 105); ctx.lineTo(190, 180); ctx.closePath(); ctx.stroke();
-  } else if (gameId === "hidden-paper") {
-    ctx.beginPath(); ctx.arc(70, 80, 62, 0, Math.PI * 2); ctx.moveTo(112, 125); ctx.lineTo(190, 205); ctx.stroke();
-  } else {
-    ctx.font = "700 52px monospace"; ctx.fillStyle = `${accent}77`; ctx.fillText("FIBRE", 0, 70); ctx.fillText("PAPER", 20, 125); ctx.fillText("MILLS", 0, 180);
-  }
-  ctx.restore();
-}
+  ctx.globalAlpha = reveal;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
 
-function drawPaperTexture(ctx: CanvasRenderingContext2D, ink: string) {
-  ctx.save();
-  ctx.globalAlpha = 0.025;
-  ctx.strokeStyle = ink;
-  for (let y = 78; y < 1010; y += 18) {
+  if (gameId === "grow-or-shred") {
+    const correct = Math.max(0, Number(metrics.correctAnswers) || 0);
+    const total = 8;
+    const share = Math.min(1, correct / total);
+    const baseX = 806;
+    const baseY = 872;
+    let seed = 1337;
+    const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+
+    const leaf = (x: number, y: number, angle: number, size: number, tone: number) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.scale(size, size * 0.64);
+      ctx.fillStyle = tone % 3 === 0 ? deep : tone % 2 === 0 ? accent : "#4b744c";
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(-9, -8, -12, -22, 0, -32);
+      ctx.bezierCurveTo(13, -22, 11, -8, 0, 0);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    const limb = (x: number, y: number, length: number, angle: number, width: number, depth: number) => {
+      if (depth <= 0 || length < 9) return;
+      const ex = x + Math.cos(angle) * length;
+      const ey = y + Math.sin(angle) * length;
+      ctx.strokeStyle = "#6b4a30";
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + Math.cos(angle) * length * 0.5 + (rnd() - 0.5) * 14, y + Math.sin(angle) * length * 0.5, ex, ey);
+      ctx.stroke();
+
+      // Leaves run the length of the limb, not only at its tip.
+      if (depth <= 3 && correct > 0) {
+        const count = Math.round(1 + share * 4);
+        for (let i = 0; i < count; i += 1) {
+          const t = 0.3 + (i / Math.max(1, count)) * 0.7;
+          const px = x + (ex - x) * t;
+          const py = y + (ey - y) * t;
+          const spin = angle + (rnd() - 0.5) * 1.7;
+          leaf(px + Math.cos(spin) * 5, py + Math.sin(spin) * 4, spin, 0.75 + rnd() * 0.5, i + depth);
+        }
+      }
+      const branches = depth > 3 ? 2 : rnd() > 0.45 ? 3 : 2;
+      for (let b = 0; b < branches; b += 1) {
+        const spread = branches === 2 ? (b === 0 ? -0.46 : 0.46) : (b - 1) * 0.42;
+        limb(ex, ey, length * (0.7 + rnd() * 0.06), angle + spread + (rnd() - 0.5) * 0.18, Math.max(1.6, width * 0.68), depth - 1);
+      }
+    };
+
+    // Depth follows the share of correct answers, so a perfect round fills out.
+    // A weak round still draws a real tree, a perfect one fills the column.
+    limb(baseX, baseY, 164, -Math.PI / 2, 21, Math.max(2, Math.round(2 + share * 4)));
+    ctx.strokeStyle = `${deep}44`;
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(78, y);
-    ctx.bezierCurveTo(300, y - 3, 700, y + 5, 1002, y);
+    ctx.moveTo(baseX - 86, baseY + 2);
+    ctx.quadraticCurveTo(baseX, baseY + 12, baseX + 86, baseY + 2);
     ctx.stroke();
+  } else if (gameId === "truth-press") {
+    // A verdict struck onto a stack of claim slips.
+    const checked = Math.max(0, Number(metrics.correctClaims) || 0);
+    const reviewed = Math.max(1, Number(metrics.claimsReviewed) || 1);
+    // How many slips were judged right, shown as marked edges rather than a
+    // caption, since the message below the score already states the count.
+    const marked = Math.round((checked / reviewed) * 5);
+    for (let i = 4; i >= 0; i -= 1) {
+      ctx.save();
+      ctx.translate(708 + i * 9, 356 + i * 46);
+      ctx.rotate((i % 2 ? 1 : -1) * 0.025);
+      ctx.fillStyle = i === 0 ? "#fffdf8" : "#f1ebdd";
+      ctx.strokeStyle = `${deep}33`;
+      ctx.lineWidth = 2;
+      ctx.fillRect(0, 0, 232, 128);
+      ctx.strokeRect(0, 0, 232, 128);
+      ctx.fillStyle = `${deep}2a`;
+      for (let line = 0; line < 3; line += 1) ctx.fillRect(22, 36 + line * 24, 188 - line * 52, 5);
+      if (4 - i < marked) {
+        ctx.fillStyle = accent;
+        ctx.fillRect(0, 0, 7, 128);
+      }
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.translate(762, 448);
+    ctx.rotate(-0.17);
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 6;
+    ctx.strokeRect(-104, -46, 208, 92);
+    ctx.fillStyle = accent;
+    ctx.font = `600 38px ${MONO}`;
+    ctx.textAlign = "center";
+    ctx.fillText("VERDICT", 0, 14);
+    ctx.textAlign = "left";
+    ctx.restore();
+  } else if (gameId === "mill-master") {
+    // The production line, drawn as the eight stages in order.
+    const placed = Math.max(1, Math.round(scoreShare * 8));
+    ctx.strokeStyle = `${deep}33`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(676, 300);
+    ctx.lineTo(676, 836);
+    ctx.stroke();
+    for (let i = 0; i < 8; i += 1) {
+      const y = 316 + i * 74;
+      const on = i < placed;
+      ctx.fillStyle = on ? accent : `${deep}22`;
+      ctx.beginPath();
+      ctx.arc(676, y, on ? 15 : 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = on ? accent : `${deep}33`;
+      ctx.lineWidth = on ? 5 : 3;
+      ctx.beginPath();
+      ctx.moveTo(704, y);
+      ctx.lineTo(704 + (on ? 180 : 96), y);
+      ctx.stroke();
+      ctx.fillStyle = MUTED;
+      ctx.font = `500 19px ${MONO}`;
+      ctx.fillText(String(i + 1).padStart(2, "0"), 900 + (on ? 0 : -84), y + 7);
+    }
+  } else if (gameId === "hidden-paper") {
+    // Objects found, under the lens.
+    const found = Math.max(0, Number(metrics.identified) || 0);
+    for (let i = 0; i < 4; i += 1) {
+      const x = 668 + (i % 2) * 168;
+      const y = 326 + Math.floor(i / 2) * 168;
+      ctx.strokeStyle = i < Math.min(4, found) ? accent : `${deep}26`;
+      ctx.lineWidth = i < Math.min(4, found) ? 5 : 3;
+      ctx.strokeRect(x, y, 134, 134);
+      if (i < Math.min(4, found)) {
+        ctx.fillStyle = `${accent}1f`;
+        ctx.fillRect(x, y, 134, 134);
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.moveTo(x + 36, y + 70);
+        ctx.lineTo(x + 60, y + 94);
+        ctx.lineTo(x + 100, y + 42);
+        ctx.stroke();
+      }
+    }
+    ctx.strokeStyle = deep;
+    ctx.lineWidth = 9;
+    ctx.beginPath();
+    ctx.arc(836, 700, 62, 0, Math.PI * 2);
+    ctx.moveTo(880, 744);
+    ctx.lineTo(948, 812);
+    ctx.stroke();
+  } else {
+    // The grid, with the words that were found struck through.
+    const hidden = Math.max(1, Number(metrics.wordsHidden) || 1);
+    const found = Math.round(Math.min(1, (Number(metrics.wordsFound) || 0) / hidden) * 6);
+    const letters = "PULPFIBREMILLREAMSHEETKRAFTGRAINDECKLE";
+    ctx.font = `600 27px ${MONO}`;
+    for (let row = 0; row < 6; row += 1) {
+      for (let col = 0; col < 6; col += 1) {
+        const lit = row < found;
+        ctx.fillStyle = lit ? deep : `${deep}30`;
+        ctx.fillText(letters[(row * 6 + col) % letters.length], 668 + col * 52, 336 + row * 56);
+      }
+      if (row < found) {
+        ctx.strokeStyle = `${accent}cc`;
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(660, 328 + row * 56 - 9);
+        ctx.lineTo(668 + 5 * 52 + 26, 328 + row * 56 - 9);
+        ctx.stroke();
+      }
+    }
   }
   ctx.restore();
 }
