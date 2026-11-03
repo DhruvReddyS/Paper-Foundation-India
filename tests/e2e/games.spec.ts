@@ -192,7 +192,11 @@ test.describe("games play to completion", () => {
 
     const result = await readResult(page);
     assertSaneResult(result, "Hidden Paper");
-    expect(seen.size, "an object was skipped").toBeGreaterThanOrEqual(5);
+    // Derived from the game's own counter ("Mystery 2 / 4") rather than
+    // hardcoded, so changing the round size does not silently weaken this.
+    const roundLength = Number([...seen][0]?.match(/\/\s*(\d+)/)?.[1] ?? 0);
+    expect(roundLength, "could not read the round length from the clue console").toBeGreaterThan(0);
+    expect(seen.size, "an object was skipped").toBe(roundLength);
     // Cycling through every option must solve each object without giving up.
     expect(reveals, "an object could not be solved from its own option list").toBe(0);
     expect(errors).toEqual([]);

@@ -8,11 +8,22 @@ import { GameFrame, GameIntro, ResultPanel, shuffleItems, useGameConfiguration, 
 import { playGameSound } from "./gameAudio";
 import { hiddenProducts, type HiddenProduct } from "./gameData";
 
-/** Objects dealt per round, drawn fresh from the full pool each time. */
-const ROUND_SIZE = 5;
+/**
+ * Objects dealt per round.
+ *
+ * The pool is small, because every object needs a photograph that is ours to
+ * use, so four per round rather than five already cuts how much of it any one
+ * play reveals. dealRound then puts the objects that were not used last time
+ * first, so a second play leads with things the player has not just seen
+ * instead of reshuffling the same handful.
+ */
+const ROUND_SIZE = 4;
 
-function dealRound(pool: readonly HiddenProduct[]) {
-  return shuffleItems(pool).slice(0, Math.min(ROUND_SIZE, pool.length));
+function dealRound(pool: readonly HiddenProduct[], previous: readonly HiddenProduct[] = []) {
+  const seen = new Set(previous.map(item => item.name));
+  const unseen = shuffleItems(pool.filter(item => !seen.has(item.name)));
+  const repeats = shuffleItems(pool.filter(item => seen.has(item.name)));
+  return [...unseen, ...repeats].slice(0, Math.min(ROUND_SIZE, pool.length));
 }
 
 export default function HiddenPaperGame() {
@@ -38,7 +49,7 @@ export default function HiddenPaperGame() {
   const availablePoints = Math.max(20, 120 - (clues - 1) * 20 - wrong * 15);
   useEffect(() => {
     const configured = configuration?.content?.products;
-    if (phase === "intro" && Array.isArray(configured) && configured.length) setProducts(dealRound(configured as HiddenProduct[]));
+    if (phase === "intro" && Array.isArray(configured) && configured.length) setProducts(previous => dealRound(configured as HiddenProduct[], previous));
   }, [configuration, phase]);
 
   const normalize = (value: string) => value.toLocaleLowerCase().replace(/\s+/g, " ").trim();
@@ -82,7 +93,7 @@ export default function HiddenPaperGame() {
   }
 
   function reset() { const configured = configuration?.content?.products; advancedFrom.current = null; answeredAt.current = null;
-    setPhase("intro"); setIndex(0); setClues(1); setWrong(0); setSolved(false); setRevealed(false); setScore(0); setClueHistory([]); setSolvedCount(0); setProducts(dealRound(Array.isArray(configured) && configured.length ? configured as HiddenProduct[] : hiddenProducts)); resetTimer(); }
+    setPhase("intro"); setIndex(0); setClues(1); setWrong(0); setSolved(false); setRevealed(false); setScore(0); setClueHistory([]); setSolvedCount(0); setProducts(previous => dealRound(Array.isArray(configured) && configured.length ? configured as HiddenProduct[] : hiddenProducts, previous)); resetTimer(); }
   const averageClues = clueHistory.length ? clueHistory.reduce((a, b) => a + b, 0) / clueHistory.length : 0;
   const identifiedEverything = solvedCount === products.length;
   const badge = identifiedEverything && averageClues <= 1.8

@@ -145,8 +145,15 @@ for (const [name, label] of [
   if (!process.env[name]) warning(`${name} is not set, so ${label} will be unavailable.`, `Add ${name} or accept that ${label} stays switched off.`);
 }
 
-if (!process.env.NEXT_PUBLIC_GA_ID) {
-  warning("NEXT_PUBLIC_GA_ID is not set, so no analytics will be collected.", "Add the measurement ID, or leave it unset deliberately.");
+if (process.env.NEXT_PUBLIC_GA_ID) {
+  // Not a blocker, but it deserves a second thought rather than a nudge to
+  // switch it on. The site already measures itself through its own cookieless
+  // pipeline, and this audience includes school students, whom the DPDP rules
+  // protect from behavioural monitoring whatever consent a parent gives.
+  warning(
+    "NEXT_PUBLIC_GA_ID is set, which adds third-party behavioural analytics.",
+    "The admin dashboard already reports readership from the site's own cookieless pipeline. Google Analytics adds cookies, a consent banner and profiling of visitors who may be minors. Remove it unless you have decided you need it."
+  );
 }
 
 for (const key of ["NEXT_PUBLIC_SITE_URL", "NEXTAUTH_URL"]) {

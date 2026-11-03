@@ -137,7 +137,7 @@ export default function MythsExperience({ initialSearch = "" }: { initialSearch?
 
 function MythCase({ item, index }: { item: HandbookCard; index: number }) {
   const [revealed, setRevealed] = useState(false);
-  return <motion.article layout initial={{ opacity: 0, y: 24, rotate: index % 2 ? 1 : -1 }} animate={{ opacity: 1, y: 0, rotate: 0 }} exit={{ opacity: 0, scale: .94 }} transition={{ delay: Math.min(index * .025, .18) }} whileHover={{ y: -7, rotate: index % 2 ? .35 : -.35 }} className={`case-tone-${index % 5 + 1} ${revealed ? "is-revealed" : ""}`}>
+  return <motion.article layout initial={{ opacity: 0, y: 24, rotate: index % 2 ? 1 : -1 }} animate={{ opacity: 1, y: 0, rotate: 0 }} exit={{ opacity: 0, scale: .94 }} transition={{ delay: Math.min(index * .025, .18) }} whileHover={{ y: -7, rotate: index % 2 ? .35 : -.35 }} data-myth={item.id} className={`case-tone-${index % 5 + 1} ${revealed ? "is-revealed" : ""}`}>
     <button className="myth-case-trigger" onClick={() => setRevealed(value => !value)} aria-expanded={revealed}>
       <AnimatePresence mode="wait" initial={false}>
         {!revealed ? <motion.div className="myth-card-face myth-card-front" key="myth" initial={{ opacity: 0, rotateX: -8 }} animate={{ opacity: 1, rotateX: 0 }} exit={{ opacity: 0, rotateX: 8 }} transition={{ duration: .22 }}>
