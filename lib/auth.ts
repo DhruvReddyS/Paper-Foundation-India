@@ -6,6 +6,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { AdminUser } from "@/lib/models/AdminUser";
 import { decryptMfaSecret, normalizeRecoveryCode, verifyTotp } from "@/lib/mfa";
+import { consumeRateLimit } from "@/lib/rate-limit";
 
 export function adminAuthConfigured() {
   return Boolean(process.env.MONGODB_URI && process.env.NEXTAUTH_SECRET);
@@ -49,9 +50,19 @@ export const authOptions: NextAuthOptions = {
       password: { label: "Password", type: "password" },
       otp: { label: "Authenticator or recovery code", type: "text" },
     },
-    async authorize(credentials) {
+    async authorize(credentials, request) {
       const parsed = loginSchema.safeParse(credentials);
       if (!parsed.success || !adminAuthConfigured()) return null;
+
+      // The per-account lockout below stops repeated guesses at one user ID,
+      // but it does nothing about guesses spread thinly across many of them,
+      // because no single account ever reaches five failures. Limit the
+      // source as well as the account.
+      const headers = (request?.headers ?? {}) as Record<string, string | undefined>;
+      const source = headers["x-forwarded-for"]?.split(",")[0]?.trim() || headers["x-real-ip"] || "unknown";
+      const { limited } = await consumeRateLimit(source, "admin-signin", 10, 10 * 60_000);
+      if (limited) throw new Error("TOO_MANY_ATTEMPTS");
+
       await connectDB();
       const { username, password } = parsed.data;
       let admin = await AdminUser.findOne({ username }).select("+passwordHash +failedAttempts +lockedUntil +sessionVersion +mfaSecretEncrypted +recoveryCodeHashes");

@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 
-export function AdminLoginAction({ preview }: { preview: boolean }) {
+export function AdminLoginAction({ preview, callbackUrl }: { preview: boolean; callbackUrl: string }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -19,18 +19,20 @@ export function AdminLoginAction({ preview }: { preview: boolean }) {
   const [error, setError] = useState("");
 
   if (preview) {
-    return <Link className="admin-signin-submit" href="/admin">Enter the admin workspace</Link>;
+    return <Link className="admin-signin-submit" href={callbackUrl}>Enter the admin workspace</Link>;
   }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setWorking(true);
     setError("");
-    const result = await signIn("credentials", { username, password, otp, redirect: false, callbackUrl: "/admin" });
+    const result = await signIn("credentials", { username, password, otp, redirect: false, callbackUrl });
     setWorking(false);
     if (!result?.ok) {
       if (result?.error === "ACCOUNT_LOCKED") {
-        setError("Too many failed attempts. Try again in 15 minutes.");
+        setError("Too many failed attempts on this account. Try again in 15 minutes.");
+      } else if (result?.error === "TOO_MANY_ATTEMPTS") {
+        setError("Too many sign-in attempts from this network. Wait a few minutes and try again.");
       } else if (result?.error === "MFA_REQUIRED") {
         setCodeVisible(true);
         setError("This account needs the code from your authenticator app.");
@@ -42,11 +44,11 @@ export function AdminLoginAction({ preview }: { preview: boolean }) {
       }
       return;
     }
-    // Deliberately relative, not result.url. NextAuth builds that from
-    // NEXTAUTH_URL, so a mismatch between it and the origin actually being
-    // served sends a successfully authenticated administrator to another
-    // host. The credentials flow always ends on this origin's /admin.
-    window.location.assign("/admin");
+    // Deliberately the server-validated relative path, not result.url.
+    // NextAuth builds that from NEXTAUTH_URL, so a mismatch between it and
+    // the origin actually being served sends a successfully authenticated
+    // administrator to another host.
+    window.location.assign(callbackUrl);
   }
 
   return (

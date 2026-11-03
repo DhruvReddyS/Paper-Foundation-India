@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowLeft } from "@/components/paper-ui/icons";
 import { AdminLoginAction } from "@/components/admin/AdminLoginAction";
+import { currentAdmin } from "@/lib/api-auth";
 import { adminPreviewEnabled } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -42,8 +44,39 @@ function SheetWatermark() {
   );
 }
 
-export default function AdminLogin() {
+/**
+ * The middleware puts the page you were trying to reach in callbackUrl. It is
+ * attacker-controllable, so only an in-admin path is honoured: a value like
+ * "//example.com" or "/\example.com" is a URL the browser will happily treat
+ * as another origin.
+ */
+function safeCallback(value: string | string[] | undefined) {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw || raw.includes("\\") || raw.startsWith("//")) return null;
+  return raw === "/admin" || raw.startsWith("/admin/") ? raw : null;
+}
+
+function noticeFor(params: Record<string, string | string[] | undefined>, callback: string | null) {
+  if (params.setup === "required") return "Finish configuring the database and admin secret before signing in.";
+  if (params.error === "SessionRequired") return "That session has ended. Sign in again to continue.";
+  if (callback && callback !== "/admin") return `Sign in to continue to ${callback}.`;
+  return null;
+}
+
+export default async function AdminLogin({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const callback = safeCallback(params.callbackUrl);
   const preview = adminPreviewEnabled();
+
+  // Someone already signed in has no business being shown the form again.
+  if (!preview && await currentAdmin()) redirect(callback ?? "/admin");
+
+  const notice = noticeFor(params, callback);
+
   return (
     <main className="admin-signin">
       <div className="admin-signin-sheet">
@@ -69,7 +102,9 @@ export default function AdminLogin() {
             : "Enter your administrator ID and password."}
         </p>
 
-        <AdminLoginAction preview={preview} />
+        {notice && <p className="admin-signin-notice">{notice}</p>}
+
+        <AdminLoginAction preview={preview} callbackUrl={callback ?? "/admin"} />
 
         <div className="admin-signin-foot">
           <Link href="/"><ArrowLeft /><span>Back to website</span></Link>
