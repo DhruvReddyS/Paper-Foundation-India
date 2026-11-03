@@ -1,57 +1,81 @@
-import { ArrowLeft, BarChart3, FileCheck2, LayoutDashboard, ShieldCheck } from "@/components/paper-ui/icons";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowLeft } from "@/components/paper-ui/icons";
 import { AdminLoginAction } from "@/components/admin/AdminLoginAction";
 import { adminPreviewEnabled } from "@/lib/auth";
 
-const workspaceAreas = [
-  { icon: FileCheck2, title: "Publish content", copy: "Articles, myths, resources and research notes." },
-  { icon: LayoutDashboard, title: "Shape the website", copy: "Homepage order, games, navigation and public pages." },
-  { icon: BarChart3, title: "Read the insights", copy: "Article readership, interactions and game performance." },
-];
+export const metadata: Metadata = {
+  title: "Sign in",
+  robots: { index: false, follow: false },
+};
+
+/**
+ * A sheet of mill letterhead on a desk, rather than a card in the middle of a
+ * page. The form stays the only thing you can act on: the paper character is
+ * carried by the sheet itself (laid and chain lines, a watermark, a deckle
+ * edge) so nothing competes with the two fields.
+ *
+ * A watermark is also the honest metaphor for this screen, being the mark a
+ * mill presses into a sheet to prove it is genuine.
+ */
+function SheetWatermark() {
+  return (
+    <svg className="admin-signin-watermark" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+      <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" strokeWidth="1.4" />
+      <circle cx="60" cy="60" r="46" fill="none" stroke="currentColor" strokeWidth="0.6" />
+      {/* Chain lines, as they fall across a sheet held to the light. */}
+      {[30, 45, 60, 75, 90].map(x => (
+        <line key={x} x1={x} y1="16" x2={x} y2="104" stroke="currentColor" strokeWidth="0.5" opacity="0.5" />
+      ))}
+      {/* A single leaf, echoing the Foundation's mark. */}
+      <path
+        d="M60 30c14 9 21 20 21 32 0 13-9 22-21 26-12-4-21-13-21-26 0-12 7-23 21-32Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path d="M60 36v48" stroke="currentColor" strokeWidth="1" />
+      <path d="M60 52l11-8M60 52L49 44M60 66l13-9M60 66l-13-9M60 78l11-8M60 78L49 70" stroke="currentColor" strokeWidth="0.8" />
+    </svg>
+  );
+}
 
 export default function AdminLogin() {
   const preview = adminPreviewEnabled();
   return (
-    <main className="admin-login admin-login-modern">
-      <section className="admin-login-modern-copy">
-        <header>
-          <Link href="/"><ArrowLeft /><span>Back to website</span></Link>
-          <div className="admin-login-modern-brand">
+    <main className="admin-signin">
+      <div className="admin-signin-sheet">
+        <SheetWatermark />
+
+        <header className="admin-signin-head">
+          <div className="admin-signin-brand">
             <Image src="/images/brand/paper-foundation-nav-logo.png" alt="" width={42} height={50} priority />
-            <span><strong>Paper Foundation India</strong><small>Administration</small></span>
+            <span>
+              <strong>Paper Foundation India</strong>
+              <small>Administration</small>
+            </span>
           </div>
+          <p className="admin-signin-ref">FORM 01<br />ACCESS</p>
         </header>
 
-        <div className="admin-login-modern-intro">
-          <p>SECURE ADMIN PORTAL</p>
-          <h1>Manage the website with clarity.</h1>
-          <span>{preview ? "Preview mode is ready. Enter the complete workspace without authentication." : "Use your Paper Foundation India administrator ID and password."}</span>
-          <AdminLoginAction preview={preview} />
-          <div className="admin-login-modern-access">
-            <ShieldCheck />
-            <span><strong>{preview ? "Local preview access" : "Restricted access"}</strong><small>{preview ? "Credential authentication activates when MongoDB and the admin secret are configured." : "Passwords are salted and hashed; repeated failed attempts are temporarily locked."}</small></span>
-          </div>
-        </div>
+        <div className="admin-signin-rule" />
 
-        <footer>Paper Foundation India · Internal workspace</footer>
-      </section>
+        <h1>Sign in</h1>
+        <p className="admin-signin-lede">
+          {preview
+            ? "Preview mode is active on this machine, so no credentials are needed."
+            : "Enter your administrator ID and password."}
+        </p>
 
-      <aside className="admin-login-modern-aside">
-        <div>
-          <p>ADMIN WORKSPACE</p>
-          <h2>One calm place to run every public touchpoint.</h2>
-          <ul>
-            {workspaceAreas.map(({ icon: Icon, title, copy }) => (
-              <li key={title}>
-                <Icon />
-                <span><strong>{title}</strong><small>{copy}</small></span>
-              </li>
-            ))}
-          </ul>
-          <footer><i /> {preview ? "Complete admin preview is active" : "Protected by hashed credentials and secure sessions"}</footer>
+        <AdminLoginAction preview={preview} />
+
+        <div className="admin-signin-foot">
+          <Link href="/"><ArrowLeft /><span>Back to website</span></Link>
+          <small>INTERNAL</small>
         </div>
-      </aside>
+      </div>
     </main>
   );
 }

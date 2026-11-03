@@ -13,6 +13,7 @@
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build",
     "bundle:godaddy": "node scripts/package-godaddy.mjs",
     "preflight": "tsx scripts/preflight.ts",
+    "admin:credentials": "tsx scripts/set-admin-credentials.ts",
     "typecheck": "tsc --noEmit",
     "verify:deploy": "npm run verify && npm run preflight && npm run cms:check",
     "test:e2e": "playwright test",
