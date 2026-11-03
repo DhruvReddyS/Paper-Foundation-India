@@ -1,3 +1,20 @@
+/* Typefaces, served from this site.
+   next/font/google downloads these while the site is being built, which makes
+   every build depend on reaching Google and fails the whole build when that
+   request does not come back. Declaring them here removes that dependency,
+   stops a reader's browser contacting a third party, and keeps the family
+   names literal, which the share-card canvas needs in order to ask for them
+   by name. All three are under the SIL Open Font License; see
+   public/fonts/LICENSE.md. */
+@font-face{font-family:"Fraunces";src:url("/fonts/fraunces.woff2") format("woff2");font-weight:400 800;font-style:normal;font-display:swap}
+@font-face{font-family:"Fraunces";src:url("/fonts/fraunces-italic.woff2") format("woff2");font-weight:400 800;font-style:italic;font-display:swap}
+@font-face{font-family:"DM Sans";src:url("/fonts/dm-sans.woff2") format("woff2");font-weight:400 700;font-style:normal;font-display:swap}
+@font-face{font-family:"DM Sans";src:url("/fonts/dm-sans-italic.woff2") format("woff2");font-weight:400 700;font-style:italic;font-display:swap}
+@font-face{font-family:"DM Mono";src:url("/fonts/dm-mono-300.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"DM Mono";src:url("/fonts/dm-mono-400.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"DM Mono";src:url("/fonts/dm-mono-500.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+:root{--font-fraunces:"Fraunces";--font-dm-sans:"DM Sans";--font-dm-mono:"DM Mono"}
+
 @import "./experience-upgrades.css";
 @import "./editorial-redesign.css";
 @import "./india-investigation.css";

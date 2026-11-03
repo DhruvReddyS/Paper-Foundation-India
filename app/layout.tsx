@@ -1,29 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Mono, DM_Sans, Fraunces } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import "./games-rework.css";
 import "./transitions.css";
 import "./editorial-polish.css";
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-dm-sans",
-});
-
-const dmMono = DM_Mono({
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  variable: "--font-dm-mono",
-});
 
 const DEFAULT_OG_IMAGE = "/images/brand/og-default.png";
 
@@ -88,7 +68,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${fraunces.variable} ${dmSans.variable} ${dmMono.variable} min-h-screen bg-paper-white text-charcoal font-sans antialiased`}
+        className="min-h-screen bg-paper-white text-charcoal font-sans antialiased"
       >
         {children}
         {gaId && <>
