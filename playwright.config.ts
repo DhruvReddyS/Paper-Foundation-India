@@ -13,7 +13,12 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
-  workers: 4,
+  // The suite grew past two hundred tests, and they all share one Node
+  // process serving the build. At four workers the server became the
+  // bottleneck and tests began failing on timing rather than on faults, with
+  // a different handful failing each run. Retries would have hidden that;
+  // fewer workers removes the cause.
+  workers: 2,
   retries: 0,
   reporter: [["list", { printSteps: false }]],
   timeout: 45_000,

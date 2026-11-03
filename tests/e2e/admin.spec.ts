@@ -31,7 +31,33 @@ const ADMIN_ROUTES = [
   "/admin/security",
 ];
 
-const signedIn = process.env.ADMIN_E2E === "1";
+/**
+ * The signed-in checks sign in the way an administrator does, against the
+ * build under test, rather than relying on the development preview bypass
+ * which a production build refuses outright. Give them an account and they
+ * run; leave the variables unset and they skip.
+ */
+const ADMIN_USER = process.env.ADMIN_E2E_USER || "";
+const ADMIN_PASSWORD = process.env.ADMIN_E2E_PASSWORD || "";
+const signedIn = Boolean(ADMIN_USER && ADMIN_PASSWORD);
+
+/**
+ * Signed in once for the whole file, then replayed as cookies.
+ *
+ * Signing in per test would send twenty-odd attempts from one address in a
+ * couple of minutes, which is exactly what the sign-in rate limit exists to
+ * stop. The limiter is right; the suite was wrong to hammer it.
+ */
+let sessionCookies: Awaited<ReturnType<import("@playwright/test").BrowserContext["cookies"]>> = [];
+
+async function signIn(page: Page) {
+  await page.goto("/admin/login", { waitUntil: "domcontentloaded" });
+  if (!page.url().includes("/admin/login")) return;
+  await page.getByPlaceholder("Your administrator ID").fill(ADMIN_USER);
+  await page.locator('input[type="password"]').fill(ADMIN_PASSWORD);
+  await page.locator("form button[type=submit], form .admin-signin-submit").first().click();
+  await page.waitForURL((url) => !url.pathname.includes("/admin/login"), { timeout: 20_000 });
+}
 
 test.describe("admin access control", () => {
   test.skip(signedIn, "preview mode is on, so these routes are deliberately open");
@@ -60,6 +86,18 @@ test.describe("admin access control", () => {
 async function assertNoFaults(page: Page, route: string, errors: string[]) {
   const body = await page.locator("body").innerText();
   expect(body.length, `${route} rendered almost nothing`).toBeGreaterThan(40);
+
+  // The sidebar alone is about 340 characters, so a screen stuck on its
+  // loading state still passes a crude length check. Insist the workspace
+  // itself arrived.
+  await expect(
+    page.locator(".admin-loading-state"),
+    `${route} is still showing "Preparing the workspace…"`
+  ).toHaveCount(0);
+  await expect(
+    page.locator(".admin-workspace-heading, .admin-page-heading, .admin-panel, .admin-data-list").first(),
+    `${route} never rendered any workspace content`
+  ).toBeVisible();
   expect(body, `${route} shows an error boundary`).not.toMatch(/Application error|Something went wrong/i);
   expect(errors, `${route} logged console errors`).toEqual([]);
 
@@ -71,7 +109,19 @@ async function assertNoFaults(page: Page, route: string, errors: string[]) {
 }
 
 test.describe("admin workspace", () => {
-  test.skip(!signedIn, "set ADMIN_E2E=1 with preview mode enabled to run these");
+  test.skip(!signedIn, "set ADMIN_E2E_USER and ADMIN_E2E_PASSWORD to run these");
+
+  test.beforeAll(async ({ browser }) => {
+    const context = await browser.newContext({ baseURL: process.env.E2E_BASE_URL || "http://localhost:3100" });
+    const page = await context.newPage();
+    await signIn(page);
+    sessionCookies = await context.cookies();
+    await context.close();
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await page.context().addCookies(sessionCookies);
+  });
 
   for (const route of ADMIN_ROUTES) {
     test(`${route} loads cleanly`, async ({ page }) => {
