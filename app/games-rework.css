@@ -3235,7 +3235,7 @@
 
 @media (max-width: 800px) {
   .game-rework .game-session-live { gap:.35rem; }
-  .game-rework .game-sound-toggle { width:36px;height:36px; }
+  .game-rework .game-sound-toggle { width:44px;height:44px; }
   .game-rework .knowledge-tree canvas { height:320px; }
   .press-machine { min-height:520px; }
 }

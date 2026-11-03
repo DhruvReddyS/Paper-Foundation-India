@@ -199,7 +199,7 @@
 .site-menu-link-arrow { width:14px; color:var(--menu-detail); opacity:0; transform:translateX(-5px); transition:opacity .16s,transform .16s; }.site-menu-link:hover .site-menu-link-arrow { opacity:1; transform:none; }
 .site-nav-actions { min-width:0;display:flex;flex:none;align-items:center;justify-self:end;gap:.55rem; }
 .site-nav-quick{flex:none;align-items:center;gap:.35rem}.site-nav-quick a{height:42px;flex:none;display:flex;align-items:center;gap:.38rem;padding:0 .68rem;border:1px solid rgba(45,95,62,.2);color:#294733;font-size:.62rem;font-weight:700;white-space:nowrap;transition:background .2s,color .2s,transform .2s,box-shadow .2s}.site-nav-quick svg{width:14px;flex:none}.site-nav-quick a:hover{transform:translateY(-2px);box-shadow:4px 5px 0 rgba(45,95,62,.1)}.site-nav-join{min-width:86px;color:#fff!important;background:#315e40}.site-nav-contact{min-width:88px}.site-nav-contact:hover{background:#eee5d4}
-.site-search,.site-menu-toggle { width:36px; height:36px; display:grid; place-items:center; border:0; color:var(--nav-strong); background:transparent; transition:background .18s,transform .18s; }
+.site-search,.site-menu-toggle { width:44px; height:44px; display:grid; place-items:center; border:0; color:var(--nav-strong); background:transparent; transition:background .18s,transform .18s; }
 .site-search:hover,.site-menu-toggle:hover { background:var(--nav-hover); transform:translateY(-2px); }.site-search svg { transition:transform .22s; }.site-search:hover svg { transform:rotate(-12deg) scale(1.06); }
 .site-gooey-search{--background:#faf8f5;--foreground:#294c35;--gooey-search-height:42px;z-index:70;flex:none}.site-gooey-search>div>div:last-child{font-family:var(--font-dm-sans);letter-spacing:0!important}.site-gooey-search [role="option"]{font-family:var(--font-fraunces)}
 .site-desktop-gooey-slot{width:238px;height:42px;flex:none;align-items:center;justify-content:flex-end;position:relative}.site-gooey-search-desktop{position:relative;z-index:78}
@@ -1202,3 +1202,28 @@
 @media(max-width:640px){.article-cover-image{min-height:360px}}
 
 .unsubscribe-page{min-height:80svh;display:grid;place-items:center;padding:4rem 1rem;background:#eee8dc}.unsubscribe-page section{width:min(620px,100%);display:grid;justify-items:start;gap:1rem;padding:clamp(2rem,6vw,5rem);background:#fdfaf4;border:1px solid #d9d2c5}.unsubscribe-page svg{width:42px;height:42px;color:#315e40}.unsubscribe-page section>p:first-of-type{font:600 .55rem/1 var(--font-mono);letter-spacing:.13em;color:#a06c49}.unsubscribe-page h1{font:500 clamp(2.5rem,6vw,5rem)/.92 var(--font-serif);color:#173b29}.unsubscribe-page section>p:not(:first-of-type){color:#68716a;line-height:1.6}.unsubscribe-page button{padding:.9rem 1rem;color:#fff;background:#173b29;font-size:.7rem;font-weight:700}.unsubscribe-page a{color:#315e40;font-size:.65rem;font-weight:700}
+
+/* Comfortable thumb targets on phones and small tablets.
+   Apple and Google both put the comfortable minimum around 44px, and a good
+   deal of this site's filtering, searching and stepping was built at 20 to 38.
+   Scoped to the public pages: the admin has its own layout, and the word
+   search grid keeps its own cell size through [data-cell]. */
+@media (max-width: 820px) {
+  .site-main button:not([data-cell]):not([data-compact]),
+  .site-main select,
+  .site-main textarea,
+  .site-main input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+  .site-main a[class*="button"],
+  .site-main a[class*="Button"] {
+    min-height: 44px;
+  }
+  /* Width matters as much as height for a single letter or an arrow. */
+  .site-main button:not([data-cell]):not([data-compact]) {
+    min-width: 44px;
+  }
+  /* min-height is ignored on a truly inline element, so this reaches links
+     set as blocks, flex or inline-block without touching prose links. */
+  .site-main a {
+    min-height: 44px;
+  }
+}

@@ -22,7 +22,7 @@ export default function SiteLayout({
       <PaperCursor />
       <SiteAnalytics />
       {!immersive && <Nav />}
-      <main className="min-h-screen"><PageTransition>{children}</PageTransition></main>
+      <main className="min-h-screen site-main"><PageTransition>{children}</PageTransition></main>
       {!immersive && <Footer />}
     </>
   );

@@ -27,6 +27,9 @@ export default function JourneySaga() {
   }
 
   return <main className={styles.journey}>
+    {/* The saga has no visible title bar, but the page still needs one
+        heading that names it. Every step below is a section of this. */}
+    <h1 className="sr-only">The Paper Journey: how a sheet is made, used and recovered</h1>
     <nav className={styles.rail} aria-label="Paper journey steps">
       {journeySteps.map(step => <button key={step.id} onClick={() => goTo(step.id)} className={active === step.id ? styles.active : ""} aria-label={`Go to step ${step.id}: ${step.title}`}><span>{String(step.id).padStart(2, "0")}</span><i /></button>)}
     </nav>
@@ -47,7 +50,7 @@ export default function JourneySaga() {
           transition={{ duration: .7, ease: [0.22, 1, 0.36, 1] }}
         >
           <header><span>{String(step.id).padStart(2, "0")}</span><p>{step.phase} / {step.process}</p></header>
-          <h1>{step.title}</h1>
+          <h2>{step.title}</h2>
           <div className={styles.body}>{step.body.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
           <aside><CheckCircle2 /><p>{step.insight}</p></aside>
           <footer>
