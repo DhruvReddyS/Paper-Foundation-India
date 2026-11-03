@@ -77,6 +77,7 @@
 .admin-signin-otp{justify-self:start;margin-top:.1rem;color:#6c766e;font-size:.5rem;font-weight:650;text-decoration:underline;text-underline-offset:3px;transition:color .16s}
 .admin-signin-otp:hover{color:#173b29}
 .admin-signin-caps{color:#8a6a33;font-size:.49rem}
+.admin-analytics-error{margin:0 0 1rem;border-left:2px solid #a13f34;border-radius:0 4px 4px 0;padding:.5rem .7rem;color:#8f3528;background:#fbf0ed;font-size:.54rem;line-height:1.5}
 .admin-signin-notice{margin-top:.8rem;border-left:2px solid #c9b48f;padding:.42rem .6rem;color:#6b5a3c;background:#f7f1e4;font-size:.53rem;line-height:1.5}
 @media(max-width:420px){.admin-signin{padding:.85rem}.admin-signin-watermark{width:118px;height:118px;right:10px;bottom:34px}}
 

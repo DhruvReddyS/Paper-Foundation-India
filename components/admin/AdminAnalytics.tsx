@@ -2,15 +2,43 @@
 
 import { Activity, ArrowRight, BookOpenCheck, Clock3, Eye, Gamepad2, Lightbulb, MousePointer2, RefreshCw, Sparkles, Target } from "@/components/paper-ui/icons";
 import { useCallback, useEffect, useState } from "react";
+import type { AnalyticsReport } from "@/lib/analytics-report";
 
-type Data = { configured: boolean; preview?: boolean; days?: number; totals: Record<string, number>; daily: { _id: string; views: number; interactions: number }[]; topContent: { _id: { type: string; id: string }; interactions: number; averageDuration: number }[] };
-const empty: Data = { configured: false, totals: {}, daily: [], topContent: [] };
+/**
+ * The first view arrives already rendered from the server. This component
+ * only refetches when the range changes or Refresh is pressed, so there is
+ * no window in which the page can show a confident zero for a figure it has
+ * not actually loaded yet. A failed refetch keeps the previous figures on
+ * screen and says so, rather than silently resetting everything to nothing.
+ */
+export default function AdminAnalytics({ initial }: { initial: AnalyticsReport }) {
+  const [days, setDays] = useState(initial.days);
+  const [loadedDays, setLoadedDays] = useState(initial.days);
+  const [data, setData] = useState<AnalyticsReport>(initial);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
-export default function AdminAnalytics() {
-  const [days, setDays] = useState(30);
-  const [data, setData] = useState<Data>(empty);
-  const load = useCallback(async () => { const response = await fetch(`/api/analytics?days=${days}`); setData(await response.json()); }, [days]);
-  useEffect(() => { void load(); }, [load]);
+  const load = useCallback(async (next: number) => {
+    setBusy(true);
+    try {
+      const response = await fetch(`/api/analytics?days=${next}`);
+      if (!response.ok) throw new Error(`The server answered ${response.status}.`);
+      const report = (await response.json()) as AnalyticsReport;
+      if (!report?.totals) throw new Error("The reply did not contain a report.");
+      setData(report);
+      setLoadedDays(next);
+      setError("");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "The figures could not be refreshed.");
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (days !== loadedDays) void load(days);
+  }, [days, loadedDays, load]);
+
   const max = Math.max(...data.daily.map(item => item.views + item.interactions), 1);
   const views = data.totals.page_view ?? 0;
   const opens = data.totals.article_open ?? 0;
@@ -20,7 +48,8 @@ export default function AdminAnalytics() {
   const completionRate = opens ? Math.round((completions / opens) * 100) : 0;
   const averageDuration = data.topContent.length ? Math.round(data.topContent.reduce((sum, item) => sum + (item.averageDuration || 0), 0) / data.topContent.length) : 0;
   return <div>
-    <header className="admin-workspace-heading"><div><p>Audience intelligence</p><h1>Analytics</h1>{data.preview && <span className="admin-preview-badge">DEMONSTRATION DATA</span>}</div><div><select className="admin-action" value={days} onChange={event => setDays(Number(event.target.value))}><option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option></select><button className="admin-action" onClick={() => void load()}><RefreshCw /> Refresh</button></div></header>
+    <header className="admin-workspace-heading"><div><p>Audience intelligence</p><h1>Analytics</h1>{data.preview && <span className="admin-preview-badge">DEMONSTRATION DATA</span>}</div><div><select className="admin-action" value={days} disabled={busy} onChange={event => setDays(Number(event.target.value))}><option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option></select><button className="admin-action" disabled={busy} onClick={() => void load(days)}><RefreshCw /> {busy ? "Loading" : "Refresh"}</button></div></header>
+    {error && <p className="admin-analytics-error" role="alert">{error} The figures below are from the last successful load.</p>}
     <section className="admin-stat-grid"><Metric icon={Eye} label="Page views" value={views} note="All tracked public routes" /><Metric icon={Target} label="Engagement rate" value={`${engagementRate}%`} note="Meaningful actions per page view" /><Metric icon={BookOpenCheck} label="Reading completion" value={`${completionRate}%`} note="Opened articles completed" /><Metric icon={Clock3} label="Average attention" value={`${Math.floor(averageDuration / 60)}m ${averageDuration % 60}s`} note="Across the leading content" /></section>
     <section className="admin-funnel">
       <header><div><p>READER JOURNEY</p><h2>From arrival to deeper action</h2></div><small>Use this to find where interest drops</small></header>
@@ -32,8 +61,8 @@ export default function AdminAnalytics() {
       </div>
     </section>
     <div className="admin-dashboard-grid">
-      <section className="admin-panel"><header><div><p>Traffic rhythm</p><h2>Views and interactions</h2></div></header><div className="admin-chart">{data.daily.length ? data.daily.map(item => <div key={item._id} title={`${item._id}: ${item.views} views, ${item.interactions} interactions`}><i style={{ height: `${Math.max(4, ((item.views + item.interactions) / max) * 100)}%` }} /><span>{item._id.slice(5)}</span></div>) : <div className="admin-empty"><p>Daily activity will appear after MongoDB is connected.</p></div>}</div></section>
-      <section className="admin-panel admin-top-content"><header><div><p>Content ranking</p><h2>Most active content</h2></div></header><div>{data.topContent.length ? data.topContent.map((item, index) => <article key={`${item._id.type}-${item._id.id}`}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{item._id.id.replaceAll("-", " ")}</strong><small><Activity /> {item._id.type} · {Math.round(item.averageDuration || 0)} sec attention</small></div><b>{item.interactions}</b></article>) : <div className="admin-empty"><p>Content rankings will appear after real visits are collected.</p></div>}</div></section>
+      <section className="admin-panel"><header><div><p>Traffic rhythm</p><h2>Views and interactions</h2></div></header><div className="admin-chart">{data.daily.length ? data.daily.map(item => <div key={item._id} title={`${item._id}: ${item.views} views, ${item.interactions} interactions`}><i style={{ height: `${Math.max(4, ((item.views + item.interactions) / max) * 100)}%` }} /><span>{item._id.slice(5)}</span></div>) : <div className="admin-empty"><p>No activity has been recorded in this period.</p></div>}</div></section>
+      <section className="admin-panel admin-top-content"><header><div><p>Content ranking</p><h2>Most active content</h2></div></header><div>{data.topContent.length ? data.topContent.map((item, index) => <article key={`${item._id.type}-${item._id.id}`}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{item._id.id.replaceAll("-", " ")}</strong><small><Activity /> {item._id.type} · {Math.round(item.averageDuration || 0)} sec attention</small></div><b>{item.interactions}</b></article>) : <div className="admin-empty"><p>No content interactions have been recorded in this period.</p></div>}</div></section>
     </div>
     <section className="admin-analysis-notes">
       <header><Sparkles /><div><p>PLAIN LANGUAGE ANALYSIS</p><h2>Three useful readings of the data</h2></div></header>
