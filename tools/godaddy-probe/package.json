@@ -1,0 +1,13 @@
+{
+  "name": "godaddy-outbound-probe",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Checks whether a GoDaddy Node.js Hosting app can reach MongoDB Atlas on 27017 and the HTTPS services this site depends on.",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "build": "node -e \"console.log('No build step; this probe is plain Node.')\"",
+    "start": "node server.mjs"
+  }
+}

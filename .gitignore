@@ -14,3 +14,6 @@ tmp/
 .release/
 test-results/
 playwright-report/
+
+# Build artefact of tools/godaddy-probe
+tools/godaddy-probe.zip
