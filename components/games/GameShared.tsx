@@ -790,14 +790,33 @@ export async function buildScoreAnimation(options: CanvasOptions, seconds = 3.2)
   recorder.start();
   const startedAt = performance.now();
   await new Promise<void>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(watchdog);
+      resolve();
+    };
+
+    /**
+     * Browsers stop serving requestAnimationFrame to a page that is not
+     * visible, so a viewer who switches tab or app while the card records
+     * would otherwise wait for a promise that never settles, leaving the
+     * share button saying "Preparing" until the page is reloaded. Give the
+     * loop a wall clock as well, and let the caller fall back to the still
+     * image if too little was captured.
+     */
+    const watchdog = window.setTimeout(finish, seconds * 1000 + 2500);
+
     function frame(now: number) {
+      if (settled) return;
       const elapsed = (now - startedAt) / 1000;
       // Hold on the finished card for the last part, so a looping preview
       // rests on the score rather than snapping back.
       const progress = Math.min(1, elapsed / (seconds * 0.72));
       void drawScoreFrame(ctx!, options, progress, logo);
       if (elapsed < seconds) requestAnimationFrame(frame);
-      else resolve();
+      else finish();
     }
     requestAnimationFrame(frame);
   });
@@ -1067,27 +1086,46 @@ function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accen
 }
 
 
+/**
+ * Wraps to `maxWidth`, and stops after `maxLines`.
+ *
+ * Without a limit a longer message than any game currently produces would
+ * simply keep drawing down the sheet and through the footer rule, which is
+ * the kind of fault nobody sees until an editor lengthens a line in the CMS.
+ */
 function wrapCanvasText(
   ctx: CanvasRenderingContext2D,
   text: string,
   x: number,
   y: number,
   maxWidth: number,
-  lineHeight: number
+  lineHeight: number,
+  maxLines = 4
 ) {
   const words = text.split(" ");
+  const lines: string[] = [];
   let line = "";
   for (const word of words) {
-    const test = `${line}${word} `;
+    const test = line ? `${line} ${word}` : word;
     if (ctx.measureText(test).width > maxWidth && line) {
-      ctx.fillText(line, x, y);
-      line = `${word} `;
-      y += lineHeight;
+      lines.push(line);
+      line = word;
+      if (lines.length === maxLines) break;
     } else {
       line = test;
     }
   }
-  ctx.fillText(line, x, y);
+  if (lines.length < maxLines && line) lines.push(line);
+
+  const overflowed = lines.length === maxLines && ctx.measureText(lines[maxLines - 1]).width > maxWidth;
+  lines.forEach((entry, index) => {
+    let drawn = entry;
+    if (index === maxLines - 1 && overflowed) {
+      while (drawn.length > 1 && ctx.measureText(`${drawn}...`).width > maxWidth) drawn = drawn.slice(0, -1);
+      drawn = `${drawn}...`;
+    }
+    ctx.fillText(drawn, x, y + index * lineHeight);
+  });
 }
 
 export function formatTime(seconds: number) {
