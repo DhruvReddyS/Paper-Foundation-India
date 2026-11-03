@@ -642,7 +642,7 @@ async function drawScoreFrame(
   setSpacing("0px");
   ctx.fillStyle = MUTED;
   ctx.font = `500 23px ${SANS}`;
-  ctx.fillText("Evidence for how India really uses paper", 182, 170);
+  ctx.fillText("Love Paper use Paper without Hesitation", 182, 170);
 
   ctx.textAlign = "right";
   ctx.fillStyle = MUTED;
@@ -989,25 +989,52 @@ function drawGameCanvasMark(ctx: CanvasRenderingContext2D, gameId: GameId, accen
     ctx.lineTo(948, 812);
     ctx.stroke();
   } else {
-    // The grid, with the words that were found struck through.
+    // A real grid hides words across, down and diagonally, so striking only
+    // across read as wrong. These three words are genuinely placed in those
+    // three directions and each line is struck along its own run.
     const hidden = Math.max(1, Number(metrics.wordsHidden) || 1);
-    const found = Math.round(Math.min(1, (Number(metrics.wordsFound) || 0) / hidden) * 6);
-    const letters = "PULPFIBREMILLREAMSHEETKRAFTGRAINDECKLE";
+    const share = Math.min(1, (Number(metrics.wordsFound) || 0) / hidden);
+    const rows = ["KPULPS", "ADMEFR", "RTBIGN", "ENCOLK", "AFSDTL", "MHEBRY"];
+    const solved = [
+      { from: [1, 0], to: [4, 0] },   // PULP, across
+      { from: [0, 2], to: [0, 5] },   // REAM, down
+      { from: [2, 1], to: [5, 4] },   // MILL, diagonal
+    ];
+    const struck = Math.round(share * solved.length);
+    const cx = (col: number) => 700 + col * 52;
+    const cy = (row: number) => 336 + row * 56;
+
     ctx.font = `600 27px ${MONO}`;
     for (let row = 0; row < 6; row += 1) {
       for (let col = 0; col < 6; col += 1) {
-        const lit = row < found;
-        ctx.fillStyle = lit ? deep : `${deep}30`;
-        ctx.fillText(letters[(row * 6 + col) % letters.length], 668 + col * 52, 336 + row * 56);
+        const inSolved = solved.slice(0, struck).some(({ from, to }) => {
+          const steps = Math.max(Math.abs(to[0] - from[0]), Math.abs(to[1] - from[1]));
+          const dc = Math.sign(to[0] - from[0]);
+          const dr = Math.sign(to[1] - from[1]);
+          for (let i = 0; i <= steps; i += 1) {
+            if (from[0] + dc * i === col && from[1] + dr * i === row) return true;
+          }
+          return false;
+        });
+        ctx.fillStyle = inSolved ? deep : `${deep}38`;
+        ctx.fillText(rows[row][col], cx(col), cy(row));
       }
-      if (row < found) {
-        ctx.strokeStyle = `${accent}cc`;
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(660, 328 + row * 56 - 9);
-        ctx.lineTo(668 + 5 * 52 + 26, 328 + row * 56 - 9);
-        ctx.stroke();
-      }
+    }
+
+    ctx.strokeStyle = `${accent}d0`;
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+    for (const { from, to } of solved.slice(0, struck)) {
+      // Extend along the run's own direction. Offsetting both ends in x left
+      // the vertical strike sitting beside its letters instead of over them.
+      const ax = cx(from[0]) + 9, ay = cy(from[1]) - 9;
+      const bx = cx(to[0]) + 9, by = cy(to[1]) - 9;
+      const span = Math.hypot(bx - ax, by - ay) || 1;
+      const ux = (bx - ax) / span, uy = (by - ay) / span;
+      ctx.beginPath();
+      ctx.moveTo(ax - ux * 18, ay - uy * 18);
+      ctx.lineTo(bx + ux * 18, by + uy * 18);
+      ctx.stroke();
     }
   }
   ctx.restore();
